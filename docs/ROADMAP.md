@@ -10,7 +10,7 @@ VRes se construye por **fases**. Cada fase termina en una versión instalable: c
 | **F3** | Vibrance por driver | v0.3 | ✅ |
 | **F4** | Crosshair | v0.4 | ✅ |
 | **F5** | Looks, Biblioteca, códigos y color avanzado | v0.5 | ✅ |
-| **F6** | Perfiles por juego | v0.6 | 🗓 |
+| **F6** | Perfiles por juego | v0.6 | ✅ |
 | **F7** | Dark Boost y Zoom | v0.7 | 🗓 |
 | **F8** | Monitor (DDC/CI), Personalizar y Más | v0.8 | 🗓 |
 | **F9** | Control desde el celular | v0.9 | 🗓 |
@@ -88,9 +88,13 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 
 ## F6 — Perfiles por juego
 
-- Detección del juego en primer plano sin abrir su proceso
-- Fortnite, VALORANT, CS2, Apex Legends, Rust y Rainbow Six Siege, y cualquier otro juego
-- Cambio automático y restauración exacta al salir; resolución por juego
+- [x] Detección del juego en primer plano por el nombre del ejecutable (foto de la lista de procesos), **sin abrir nunca su proceso**
+- [x] Fortnite, VALORANT, CS2, Apex Legends, Rust y Rainbow Six Siege, y cualquier otro juego (elegido entre los programas abiertos)
+- [x] Look y crosshair del perfil solo con el juego al frente (Alt+Tab vuelve al escritorio); resolución desde que el juego abre hasta que cierra (se vigila cada 3 s)
+- [x] Pestaña Perfiles y aviso en Pantalla cuando un perfil está en uso
+- [x] `vres-cli fg watch`
+- [ ] Código de perfil `VRP1-…` y submenú de perfiles en la bandeja
+- [ ] A ojo: abrir cada juego instalado activa su perfil y Alt+Tab restaura el escritorio, sin parpadeos
 
 ## F7 — Dark Boost y Zoom
 

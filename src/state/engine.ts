@@ -14,6 +14,9 @@ interface EngineStore {
   requested: Requested | null;
   status: EngineStatus | null;
   notices: Notice[];
+  /** Perfil de juego en uso (`null`: el escritorio). */
+  activeProfile: string | null;
+  setActiveProfile: (game: string | null) => void;
   hydrate: (bootstrap: Bootstrap) => void;
   setDisplays: (displays: DisplayInfo[]) => void;
   setRequested: (requested: Requested) => void;
@@ -29,6 +32,8 @@ export const useEngineStore = create<EngineStore>()((set) => ({
   requested: null,
   status: null,
   notices: [],
+  activeProfile: null,
+  setActiveProfile: (activeProfile) => set({ activeProfile }),
   hydrate: (bootstrap) =>
     set({
       ready: true,

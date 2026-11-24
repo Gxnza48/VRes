@@ -35,6 +35,8 @@ pub const EVENT_RESOLUTION: &str = "resolution:changed";
 pub const EVENT_RESOLVED: &str = "resolution:resolved";
 /// Evento: cambiaron los ajustes (por ejemplo, un modo nuevo confirmado).
 pub const EVENT_SETTINGS: &str = "settings:changed";
+/// Evento: cambió el perfil de juego en uso (`null`: el escritorio).
+pub const EVENT_PROFILE: &str = "profile:active";
 
 fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
     mutex
@@ -56,6 +58,7 @@ pub struct EngineState {
     displays: Mutex<Vec<DisplayInfo>>,
     status: Mutex<EngineStatus>,
     resolution: Mutex<ResolutionState>,
+    active_profile: Mutex<Option<String>>,
     notices: Mutex<Vec<Notice>>,
     session_path: Option<PathBuf>,
 }
@@ -111,6 +114,7 @@ impl EngineState {
                     displays: Mutex::new(snapshot.displays),
                     status: Mutex::new(snapshot.status),
                     resolution: Mutex::new(snapshot.resolution),
+                    active_profile: Mutex::new(None),
                     notices: Mutex::new(notices),
                     session_path,
                 }
@@ -124,6 +128,7 @@ impl EngineState {
                     displays: Mutex::new(Vec::new()),
                     status: Mutex::new(EngineStatus::default()),
                     resolution: Mutex::new(ResolutionState::default()),
+                    active_profile: Mutex::new(None),
                     notices: Mutex::new(notices),
                     session_path,
                 }
@@ -157,6 +162,11 @@ impl EngineState {
     /// Modos de cada pantalla y el cambio pendiente, si hay.
     pub fn resolution(&self) -> ResolutionState {
         lock(&self.resolution).clone()
+    }
+
+    /// Perfil de juego en uso (`None`: el escritorio).
+    pub fn active_profile(&self) -> Option<String> {
+        lock(&self.active_profile).clone()
     }
 
     /// Avisos pendientes para la interfaz (se vacían al leerlos).
@@ -325,6 +335,11 @@ fn on_engine_event(app: &AppHandle, event: EngineEvent) {
         }
         EngineEvent::Log(detail) => {
             tracing::warn!(%detail, "motor");
+        }
+        EngineEvent::Profile(active) => {
+            tracing::info!(profile = ?active, "perfil de juego");
+            *lock(&state.active_profile) = active.clone();
+            let _ = app.emit(EVENT_PROFILE, active);
         }
     }
 }

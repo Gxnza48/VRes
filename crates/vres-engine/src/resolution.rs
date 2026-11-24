@@ -79,6 +79,8 @@ enum Purpose {
     Try { token: String, seconds: u32 },
     /// Alternar con el atajo a un modo confirmado.
     ToggleOn,
+    /// Un perfil de juego pide un modo confirmado (sin tonos).
+    Profile,
     /// Volver al modo anterior del pendiente (pedido o vencido).
     RevertPending { expired: bool },
     /// Volver a la resolución de Windows.
@@ -334,6 +336,29 @@ impl ResolutionManager {
         Ok(self.launch(display, job, Purpose::ToggleOn))
     }
 
+    /// Un perfil de juego pide un modo ya confirmado. `None` si ya está
+    /// aplicado (no hace nada).
+    pub fn start_ensure(
+        &mut self,
+        target: &SavedMode,
+        display: &DisplayInfo,
+        listed: bool,
+    ) -> Result<Option<ModeJob>, ErrorCode> {
+        self.check_free()?;
+        if self.changed.get(&display.id) == Some(&target.mode) {
+            return Ok(None);
+        }
+        if !listed {
+            return Err(ErrorCode::ModeNotSupported);
+        }
+        self.mark_mode_changed(display);
+        let job = ModeJob::Apply {
+            gdi_name: display.gdi_name.clone(),
+            request: target.mode,
+        };
+        Ok(Some(self.launch(display, job, Purpose::Profile)))
+    }
+
     /// Prender o apagar HDR. `None` si ya está así.
     pub fn start_hdr(
         &mut self,
@@ -450,12 +475,15 @@ impl ResolutionManager {
                     reason: ok_reason.is_none().then_some(ReasonCode::ModeChangeFailed),
                 });
             }
-            Purpose::ToggleOn => {
+            Purpose::ToggleOn | Purpose::Profile => {
+                let tone = flight.purpose == Purpose::ToggleOn;
                 if let ModeJob::Apply { request, .. } = flight.job
                     && ok_reason.is_some()
                 {
                     self.changed.insert(flight.display_id, request);
-                    outcome.feedback = Some(Feedback::ToneUp);
+                    if tone {
+                        outcome.feedback = Some(Feedback::ToneUp);
+                    }
                 } else {
                     self.unmark_mode_if_unchanged(&flight.display_id);
                 }
@@ -826,6 +854,40 @@ mod tests {
         let off = manager.finish(ok(), Instant::now());
         assert_eq!(off.feedback, Some(Feedback::ToneDown));
         assert!(manager.changed("A").is_none());
+    }
+
+    #[test]
+    fn a_profile_ensures_its_mode_once() {
+        let mut manager = ResolutionManager::new(None);
+        let screen = display("A");
+        let target = SavedMode {
+            display_id: "A".into(),
+            mode: stretched(1440),
+        };
+        let job = manager
+            .start_ensure(&target, &screen, true)
+            .expect("libre")
+            .expect("hay que aplicarlo");
+        assert!(matches!(job, ModeJob::Apply { .. }));
+        let outcome = manager.finish(ok(), Instant::now());
+        assert_eq!(outcome.feedback, None, "los perfiles no suenan");
+        assert_eq!(manager.changed("A"), Some(&stretched(1440)));
+        assert_eq!(
+            manager.start_ensure(&target, &screen, true),
+            Ok(None),
+            "ya está"
+        );
+        assert_eq!(
+            manager.start_ensure(
+                &SavedMode {
+                    display_id: "A".into(),
+                    mode: stretched(1280)
+                },
+                &screen,
+                false
+            ),
+            Err(ErrorCode::ModeNotSupported)
+        );
     }
 
     #[test]

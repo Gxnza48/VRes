@@ -3,4 +3,12 @@
 /**
  * Un juego conocido (looks por juego y, más adelante, perfiles).
  */
-export type GameInfo = { id: string, name: string, };
+export type GameInfo = { id: string, name: string, 
+/**
+ * Ejecutables que lo identifican.
+ */
+executables: Array<string>, 
+/**
+ * Anti-cheat del juego (para los avisos).
+ */
+antiCheat: string | null, };

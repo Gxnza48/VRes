@@ -44,16 +44,6 @@
         "Window opacity"
       ]
     },
-    "profiles": {
-      "title": "Profiles",
-      "subtitle": "Each game with its own setup, applied automatically when it opens.",
-      "items": [
-        "Per-game profile: look, crosshair, resolution and tools",
-        "Detects Fortnite, VALORANT, CS2, Apex Legends, Rust and Rainbow Six Siege",
-        "When you leave the game, everything goes back to how it was",
-        "Add any other game in two clicks"
-      ]
-    },
     "enhancers": {
       "title": "Dark Boost & Zoom",
       "subtitle": "Tools to see better in specific moments.",
@@ -203,7 +193,8 @@
       "description": "Less blue and less brightness for playing at night. Adds on top of any look.",
       "warmth": "Warmth",
       "dim": "Dimming"
-    }
+    },
+    "profileNote": "A game profile is in use: while the game is in front, its look replaces this tab's."
   },
   "reasons": {
     "hdrActive": "HDR is on: fine tuning doesn't apply on this monitor.",
@@ -561,5 +552,40 @@
     "looks": "Looks (favorites and general)",
     "openMain": "Open VRes",
     "close": "Close"
+  },
+  "profiles": {
+    "title": "Profiles",
+    "subtitle": "One profile per game: VRes applies it when it detects the game in front and goes back to yours with Alt+Tab or when you close it.",
+    "autoSwitch": "Auto switch",
+    "on": "On",
+    "off": "Off",
+    "active": "In use: {{game}} profile.",
+    "inactive": "No game with a profile in front: your desktop settings are used.",
+    "inUse": "In use",
+    "profileEnabled": "Profile on",
+    "antiCheat": "{{name}} anti-cheat",
+    "look": "Look",
+    "lookDesktop": "The desktop one",
+    "lookCustom": "Custom",
+    "includedGroup": "Included",
+    "mineGroup": "Yours",
+    "crosshair": "Crosshair",
+    "crosshairChoices": {
+      "keep": "As it is",
+      "on": "On",
+      "off": "Off"
+    },
+    "resolution": "Resolution",
+    "resolutionNone": "Windows' one",
+    "resolutionHint": "Only ones you've kept. Applied when the game starts, reverted when it closes.",
+    "custom": {
+      "title": "Add a game",
+      "description": "Pick an open program: VRes recognizes it by its executable name.",
+      "pick": "Pick an open program",
+      "empty": "No programs with a window are open",
+      "refresh": "Refresh",
+      "add": "Add",
+      "remove": "Remove"
+    }
   }
 }

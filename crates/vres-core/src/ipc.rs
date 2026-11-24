@@ -78,6 +78,19 @@ pub struct ShareDecoded {
 pub struct GameInfo {
     pub id: String,
     pub name: String,
+    /// Ejecutables que lo identifican.
+    pub executables: Vec<String>,
+    /// Anti-cheat del juego (para los avisos).
+    pub anti_cheat: Option<String>,
+}
+
+/// Un programa abierto con ventana (para agregarlo como juego propio).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct RunningApp {
+    pub executable: String,
+    pub title: String,
 }
 
 /// Una actualización disponible en GitHub Releases.

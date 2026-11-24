@@ -36,6 +36,8 @@ export const events = {
     on("resolution:resolved", handler),
   /** Cambiaron los ajustes (por ejemplo, se confirmó un modo nuevo). */
   onSettingsChanged: (handler: (settings: Settings) => void) => on("settings:changed", handler),
+  /** Cambió el perfil de juego en uso (`null`: el escritorio). */
+  onProfileActive: (handler: (game: string | null) => void) => on("profile:active", handler),
   /** La ventana actual ganó o perdió el foco (el popup rápido se cierra al perderlo). */
   onFocusChanged: (handler: (focused: boolean) => void) =>
     getCurrentWindow().onFocusChanged((event) => handler(event.payload)),

@@ -21,6 +21,8 @@ mod app;
 #[cfg(windows)]
 mod crosshair;
 #[cfg(windows)]
+mod foreground;
+#[cfg(windows)]
 mod guard;
 #[cfg(windows)]
 mod hw;
@@ -110,6 +112,9 @@ enum Command {
     /// Códigos para compartir (looks, crosshairs y resoluciones).
     #[command(subcommand)]
     Share(ShareCommand),
+    /// Programa en primer plano (detección de juegos).
+    #[command(subcommand)]
+    Fg(FgCommand),
     /// Mediciones en hardware real.
     #[command(subcommand)]
     Probe(ProbeCommand),
@@ -164,6 +169,16 @@ enum ModeCommand {
         /// Confirma que la pantalla puede parpadear y cambiar unos segundos.
         #[arg(long)]
         allow_mode_switch: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum FgCommand {
+    /// Anota qué programa queda al frente y si es un juego conocido.
+    Watch {
+        /// Cuánto tiempo mirar, en segundos.
+        #[arg(long, default_value_t = 10)]
+        seconds: u64,
     },
 }
 
@@ -450,6 +465,9 @@ fn run(command: Command) -> Report {
             Duration::from_millis(hold_ms.min(resolution::MAX_MODE_HOLD_MS)),
             allow_mode_switch,
         ),
+        Command::Fg(FgCommand::Watch { seconds }) => {
+            foreground::watch(Duration::from_secs(seconds.clamp(1, 600)))
+        }
         Command::Share(ShareCommand::Decode { code }) => share::decode(&code),
         Command::Share(ShareCommand::Encode { look, crosshair }) => {
             share::encode(look.as_deref(), crosshair.as_deref())

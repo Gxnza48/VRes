@@ -1,6 +1,7 @@
 import { CrosshairPage } from "@/features/crosshair/CrosshairPage";
 import { DisplayPage } from "@/features/display/DisplayPage";
 import { LibraryPage } from "@/features/library/LibraryPage";
+import { ProfilesPage } from "@/features/profiles/ProfilesPage";
 import { MorePage } from "@/features/more/MorePage";
 import { CountdownDialog } from "@/features/resolution/CountdownDialog";
 import { ResolutionPage } from "@/features/resolution/ResolutionPage";
@@ -27,6 +28,8 @@ export function Shell() {
           <Notices />
           {tab.id === "display" ? (
             <DisplayPage />
+          ) : tab.id === "profiles" ? (
+            <ProfilesPage />
           ) : tab.id === "library" ? (
             <LibraryPage />
           ) : tab.id === "crosshair" ? (

@@ -5166,7 +5166,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "vres"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -5187,7 +5187,7 @@ dependencies = [
 
 [[package]]
 name = "vres-cli"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "clap",
  "serde",
@@ -5199,7 +5199,7 @@ dependencies = [
 
 [[package]]
 name = "vres-core"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "proptest",
  "serde",
@@ -5211,7 +5211,7 @@ dependencies = [
 
 [[package]]
 name = "vres-engine"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "vres-core",
  "vres-win",
@@ -5219,7 +5219,7 @@ dependencies = [
 
 [[package]]
 name = "vres-win"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "thiserror 2.0.21",
  "vres-core",

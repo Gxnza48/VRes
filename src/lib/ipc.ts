@@ -21,6 +21,7 @@ import type { LookPreset } from "./bindings/LookPreset";
 import type { ModeRequest } from "./bindings/ModeRequest";
 import type { PendingMode } from "./bindings/PendingMode";
 import type { Requested } from "./bindings/Requested";
+import type { RunningApp } from "./bindings/RunningApp";
 import type { ResolutionState } from "./bindings/ResolutionState";
 import type { Settings } from "./bindings/Settings";
 import type { ShareDecoded } from "./bindings/ShareDecoded";
@@ -132,6 +133,10 @@ export const ipc = {
   looksPresets: () => call<LookPreset[]>("looks_presets"),
   /** Juegos conocidos. */
   gamesList: () => call<GameInfo[]>("games_list"),
+  /** Perfil de juego en uso (`null`: el escritorio). */
+  profileActive: () => call<string | null>("profile_active"),
+  /** Programas abiertos con ventana, para agregar un juego propio. */
+  gamesRunningCandidates: () => call<RunningApp[]>("games_running_candidates"),
 
   /** Consulta si hay una versión nueva en GitHub Releases. */
   updateCheck: () => call<UpdateInfo | null>("update_check"),

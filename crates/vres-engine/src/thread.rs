@@ -28,12 +28,14 @@ use vres_core::model::resolution::{
 };
 use vres_core::model::vibrance::VibranceInfo;
 use vres_core::planner::Requested;
+use vres_core::profiles::{Observed, ProfileSettings, SessionPlan, match_game, resolve};
 use vres_core::settings::{CrosshairSettings, DEFAULT_CONFIRM_SECONDS, SavedMode};
 use vres_core::status::{EngineStatus, ReasonCode};
 use vres_win::control::{self, ACK, RemoteCommand};
 use vres_win::identify::IdentifyOverlay;
 use vres_win::mag::Magnifier;
 use vres_win::overlay::CrosshairOverlay;
+use vres_win::process::{self, ProcessInfo};
 use vres_win::sound::{self, Tone};
 use vres_win::vibrance::DriverVibrance;
 use vres_win::window::{self, ForegroundHook, HiddenWindow};
@@ -72,12 +74,15 @@ const TIMER_HEALTH: usize = 2;
 const TIMER_IDENTIFY: usize = 3;
 const TIMER_FOREGROUND: usize = 4;
 const TIMER_MODE: usize = 5;
+/// Mientras hay un juego abierto: ¿sigue abierto?
+const TIMER_GAME: usize = 6;
 const HOTKEY_EMERGENCY: i32 = 1;
 const HOTKEY_TOGGLE: i32 = 2;
 
 const HEALTH_INTERVAL_MS: u32 = 1000;
 const IDENTIFY_MS: u32 = 2500;
 const MODE_TICK_MS: u32 = 250;
+const GAME_POLL_MS: u32 = 3000;
 /// Tope para esperar un cambio de modo en curso antes de restaurar.
 const JOB_WAIT: Duration = Duration::from_secs(2);
 
@@ -94,6 +99,8 @@ pub struct EngineSettings {
     pub confirm_seconds: u32,
     /// El crosshair: si está prendido, dónde y cuál.
     pub crosshair: CrosshairSettings,
+    /// Perfiles por juego.
+    pub profiles: ProfileSettings,
 }
 
 impl Default for EngineSettings {
@@ -104,6 +111,7 @@ impl Default for EngineSettings {
             tones: true,
             confirm_seconds: DEFAULT_CONFIRM_SECONDS,
             crosshair: CrosshairSettings::default(),
+            profiles: ProfileSettings::default(),
         }
     }
 }
@@ -198,6 +206,8 @@ pub enum EngineEvent {
     Notice(ReasonCode),
     /// Detalle técnico para el log (en inglés).
     Log(String),
+    /// Cambió el perfil en uso (`None`: el escritorio).
+    Profile(Option<String>),
 }
 
 /// Estado inicial, al terminar de arrancar.
@@ -462,6 +472,15 @@ struct Shell {
     resolution_rev: u64,
     overlay: Option<CrosshairOverlay>,
     crosshair_preview: Option<Crosshair>,
+    /// Lo que pidió el usuario para el escritorio (sin los perfiles).
+    desktop: Requested,
+    /// El juego abierto que tiene la sesión (el último que estuvo al frente).
+    game: Option<(String, ProcessInfo)>,
+    /// Lo que aplican ahora los perfiles.
+    session: SessionPlan,
+    /// Resolución que aplicó un perfil (para revertirla al cerrar el juego).
+    profile_resolution: Option<SavedMode>,
+    game_timer_armed: bool,
     shutdown_reply: Option<Sender<()>>,
 }
 
@@ -511,8 +530,9 @@ impl Shell {
                 if let Some(overlay) = &self.overlay {
                     overlay.raise();
                 }
-                // Un juego a pantalla completa puede pisar la rampa: se verifica.
-                if self.core.is_active() {
+                // Un juego a pantalla completa puede pisar la rampa (se
+                // verifica) y puede tener un perfil (se mira cuál es).
+                if self.core.is_active() || self.settings.profiles.auto_switch {
                     window::set_timer(self.hwnd, TIMER_FOREGROUND, 150);
                 }
                 Some(0)
@@ -561,8 +581,21 @@ impl Shell {
             }
             TIMER_FOREGROUND => {
                 window::kill_timer(self.hwnd, TIMER_FOREGROUND);
-                let changed = self.core.health_check();
-                self.after_change(changed);
+                if self.core.is_active() {
+                    let changed = self.core.health_check();
+                    self.after_change(changed);
+                }
+                self.observe_games();
+            }
+            TIMER_GAME => {
+                let ended = self
+                    .game
+                    .as_ref()
+                    .is_some_and(|(_, process)| !process::is_running(process));
+                if ended {
+                    self.game = None;
+                }
+                self.observe_games();
             }
             TIMER_IDENTIFY => {
                 window::kill_timer(self.hwnd, TIMER_IDENTIFY);
@@ -598,9 +631,8 @@ impl Shell {
         }
 
         if let Some(requested) = latest {
-            self.core.set_requested(requested);
-            let changed = self.core.reconcile(false);
-            self.after_change(changed);
+            self.desktop = requested;
+            self.apply_effective();
         }
         if refresh {
             self.displays_dirty = true;
@@ -722,6 +754,7 @@ impl Shell {
                 self.crosshair_preview = None;
                 let registered = self.register_toggle_hotkey();
                 self.apply_crosshair();
+                self.observe_games();
                 let _ = reply.send(registered);
             }
             Command::CrosshairPreview(crosshair) => {
@@ -743,7 +776,9 @@ impl Shell {
     /// Dibuja (o esconde) el crosshair según los ajustes y la vista previa.
     fn apply_crosshair(&mut self) {
         let config = self.settings.crosshair.clone();
-        if !config.enabled {
+        // Un perfil de juego puede prenderlo o apagarlo mientras está al frente.
+        let enabled = self.session.crosshair.unwrap_or(config.enabled);
+        if !enabled {
             if let Some(overlay) = &mut self.overlay {
                 overlay.hide();
             }
@@ -968,9 +1003,113 @@ impl Shell {
         }
     }
 
+    /// Lo pedido para el escritorio, con el look del perfil si hay un juego al frente.
+    fn effective_requested(&self) -> Requested {
+        let mut requested = self.desktop.clone();
+        if let Some(look) = &self.session.look {
+            requested.look = look.clone();
+        }
+        requested
+    }
+
+    fn apply_effective(&mut self) {
+        let effective = self.effective_requested();
+        self.core.set_requested(effective);
+        let changed = self.core.reconcile(false);
+        self.after_change(changed);
+    }
+
+    /// Mira qué juego está al frente y aplica (o quita) su perfil.
+    fn observe_games(&mut self) {
+        let profiles = self.settings.profiles.clone();
+        if profiles.auto_switch {
+            let foreground = process::foreground_process().and_then(|process| {
+                match_game(&process.exe, &profiles.custom_games).map(|id| (id, process))
+            });
+            if let Some((id, process)) = &foreground
+                && self.game.as_ref().map(|(_, current)| current) != Some(process)
+            {
+                self.game = Some((id.clone(), process.clone()));
+            }
+            let observed = Observed {
+                foreground: foreground.map(|(id, _)| id),
+                running: self.game.as_ref().map(|(id, _)| id.clone()),
+            };
+            self.apply_session(resolve(&profiles, &observed));
+        } else {
+            self.game = None;
+            self.apply_session(SessionPlan::default());
+        }
+        // Mientras haya un juego abierto, cada 3 s se mira si sigue abierto.
+        let want_timer = self.game.is_some();
+        if want_timer && !self.game_timer_armed {
+            window::set_timer(self.hwnd, TIMER_GAME, GAME_POLL_MS);
+        } else if !want_timer && self.game_timer_armed {
+            window::kill_timer(self.hwnd, TIMER_GAME);
+        }
+        self.game_timer_armed = want_timer;
+    }
+
+    fn apply_session(&mut self, plan: SessionPlan) {
+        let active_changed = plan.active != self.session.active;
+        let look_changed = plan.look != self.session.look;
+        let crosshair_changed = plan.crosshair != self.session.crosshair;
+        let wanted_resolution = plan.resolution.clone();
+        self.session = plan;
+        if active_changed {
+            (self.sink)(EngineEvent::Profile(self.session.active.clone()));
+        }
+        if look_changed {
+            self.apply_effective();
+        }
+        if crosshair_changed {
+            self.apply_crosshair();
+        }
+        if wanted_resolution != self.profile_resolution {
+            self.apply_profile_resolution(wanted_resolution);
+        }
+    }
+
+    /// Lleva la resolución a la que pide el perfil (o la de Windows al cerrar
+    /// el juego). Si hay otro cambio en curso, se reintenta en el próximo aviso.
+    fn apply_profile_resolution(&mut self, wanted: Option<SavedMode>) {
+        if self.modes.busy() || self.modes.pending(Instant::now()).is_some() {
+            return;
+        }
+        if let Some(previous) = self.profile_resolution.clone()
+            && wanted.as_ref() != Some(&previous)
+        {
+            if let Some(display) = self.display(&previous.display_id)
+                && let Ok(Some(job)) = self.modes.start_restore_display(&display, false)
+            {
+                self.profile_resolution = None;
+                self.run_job(job);
+                return;
+            }
+            self.profile_resolution = None;
+        }
+        let Some(target) = wanted else {
+            return;
+        };
+        let Some(display) = self.display(&target.display_id) else {
+            return;
+        };
+        let listed = is_listed(&modes::list_modes(&display.gdi_name), &target.mode);
+        match self.modes.start_ensure(&target, &display, listed) {
+            Ok(Some(job)) => {
+                self.profile_resolution = Some(target);
+                self.run_job(job);
+            }
+            Ok(None) => self.profile_resolution = Some(target),
+            Err(code) => (self.sink)(EngineEvent::Log(format!(
+                "profile resolution refused: {code:?}"
+            ))),
+        }
+    }
+
     fn emergency_reset(&mut self) {
-        let mut requested = self.core.requested().clone();
-        requested.color_enabled = false;
+        self.desktop.color_enabled = false;
+        let requested = self.effective_requested();
         self.core.set_requested(requested);
         self.core.restore_all();
         let had_modes = self.modes.has_changes();
@@ -1083,6 +1222,7 @@ fn run(
         found
     };
     core.set_displays(found);
+    let desktop = config.requested.clone();
     core.set_requested(config.requested);
     core.reconcile(false);
 
@@ -1108,6 +1248,11 @@ fn run(
         resolution_rev: 0,
         overlay: None,
         crosshair_preview: None,
+        desktop,
+        game: None,
+        session: SessionPlan::default(),
+        profile_resolution: None,
+        game_timer_armed: false,
         shutdown_reply: None,
     }));
 

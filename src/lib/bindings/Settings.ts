@@ -2,9 +2,10 @@
 import type { CrosshairSettings } from "./CrosshairSettings";
 import type { HotkeySettings } from "./HotkeySettings";
 import type { LibrarySettings } from "./LibrarySettings";
+import type { ProfileSettings } from "./ProfileSettings";
 import type { ResolutionSettings } from "./ResolutionSettings";
 
 /**
  * `settings.json`.
  */
-export type Settings = { schemaVersion: number, hotkeys: HotkeySettings, resolution: ResolutionSettings, crosshair: CrosshairSettings, library: LibrarySettings, };
+export type Settings = { schemaVersion: number, hotkeys: HotkeySettings, resolution: ResolutionSettings, crosshair: CrosshairSettings, library: LibrarySettings, profiles: ProfileSettings, };

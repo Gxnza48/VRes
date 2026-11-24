@@ -44,16 +44,6 @@
         "Opacidade da janela"
       ]
     },
-    "profiles": {
-      "title": "Perfis",
-      "subtitle": "Cada jogo com sua configuração, aplicada sozinha ao abrir.",
-      "items": [
-        "Perfil por jogo: look, mira, resolução e ferramentas",
-        "Detecta Fortnite, VALORANT, CS2, Apex Legends, Rust e Rainbow Six Siege",
-        "Ao sair do jogo, tudo volta a ser como era",
-        "Adicionar qualquer outro jogo em dois cliques"
-      ]
-    },
     "enhancers": {
       "title": "Dark Boost e Zoom",
       "subtitle": "Ferramentas para enxergar melhor em momentos específicos.",
@@ -203,7 +193,8 @@
       "description": "Menos azul e menos brilho para jogar à noite. Soma-se a qualquer look.",
       "warmth": "Calor",
       "dim": "Atenuação"
-    }
+    },
+    "profileNote": "Há um perfil de jogo em uso: enquanto o jogo está em primeiro plano, o look dele substitui o desta aba."
   },
   "reasons": {
     "hdrActive": "HDR ativo: o ajuste fino não se aplica neste monitor.",
@@ -561,5 +552,40 @@
     "looks": "Looks (favoritos e gerais)",
     "openMain": "Abrir o VRes",
     "close": "Fechar"
+  },
+  "profiles": {
+    "title": "Perfis",
+    "subtitle": "Um perfil por jogo: o VRes aplica ao detectar o jogo em primeiro plano e volta ao seu com Alt+Tab ou ao fechá-lo.",
+    "autoSwitch": "Troca automática",
+    "on": "Ativada",
+    "off": "Desligada",
+    "active": "Em uso: perfil de {{game}}.",
+    "inactive": "Nenhum jogo com perfil em primeiro plano: vale o da área de trabalho.",
+    "inUse": "Em uso",
+    "profileEnabled": "Perfil ativo",
+    "antiCheat": "anti-cheat {{name}}",
+    "look": "Look",
+    "lookDesktop": "O da área de trabalho",
+    "lookCustom": "Personalizado",
+    "includedGroup": "Incluídos",
+    "mineGroup": "Seus",
+    "crosshair": "Crosshair",
+    "crosshairChoices": {
+      "keep": "Como está",
+      "on": "Ligado",
+      "off": "Desligado"
+    },
+    "resolution": "Resolução",
+    "resolutionNone": "A do Windows",
+    "resolutionHint": "Só as que você já manteve. Aplica ao entrar e volta ao fechar o jogo.",
+    "custom": {
+      "title": "Adicionar um jogo",
+      "description": "Escolha um programa aberto: o VRes o reconhece pelo nome do executável.",
+      "pick": "Escolha um programa aberto",
+      "empty": "Não há programas com janela abertos",
+      "refresh": "Atualizar",
+      "add": "Adicionar",
+      "remove": "Remover"
+    }
   }
 }

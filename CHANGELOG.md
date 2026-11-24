@@ -4,6 +4,17 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.6.0] - 2026-11-24
+
+**Perfiles por juego** (fase F6 de la [hoja de ruta](docs/ROADMAP.md)).
+
+### Agregado
+
+- Pestaña **Perfiles**: un perfil por juego con su look, su crosshair (como esté, prendido o apagado) y su resolución estirada. Fortnite, VALORANT, CS2, Apex Legends, Rust y Rainbow Six Siege desde el inicio, y cualquier otro juego elegido entre los programas abiertos.
+- **Cambio automático**: VRes reconoce el juego al frente por el nombre de su ejecutable, sin abrir nunca su proceso. El look y el crosshair del perfil valen solo con el juego al frente (Alt+Tab vuelve a lo tuyo); la resolución se aplica al entrar y vuelve recién al cerrar el juego.
+- Aviso en la pestaña Pantalla cuando hay un perfil en uso.
+- `vres-cli fg watch`: muestra qué programa está al frente y si es un juego conocido.
+
 ## [0.5.0] - 2026-11-24
 
 **Looks, Biblioteca, códigos y color avanzado** (fase F5 de la [hoja de ruta](docs/ROADMAP.md)).
@@ -80,7 +91,8 @@ Primera versión pública: la base de la app y la pestaña **Pantalla** (fases F
 - Matemática de color con más de 70 pruebas (incluidas pruebas de propiedades) y resultados de las pruebas en hardware real en [docs/hardware/RESULTADOS.md](docs/hardware/RESULTADOS.md).
 - Documentación: arquitectura, motor de color, anti-cheat, contrato interno, códigos para compartir, desarrollo y hoja de ruta.
 
-[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.5.0...HEAD
+[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/Gxnza48/VRes/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/Gxnza48/VRes/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/Gxnza48/VRes/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Gxnza48/VRes/compare/v0.2.0...v0.3.0

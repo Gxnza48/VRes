@@ -43,5 +43,6 @@ export function defaultSettings(): Settings {
       saved: [],
     },
     library: { looks: [] },
+    profiles: { autoSwitch: false, profiles: [], customGames: [] },
   };
 }

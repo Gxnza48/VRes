@@ -63,6 +63,7 @@ export function DisplayPage() {
   const displays = useEngineStore((state) => state.displays);
   const requested = useEngineStore((state) => state.requested);
   const status = useEngineStore((state) => state.status);
+  const activeProfile = useEngineStore((state) => state.activeProfile);
 
   if (!ready || !requested) {
     return (
@@ -182,6 +183,11 @@ export function DisplayPage() {
           </CardContent>
         </Card>
 
+        {activeProfile && (
+          <p className="rounded-xl border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-fg">
+            {t("display.profileNote")}
+          </p>
+        )}
         <LooksCard look={look} enabled={enabled} />
 
         <Card>

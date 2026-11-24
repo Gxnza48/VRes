@@ -54,7 +54,7 @@ describe("LibraryPage", () => {
       loaded: true,
       lookPresets: [{ id: "vivid", game: null, look: vivid }],
       crosshairPresets: [],
-      games: [{ id: "cs2", name: "Counter-Strike 2" }],
+      games: [{ id: "cs2", name: "Counter-Strike 2", executables: ["cs2.exe"], antiCheat: "VAC" }],
     });
   });
 

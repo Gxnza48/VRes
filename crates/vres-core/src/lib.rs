@@ -16,6 +16,7 @@ pub mod keys;
 pub mod looks;
 pub mod model;
 pub mod planner;
+pub mod profiles;
 pub mod settings;
 pub mod share;
 pub mod status;

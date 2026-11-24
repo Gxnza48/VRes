@@ -24,6 +24,7 @@ pub mod mag;
 pub mod modes;
 pub mod overlay;
 pub mod probe;
+pub mod process;
 pub mod sound;
 pub mod vibrance;
 pub mod window;

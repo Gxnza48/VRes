@@ -70,11 +70,17 @@ pub async fn looks_presets() -> Result<Vec<LookPreset>, IpcError> {
 /// Juegos conocidos.
 #[tauri::command]
 pub async fn games_list() -> Result<Vec<GameInfo>, IpcError> {
-    Ok(looks::GAMES
+    Ok(vres_core::profiles::KNOWN_GAMES
         .iter()
-        .map(|(id, name)| GameInfo {
-            id: (*id).to_owned(),
-            name: (*name).to_owned(),
+        .map(|game| GameInfo {
+            id: game.id.to_owned(),
+            name: game.name.to_owned(),
+            executables: game
+                .executables
+                .iter()
+                .map(|exe| (*exe).to_owned())
+                .collect(),
+            anti_cheat: Some(game.anti_cheat.to_owned()),
         })
         .collect())
 }

@@ -12,6 +12,7 @@ use crate::crosshair::Crosshair;
 use crate::keys::{Hotkey, check_hotkey};
 use crate::model::look::Look;
 use crate::model::resolution::ModeRequest;
+use crate::profiles::ProfileSettings;
 
 /// Versión del esquema de `settings.json`.
 pub const SETTINGS_SCHEMA: u32 = 1;
@@ -129,6 +130,7 @@ pub struct Settings {
     pub resolution: ResolutionSettings,
     pub crosshair: CrosshairSettings,
     pub library: LibrarySettings,
+    pub profiles: ProfileSettings,
 }
 
 impl Default for Settings {
@@ -139,6 +141,7 @@ impl Default for Settings {
             resolution: ResolutionSettings::default(),
             crosshair: CrosshairSettings::default(),
             library: LibrarySettings::default(),
+            profiles: ProfileSettings::default(),
         }
     }
 }
@@ -191,6 +194,30 @@ impl Settings {
             saved.look = saved.look.clamped();
             saved.name = saved.name.trim().chars().take(MAX_NAME_CHARS).collect();
         }
+
+        // Un perfil por juego, y su resolución tiene que estar conservada.
+        let mut games = std::collections::BTreeSet::new();
+        self.profiles
+            .profiles
+            .retain(|profile| games.insert(profile.game_id.clone()));
+        let confirmed = self.resolution.confirmed.clone();
+        for profile in &mut self.profiles.profiles {
+            if let Some(look) = &mut profile.look {
+                *look = look.clamped();
+            }
+            if profile
+                .resolution
+                .as_ref()
+                .is_some_and(|mode| !confirmed.contains(mode))
+            {
+                profile.resolution = None;
+            }
+        }
+        let mut exes = std::collections::BTreeSet::new();
+        self.profiles.custom_games.retain(|game| {
+            !game.executable.trim().is_empty() && exes.insert(game.executable.to_lowercase())
+        });
+        self.profiles.custom_games.truncate(100);
         self
     }
 
