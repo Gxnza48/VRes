@@ -2,7 +2,7 @@
 
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use tauri::{App, AppHandle, Manager, RunEvent};
+use tauri::{App, AppHandle, Manager, RunEvent, WindowEvent};
 use vres_engine::Command;
 
 use crate::engine_bridge::EngineState;
@@ -65,6 +65,17 @@ pub fn on_run_event(app: &AppHandle, event: RunEvent) {
             }
         }
         RunEvent::Exit => shutdown(app),
+        // Si la ventana se cierra mientras se graba una tecla, los atajos y
+        // Dark Boost/Zoom vuelven a escuchar.
+        RunEvent::WindowEvent {
+            label,
+            event: WindowEvent::Destroyed,
+            ..
+        } if label == "main" => {
+            if let Some(engine) = app.try_state::<EngineState>() {
+                engine.send(Command::SuspendHotkeys(false));
+            }
+        }
         _ => {}
     }
 }

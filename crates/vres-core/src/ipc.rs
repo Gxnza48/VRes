@@ -33,6 +33,8 @@ pub enum Notice {
     ModeExpired,
     /// Otro programa usa el atajo de resolución.
     ToggleHotkeyTaken,
+    /// No se pudo hacer zoom (por ejemplo, con la Lupa de Windows abierta).
+    ZoomUnavailable,
 }
 
 /// Datos que la interfaz pide una sola vez, al arrancar.
@@ -82,6 +84,21 @@ pub struct GameInfo {
     pub executables: Vec<String>,
     /// Anti-cheat del juego (para los avisos).
     pub anti_cheat: Option<String>,
+}
+
+/// Dark Boost y Zoom en este momento.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct EnhancerState {
+    /// Se está escuchando la tecla de Dark Boost (armado y en su alcance).
+    pub dark_boost_listening: bool,
+    /// Dark Boost activo.
+    pub dark_boost: bool,
+    /// Se está escuchando la tecla del zoom.
+    pub zoom_listening: bool,
+    /// Zoom activo.
+    pub zoom: bool,
 }
 
 /// Un programa abierto con ventana (para agregarlo como juego propio).

@@ -17,6 +17,7 @@ function subscribe(): void {
   void events.onRequestedChanged((requested) => engine.setRequested(requested));
   void events.onNotice((notice) => engine.pushNotice(notice));
   void events.onProfileActive((game) => engine.setActiveProfile(game));
+  void events.onEnhancers((state) => engine.setEnhancers(state));
   const resolution = useResolutionStore.getState();
   void events.onResolutionChanged((state) => resolution.setState(state));
   void events.onResolutionResolved((resolved) => resolution.setResolved(resolved));
@@ -51,6 +52,10 @@ export async function startApp(): Promise<void> {
     ipc
       .profileActive()
       .then((game) => useEngineStore.getState().setActiveProfile(game))
+      .catch(() => undefined);
+    ipc
+      .enhancersState()
+      .then((state) => useEngineStore.getState().setEnhancers(state))
       .catch(() => undefined);
   } catch (error) {
     console.error("app_bootstrap", error);

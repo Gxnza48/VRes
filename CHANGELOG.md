@@ -4,6 +4,18 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.7.0] - 2026-11-24
+
+**Dark Boost y Zoom** (fase F7 de la [hoja de ruta](docs/ROADMAP.md)).
+
+### Agregado
+
+- Pestaña **Dark Boost y Zoom**. Los dos vienen **desarmados** y muestran un aviso: algunos juegos y torneos los consideran ventaja.
+- **Dark Boost**: aclara sombras y negros mientras mantienes (o alternas) una tecla o un botón del mouse. Funciona aunque el color esté apagado y también en pantalla completa exclusiva. Tinte opcional e inversión de colores, con aviso de fotosensibilidad (con HDR no se invierte).
+- **Zoom** de 1,5× a 4× sobre el centro de la pantalla que elijas, mientras mantienes (o alternas) una tecla o un botón: derecho, rueda, Mouse 4 y Mouse 5. Es solo visual; el juego sigue recibiendo el botón.
+- Solo con un juego al frente (o en cualquier programa, si lo eliges). La tecla se lee únicamente mientras la función está armada y en su alcance, sin hooks. Se suelta al salir del juego, con la pausa y con el atajo de emergencia.
+- `vres-cli zoom test`, `vres-cli input probe` y `vres-cli probe engine-enhancers`.
+
 ## [0.6.0] - 2026-11-24
 
 **Perfiles por juego** (fase F6 de la [hoja de ruta](docs/ROADMAP.md)).
@@ -91,7 +103,8 @@ Primera versión pública: la base de la app y la pestaña **Pantalla** (fases F
 - Matemática de color con más de 70 pruebas (incluidas pruebas de propiedades) y resultados de las pruebas en hardware real en [docs/hardware/RESULTADOS.md](docs/hardware/RESULTADOS.md).
 - Documentación: arquitectura, motor de color, anti-cheat, contrato interno, códigos para compartir, desarrollo y hoja de ruta.
 
-[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.6.0...HEAD
+[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/Gxnza48/VRes/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/Gxnza48/VRes/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/Gxnza48/VRes/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/Gxnza48/VRes/compare/v0.3.0...v0.4.0

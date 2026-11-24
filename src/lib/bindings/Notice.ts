@@ -3,4 +3,4 @@
 /**
  * Avisos para el usuario (evento `app:notice` y al arrancar).
  */
-export type Notice = "recovered" | "safeMode" | "emergencyReset" | "hotkeyTaken" | "engineUnavailable" | "modeExpired" | "toggleHotkeyTaken";
+export type Notice = "recovered" | "safeMode" | "emergencyReset" | "hotkeyTaken" | "engineUnavailable" | "modeExpired" | "toggleHotkeyTaken" | "zoomUnavailable";

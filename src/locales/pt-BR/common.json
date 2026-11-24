@@ -43,16 +43,6 @@
         "Fundo com sua própria imagem ou GIF",
         "Opacidade da janela"
       ]
-    },
-    "enhancers": {
-      "title": "Dark Boost e Zoom",
-      "subtitle": "Ferramentas para enxergar melhor em momentos específicos.",
-      "items": [
-        "Dark Boost: clareia as sombras enquanto você segura uma tecla",
-        "Zoom de 1,5× a 4× enquanto você segura uma tecla ou um botão do mouse",
-        "Pausam sozinhos ao sair do jogo",
-        "Vêm desligados: alguns jogos podem considerá-los uma vantagem"
-      ]
     }
   },
   "more": {
@@ -218,7 +208,8 @@
     "safeModeAfterCrash": "Modo seguro após um fechamento inesperado.",
     "modeChangeFailed": "O Windows não conseguiu aplicar esse modo.",
     "scalingIgnored": "A placa de vídeo ou o monitor ignoraram a escala pedida: podem aparecer barras pretas.",
-    "hdrChangeFailed": "Não foi possível mudar o HDR."
+    "hdrChangeFailed": "Não foi possível mudar o HDR.",
+    "zoomUnavailable": "Não foi possível dar zoom (por exemplo, com a Lupa do Windows aberta)."
   },
   "notices": {
     "recovered": "O VRes não fechou direito da última vez: já restaurou as cores originais.",
@@ -228,7 +219,8 @@
     "engineUnavailable": "O motor do VRes não conseguiu iniciar. Reinicie o app; se continuar, reporte.",
     "dismiss": "Fechar aviso",
     "modeExpired": "A nova resolução voltou sozinha porque você não confirmou.",
-    "toggleHotkeyTaken": "Outro programa usa o atalho de resolução que você escolheu. Escolha outro na aba Resolução."
+    "toggleHotkeyTaken": "Outro programa usa o atalho de resolução que você escolheu. Escolha outro na aba Resolução.",
+    "zoomUnavailable": "Não foi possível dar zoom. Se a Lupa do Windows estiver aberta, feche-a e tente de novo."
   },
   "resolution": {
     "title": "Resolução",
@@ -586,6 +578,77 @@
       "refresh": "Atualizar",
       "add": "Adicionar",
       "remove": "Remover"
+    }
+  },
+  "enhancers": {
+    "title": "Dark Boost e Zoom",
+    "subtitle": "Para ver melhor em momentos pontuais, enquanto você segura uma tecla ou um botão do mouse.",
+    "warning": "Use com cuidado: alguns jogos e torneios consideram que clarear as sombras ou dar zoom é vantagem e podem punir. Confira as regras; a decisão e o risco são seus.",
+    "arm": "Armar",
+    "disarm": "Desarmar",
+    "state": {
+      "disarmed": "Desarmado",
+      "active": "Ativo",
+      "listening": "Pronto",
+      "waitingGame": "Esperando um jogo em primeiro plano",
+      "paused": "Pausado"
+    },
+    "mode": {
+      "label": "Como funciona",
+      "hold": "Segurar",
+      "toggle": "Alternar (um toque liga, outro desliga)"
+    },
+    "scope": {
+      "label": "Onde",
+      "games": "Só com um jogo em primeiro plano",
+      "always": "Em qualquer programa"
+    },
+    "binding": {
+      "label": "Tecla ou botão",
+      "change": "Trocar",
+      "cancel": "Cancelar",
+      "recording": "Aperte uma tecla ou um botão do mouse…",
+      "hint": "Esc cancela. O botão esquerdo não pode ser usado.",
+      "unsupported": "Essa tecla não pode ser usada. Tente outra.",
+      "same": "Dark Boost e Zoom usam a mesma tecla: ligam juntos."
+    },
+    "buttons": {
+      "right": "Botão direito",
+      "middle": "Botão da roda",
+      "back": "Botão lateral voltar (Mouse 4)",
+      "forward": "Botão lateral avançar (Mouse 5)"
+    },
+    "keys": {
+      "shiftLeft": "Shift esquerdo",
+      "shiftRight": "Shift direito",
+      "controlLeft": "Ctrl esquerdo",
+      "controlRight": "Ctrl direito",
+      "altLeft": "Alt esquerdo",
+      "altRight": "Alt direito (AltGr)",
+      "capsLock": "Caps Lock"
+    },
+    "darkBoost": {
+      "title": "Dark Boost",
+      "description": "Clareia as sombras e os pretos enquanto você usa. Também funciona em tela cheia exclusiva (o tingimento e a inversão, não).",
+      "strength": "Sombras",
+      "blackLevel": "Pretos",
+      "tint": "Tingimento",
+      "tintColor": "Cor do tingimento",
+      "tintAmount": "Intensidade do tingimento",
+      "invert": "Inverter cores",
+      "invertWarning": "Inverter muda todas as cores de uma vez: pode incomodar, ou ser perigoso se você for fotossensível. Com HDR ativo não inverte."
+    },
+    "zoom": {
+      "title": "Zoom",
+      "description": "Amplia o centro da tela enquanto você usa. É só visual: o jogo e o mouse não mudam.",
+      "level": "Ampliação",
+      "display": "Tela",
+      "primary": "A principal",
+      "magnifierNote": "Não funciona com a Lupa do Windows aberta."
+    },
+    "units": {
+      "percent": "{{value}}%",
+      "times": "{{value}}×"
     }
   }
 }

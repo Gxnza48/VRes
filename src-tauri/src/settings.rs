@@ -33,6 +33,7 @@ pub fn engine_settings(settings: &Settings) -> EngineSettings {
         confirm_seconds: settings.resolution.confirm_seconds,
         crosshair: settings.crosshair.clone(),
         profiles: settings.profiles.clone(),
+        enhancers: settings.enhancers.clone(),
     }
 }
 

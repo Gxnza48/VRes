@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 use crate::crosshair::Crosshair;
+use crate::enhancers::EnhancerSettings;
 use crate::keys::{Hotkey, check_hotkey};
 use crate::model::look::Look;
 use crate::model::resolution::ModeRequest;
@@ -131,6 +132,7 @@ pub struct Settings {
     pub crosshair: CrosshairSettings,
     pub library: LibrarySettings,
     pub profiles: ProfileSettings,
+    pub enhancers: EnhancerSettings,
 }
 
 impl Default for Settings {
@@ -142,6 +144,7 @@ impl Default for Settings {
             crosshair: CrosshairSettings::default(),
             library: LibrarySettings::default(),
             profiles: ProfileSettings::default(),
+            enhancers: EnhancerSettings::default(),
         }
     }
 }
@@ -218,6 +221,7 @@ impl Settings {
             !game.executable.trim().is_empty() && exes.insert(game.executable.to_lowercase())
         });
         self.profiles.custom_games.truncate(100);
+        self.enhancers = self.enhancers.clamped();
         self
     }
 

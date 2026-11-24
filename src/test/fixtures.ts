@@ -1,5 +1,6 @@
 /** Datos de prueba compartidos por los tests de la interfaz. */
 import type { Crosshair } from "@/lib/bindings/Crosshair";
+import type { EnhancerSettings } from "@/lib/bindings/EnhancerSettings";
 import type { Settings } from "@/lib/bindings/Settings";
 
 /** El crosshair por defecto de VRes (igual que `Crosshair::default()` en Rust). */
@@ -29,6 +30,34 @@ export function defaultCrosshair(): Crosshair {
   };
 }
 
+/** Dark Boost y Zoom por defecto: desarmados (igual que en Rust). */
+export function defaultEnhancers(): EnhancerSettings {
+  return {
+    darkBoost: {
+      armed: false,
+      mode: "hold",
+      binding: { kind: "mouse", button: "forward" },
+      scope: "games",
+      effect: {
+        strength: 50,
+        blackLevel: 20,
+        tintEnabled: false,
+        tint: "#7CFF6B",
+        tintAmount: 40,
+        invert: false,
+      },
+    },
+    zoom: {
+      armed: false,
+      mode: "hold",
+      binding: { kind: "mouse", button: "back" },
+      scope: "games",
+      level: 2,
+      displayId: null,
+    },
+  };
+}
+
 /** Ajustes por defecto. */
 export function defaultSettings(): Settings {
   return {
@@ -44,5 +73,6 @@ export function defaultSettings(): Settings {
     },
     library: { looks: [] },
     profiles: { autoSwitch: false, profiles: [], customGames: [] },
+    enhancers: defaultEnhancers(),
   };
 }

@@ -43,16 +43,6 @@
         "Background with your own image or GIF",
         "Window opacity"
       ]
-    },
-    "enhancers": {
-      "title": "Dark Boost & Zoom",
-      "subtitle": "Tools to see better in specific moments.",
-      "items": [
-        "Dark Boost: lifts the shadows while you hold a key",
-        "1.5× to 4× zoom while you hold a key or a mouse button",
-        "They pause on their own when you leave the game",
-        "Off by default: some games may consider them an advantage"
-      ]
     }
   },
   "more": {
@@ -218,7 +208,8 @@
     "safeModeAfterCrash": "Safe mode after an unexpected shutdown.",
     "modeChangeFailed": "Windows couldn't apply that mode.",
     "scalingIgnored": "The graphics card or the monitor ignored the requested scaling: you may see black bars.",
-    "hdrChangeFailed": "HDR couldn't be changed."
+    "hdrChangeFailed": "HDR couldn't be changed.",
+    "zoomUnavailable": "Zoom failed (for example, with Windows Magnifier open)."
   },
   "notices": {
     "recovered": "VRes didn't close properly last time: it already restored the original colors.",
@@ -228,7 +219,8 @@
     "engineUnavailable": "The VRes engine couldn't start. Restart the app; if it keeps happening, please report it.",
     "dismiss": "Dismiss",
     "modeExpired": "The new resolution reverted by itself because you didn't confirm it.",
-    "toggleHotkeyTaken": "Another program uses the resolution hotkey you chose. Pick another one in the Resolution tab."
+    "toggleHotkeyTaken": "Another program uses the resolution hotkey you chose. Pick another one in the Resolution tab.",
+    "zoomUnavailable": "Zoom failed. If Windows Magnifier is open, close it and try again."
   },
   "resolution": {
     "title": "Resolution",
@@ -586,6 +578,77 @@
       "refresh": "Refresh",
       "add": "Add",
       "remove": "Remove"
+    }
+  },
+  "enhancers": {
+    "title": "Dark Boost and Zoom",
+    "subtitle": "To see better at key moments, while you hold a key or a mouse button.",
+    "warning": "Use them with care: some games and tournaments consider brightening shadows or zooming an advantage and may penalize it. Check their rules; the decision and the risk are yours.",
+    "arm": "Arm",
+    "disarm": "Disarm",
+    "state": {
+      "disarmed": "Disarmed",
+      "active": "Active",
+      "listening": "Ready",
+      "waitingGame": "Waiting for a game in front",
+      "paused": "Paused"
+    },
+    "mode": {
+      "label": "How it works",
+      "hold": "Hold",
+      "toggle": "Toggle (one press on, another off)"
+    },
+    "scope": {
+      "label": "Where",
+      "games": "Only with a game in front",
+      "always": "In any program"
+    },
+    "binding": {
+      "label": "Key or button",
+      "change": "Change",
+      "cancel": "Cancel",
+      "recording": "Press a key or a mouse button…",
+      "hint": "Esc cancels. The left button can't be used.",
+      "unsupported": "That key can't be used. Try another one.",
+      "same": "Dark Boost and Zoom use the same key: they turn on together."
+    },
+    "buttons": {
+      "right": "Right button",
+      "middle": "Wheel button",
+      "back": "Back side button (Mouse 4)",
+      "forward": "Forward side button (Mouse 5)"
+    },
+    "keys": {
+      "shiftLeft": "Left Shift",
+      "shiftRight": "Right Shift",
+      "controlLeft": "Left Ctrl",
+      "controlRight": "Right Ctrl",
+      "altLeft": "Left Alt",
+      "altRight": "Right Alt (AltGr)",
+      "capsLock": "Caps Lock"
+    },
+    "darkBoost": {
+      "title": "Dark Boost",
+      "description": "Brightens shadows and blacks while you use it. It also works in exclusive fullscreen (tint and invert don't).",
+      "strength": "Shadows",
+      "blackLevel": "Blacks",
+      "tint": "Tint",
+      "tintColor": "Tint color",
+      "tintAmount": "Tint strength",
+      "invert": "Invert colors",
+      "invertWarning": "Inverting changes every color at once: it can be uncomfortable, or dangerous if you're photosensitive. It doesn't invert with HDR on."
+    },
+    "zoom": {
+      "title": "Zoom",
+      "description": "Enlarges the center of the screen while you use it. It's only visual: the game and the mouse don't change.",
+      "level": "Magnification",
+      "display": "Display",
+      "primary": "The main one",
+      "magnifierNote": "It doesn't work while Windows Magnifier is open."
+    },
+    "units": {
+      "percent": "{{value}}%",
+      "times": "{{value}}×"
     }
   }
 }

@@ -154,6 +154,25 @@ pub fn key_spec(code: &str) -> Option<KeySpec> {
     })
 }
 
+/// Tecla física para "mantener" (Dark Boost y Zoom): las de los atajos, los
+/// modificadores solos y Bloq Mayús. `None` si no se admite (Escape cancela
+/// la grabación, así que tampoco).
+pub fn hold_key_spec(code: &str) -> Option<KeySpec> {
+    use KeySpec::Vk;
+
+    match code {
+        "Escape" => None,
+        "ShiftLeft" => Some(Vk(0xA0)),
+        "ShiftRight" => Some(Vk(0xA1)),
+        "ControlLeft" => Some(Vk(0xA2)),
+        "ControlRight" => Some(Vk(0xA3)),
+        "AltLeft" => Some(Vk(0xA4)),
+        "AltRight" => Some(Vk(0xA5)),
+        "CapsLock" => Some(Vk(0x14)),
+        _ => key_spec(code),
+    }
+}
+
 /// Teclas que escriben algo: sin modificador, el atajo impediría escribirlas.
 fn is_typing_key(code: &str) -> bool {
     matches!(key_spec(code), Some(KeySpec::Scan(_)))
@@ -192,6 +211,15 @@ pub fn check_hotkey(hotkey: &Hotkey) -> HotkeyCheck {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn hold_keys_include_lone_modifiers_but_not_escape() {
+        assert_eq!(hold_key_spec("ShiftLeft"), Some(KeySpec::Vk(0xA0)));
+        assert_eq!(hold_key_spec("AltRight"), Some(KeySpec::Vk(0xA5)));
+        assert_eq!(hold_key_spec("KeyZ"), key_spec("KeyZ"));
+        assert_eq!(hold_key_spec("Escape"), None);
+        assert_eq!(hold_key_spec("MetaLeft"), None);
+    }
 
     fn key(code: &str, ctrl: bool, alt: bool, shift: bool) -> Hotkey {
         Hotkey {

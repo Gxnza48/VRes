@@ -1,5 +1,6 @@
 import { CrosshairPage } from "@/features/crosshair/CrosshairPage";
 import { DisplayPage } from "@/features/display/DisplayPage";
+import { EnhancersPage } from "@/features/enhancers/EnhancersPage";
 import { LibraryPage } from "@/features/library/LibraryPage";
 import { ProfilesPage } from "@/features/profiles/ProfilesPage";
 import { MorePage } from "@/features/more/MorePage";
@@ -36,6 +37,8 @@ export function Shell() {
             <CrosshairPage />
           ) : tab.id === "resolution" ? (
             <ResolutionPage />
+          ) : tab.id === "enhancers" ? (
+            <EnhancersPage />
           ) : tab.id === "more" ? (
             <MorePage />
           ) : (

@@ -22,7 +22,7 @@ fn ms(duration: Duration) -> f64 {
     (duration.as_secs_f64() * 1000.0 * 100.0).round() / 100.0
 }
 
-fn list_displays() -> Result<Vec<DisplayInfo>, Report> {
+pub(crate) fn list_displays() -> Result<Vec<DisplayInfo>, Report> {
     displays::enumerate().map_err(|error| {
         Report::fail(
             json!({ "ok": false, "error": error.to_string() }),

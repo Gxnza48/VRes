@@ -6,6 +6,7 @@
 pub mod app;
 pub mod crosshair;
 pub mod engine;
+pub mod enhancers;
 pub mod profiles;
 pub mod resolution;
 pub mod settings;

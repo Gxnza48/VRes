@@ -9,13 +9,13 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Duration;
 
 use tauri::{AppHandle, Emitter, Manager};
-use vres_core::ipc::{ErrorCode, IpcError, Notice};
+use vres_core::ipc::{EnhancerState, ErrorCode, IpcError, Notice};
 use vres_core::model::display::DisplayInfo;
 use vres_core::model::resolution::{ModeOutcome, ResolutionState};
 use vres_core::model::state::{SESSION_SCHEMA, SessionState};
 use vres_core::planner::Requested;
 use vres_core::settings::Settings;
-use vres_core::status::EngineStatus;
+use vres_core::status::{EngineStatus, ReasonCode};
 use vres_core::store::{self, Loaded};
 use vres_engine::{ApplyMode, Command, EngineConfig, EngineEvent, EngineHandle, EventSink, Reply};
 
@@ -37,6 +37,8 @@ pub const EVENT_RESOLVED: &str = "resolution:resolved";
 pub const EVENT_SETTINGS: &str = "settings:changed";
 /// Evento: cambió el perfil de juego en uso (`null`: el escritorio).
 pub const EVENT_PROFILE: &str = "profile:active";
+/// Dark Boost y Zoom (escuchando o activos).
+pub const EVENT_ENHANCERS: &str = "enhancers:state";
 
 fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
     mutex
@@ -59,6 +61,7 @@ pub struct EngineState {
     status: Mutex<EngineStatus>,
     resolution: Mutex<ResolutionState>,
     active_profile: Mutex<Option<String>>,
+    enhancers: Mutex<EnhancerState>,
     notices: Mutex<Vec<Notice>>,
     session_path: Option<PathBuf>,
 }
@@ -115,6 +118,7 @@ impl EngineState {
                     status: Mutex::new(snapshot.status),
                     resolution: Mutex::new(snapshot.resolution),
                     active_profile: Mutex::new(None),
+                    enhancers: Mutex::new(EnhancerState::default()),
                     notices: Mutex::new(notices),
                     session_path,
                 }
@@ -129,6 +133,7 @@ impl EngineState {
                     status: Mutex::new(EngineStatus::default()),
                     resolution: Mutex::new(ResolutionState::default()),
                     active_profile: Mutex::new(None),
+                    enhancers: Mutex::new(EnhancerState::default()),
                     notices: Mutex::new(notices),
                     session_path,
                 }
@@ -167,6 +172,11 @@ impl EngineState {
     /// Perfil de juego en uso (`None`: el escritorio).
     pub fn active_profile(&self) -> Option<String> {
         lock(&self.active_profile).clone()
+    }
+
+    /// Dark Boost y Zoom en este momento.
+    pub fn enhancer_state(&self) -> EnhancerState {
+        *lock(&self.enhancers)
     }
 
     /// Avisos pendientes para la interfaz (se vacían al leerlos).
@@ -332,6 +342,9 @@ fn on_engine_event(app: &AppHandle, event: EngineEvent) {
         }
         EngineEvent::Notice(reason) => {
             tracing::info!(?reason, "aviso del motor");
+            if reason == ReasonCode::ZoomUnavailable {
+                let _ = app.emit(EVENT_NOTICE, Notice::ZoomUnavailable);
+            }
         }
         EngineEvent::Log(detail) => {
             tracing::warn!(%detail, "motor");
@@ -340,6 +353,10 @@ fn on_engine_event(app: &AppHandle, event: EngineEvent) {
             tracing::info!(profile = ?active, "perfil de juego");
             *lock(&state.active_profile) = active.clone();
             let _ = app.emit(EVENT_PROFILE, active);
+        }
+        EngineEvent::Enhancers(enhancers) => {
+            *lock(&state.enhancers) = enhancers;
+            let _ = app.emit(EVENT_ENHANCERS, enhancers);
         }
     }
 }

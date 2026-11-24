@@ -11,7 +11,7 @@ VRes se construye por **fases**. Cada fase termina en una versión instalable: c
 | **F4** | Crosshair | v0.4 | ✅ |
 | **F5** | Looks, Biblioteca, códigos y color avanzado | v0.5 | ✅ |
 | **F6** | Perfiles por juego | v0.6 | ✅ |
-| **F7** | Dark Boost y Zoom | v0.7 | 🗓 |
+| **F7** | Dark Boost y Zoom | v0.7 | ✅ |
 | **F8** | Monitor (DDC/CI), Personalizar y Más | v0.8 | 🗓 |
 | **F9** | Control desde el celular | v0.9 | 🗓 |
 | **F10** | Resoluciones personalizadas, asistentes por juego, firma | v1.0 | 🗓 |
@@ -98,8 +98,14 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 
 ## F7 — Dark Boost y Zoom
 
-- Dark Boost (sombras, tinte, invertir) y zoom de 1,5× a 4×, manteniendo una tecla o un botón del mouse
-- Apagados por defecto, con aviso; se pausan al salir del juego
+- [x] Dark Boost: levanta sombras y negros por rampa (funciona aunque el color esté apagado y en pantalla completa exclusiva); tinte e inversión por matriz (la inversión no se usa con HDR)
+- [x] Zoom de 1,5× a 4× sobre el centro de la pantalla elegida (también con el monitor en coordenadas negativas)
+- [x] Mantener o alternar, con una tecla (también Shift, Ctrl, Alt o Bloq Mayús solos) o un botón del mouse (derecho, rueda, Mouse 4 y 5)
+- [x] La tecla se **lee** (`GetAsyncKeyState`, sin hooks y sin consumirla) solo mientras la función está armada y en su alcance: con un juego al frente, o en cualquier programa
+- [x] Vienen desarmados, con aviso de anti-cheat y de fotosensibilidad; se sueltan al salir del juego, con la pausa y con el atajo de emergencia
+- [x] `vres-cli zoom test`, `vres-cli input probe` y `vres-cli probe engine-enhancers`
+- [ ] Dark Boost y Zoom por perfil de juego
+- [ ] A ojo: mantener el botón hace zoom al instante y soltarlo lo quita; el juego sigue recibiendo el botón; Dark Boost aclara las sombras sin lavar todo
 
 ## F8 — Monitor, Personalizar y Más
 

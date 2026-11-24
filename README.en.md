@@ -39,7 +39,7 @@ It is built for the Latin-American gaming community: **truly free** (no paid pla
 | **Crosshair** overlay: shapes by parts, colors, your own image, any monitor, hidden from captures and saved crosshairs | ✅ Available | v0.4 |
 | **Looks & Library:** own per-game looks, local library, share codes, color depth, color-blindness aids, eye care and quick adjust from the tray | ✅ Available | v0.5 |
 | **Per-game profiles:** Fortnite, VALORANT, CS2, Apex Legends, Rust, Rainbow Six Siege and any other game; look and crosshair while in front, resolution while the game is open | ✅ Available | v0.6 |
-| **Dark Boost & Zoom** while holding a key or a mouse button | 🗓 Planned | v0.7 |
+| **Dark Boost & Zoom** while holding (or toggling) a key or a mouse button, Mouse 4 and 5 included; they ship disarmed | ✅ Available | v0.7 |
 | **Monitor:** hardware brightness and contrast (DDC/CI); interface customization | 🗓 Planned | v0.8 |
 | **Phone remote** over your Wi-Fi | 🗓 Planned | v0.9 |
 | Per-GPU custom resolutions and a signed installer | 🗓 Planned | v1.0 |

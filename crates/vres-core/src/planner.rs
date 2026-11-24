@@ -11,6 +11,7 @@ use ts_rs::TS;
 
 use crate::color::matrix::{self, ColorMatrix, DEFAULT_COEFFICIENT_LIMIT};
 use crate::color::ramp::RampParams;
+use crate::enhancers::{DarkBoost, boosted_tone, dark_boost_matrix};
 use crate::model::display::DisplayInfo;
 use crate::model::look::{DisplayTrim, Look};
 use crate::model::vibrance::approximate_with_saturation;
@@ -142,9 +143,22 @@ pub fn plan_with(
     displays: &[DisplayInfo],
     vibrance_capable: &BTreeSet<String>,
 ) -> Plan {
+    plan_full(requested, displays, vibrance_capable, None)
+}
+
+/// Como [`plan_with`], con Dark Boost activo (mientras se mantiene su tecla).
+/// Dark Boost funciona aunque el color esté apagado (no con la pausa ni al
+/// comparar): levanta sombras y negros en la rampa, y tiñe o invierte en la
+/// matriz.
+pub fn plan_full(
+    requested: &Requested,
+    displays: &[DisplayInfo],
+    vibrance_capable: &BTreeSet<String>,
+    dark_boost: Option<&DarkBoost>,
+) -> Plan {
     let mut plan = Plan::neutral(displays);
 
-    if !requested.color_enabled {
+    if !requested.color_enabled && dark_boost.is_none() {
         return plan;
     }
     if requested.paused || requested.compare {
@@ -162,7 +176,11 @@ pub fn plan_with(
         return plan;
     }
 
-    let look = requested.look.clamped();
+    let look = if requested.color_enabled {
+        requested.look.clamped()
+    } else {
+        Look::default()
+    };
     let targeted: Vec<&DisplayInfo> = displays
         .iter()
         .filter(|display| requested.targets_display(&display.id))
@@ -175,7 +193,24 @@ pub fn plan_with(
     // Matriz: global. Si hay pantallas sin tildar, se pausa (no se puede
     // aplicar solo a algunas).
     let emulated = (!driver_vibrance).then_some(look.vibrance);
-    let built = matrix::build_matrix(&look, emulated, DEFAULT_COEFFICIENT_LIMIT);
+    let mut built = matrix::build_matrix(&look, emulated, DEFAULT_COEFFICIENT_LIMIT);
+    if let Some(boost) = dark_boost {
+        // Con HDR, una matriz con desplazamientos (invertir) no es confiable.
+        let hdr = targeted.iter().any(|display| display.hdr.enabled);
+        if hdr && boost.invert {
+            plan.notes.push(PlanNote {
+                layer: Layer::Matrix,
+                display: None,
+                status: LayerStatus::Limited,
+                reason: ReasonCode::HdrActive,
+            });
+        }
+        built.matrix = built
+            .matrix
+            .then(&dark_boost_matrix(boost, !hdr))
+            .sanitize(DEFAULT_COEFFICIENT_LIMIT)
+            .matrix;
+    }
     let mut approximate = false;
     if !built.matrix.is_identity(1e-6) {
         if all_targeted {
@@ -233,7 +268,11 @@ pub fn plan_with(
             .cloned()
             .unwrap_or_default()
             .clamped();
-        let params = RampParams::new(&look.tone, &look.eye_care, &trim);
+        let tone = match dark_boost {
+            Some(boost) => boosted_tone(&look.tone, boost),
+            None => look.tone.clone(),
+        };
+        let params = RampParams::new(&tone, &look.eye_care, &trim);
         if params.is_neutral() {
             continue;
         }
@@ -382,6 +421,63 @@ mod tests {
                 .vibrance
                 .is_empty()
         );
+    }
+
+    #[test]
+    fn dark_boost_lifts_shadows_even_with_color_off() {
+        let request = Requested {
+            color_enabled: false,
+            ..Requested::default()
+        };
+        let boost = DarkBoost::default();
+        let plan = plan_full(&request, &two_displays(), &BTreeSet::new(), Some(&boost));
+        assert!(
+            plan.ramps
+                .values()
+                .all(|ramp| matches!(ramp, RampTarget::Custom(_))),
+            "las sombras se levantan en los dos monitores"
+        );
+        let plain = plan_full(&request, &two_displays(), &BTreeSet::new(), None);
+        assert!(
+            plain.is_neutral(),
+            "sin Dark Boost y con el color apagado, nada"
+        );
+    }
+
+    #[test]
+    fn dark_boost_is_off_while_paused() {
+        let request = Requested {
+            paused: true,
+            ..Requested::default()
+        };
+        let plan = plan_full(
+            &request,
+            &two_displays(),
+            &BTreeSet::new(),
+            Some(&DarkBoost::default()),
+        );
+        assert!(plan.is_neutral());
+    }
+
+    #[test]
+    fn dark_boost_does_not_invert_with_hdr() {
+        let boost = DarkBoost {
+            invert: true,
+            strength: 0.0,
+            black_level: 0.0,
+            ..DarkBoost::default()
+        };
+        let hdr = vec![display("a", 0, true)];
+        let plan = plan_full(&Requested::default(), &hdr, &BTreeSet::new(), Some(&boost));
+        assert!(plan.matrix.is_identity(1e-6));
+        assert!(
+            plan.notes
+                .iter()
+                .any(|note| note.reason == ReasonCode::HdrActive)
+        );
+        let sdr = vec![display("a", 0, false)];
+        let plan = plan_full(&Requested::default(), &sdr, &BTreeSet::new(), Some(&boost));
+        assert!(plan.matrix.has_offsets(), "sin HDR sí invierte");
     }
 
     #[test]

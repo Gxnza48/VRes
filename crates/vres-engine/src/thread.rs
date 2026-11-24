@@ -19,7 +19,10 @@ use std::time::{Duration, Instant};
 use vres_core::color::matrix::ColorMatrix;
 use vres_core::color::ramp::GammaRamp;
 use vres_core::crosshair::{self, Crosshair};
-use vres_core::ipc::ErrorCode;
+use vres_core::enhancers::{
+    EnhancerScope, EnhancerSettings, HoldTracker, ZOOM_WARMUP_LEVEL, listens, zoom_offset,
+};
+use vres_core::ipc::{EnhancerState, ErrorCode};
 use vres_core::keys::Hotkey;
 use vres_core::model::display::DisplayInfo;
 use vres_core::model::resolution::{
@@ -76,6 +79,8 @@ const TIMER_FOREGROUND: usize = 4;
 const TIMER_MODE: usize = 5;
 /// Mientras hay un juego abierto: ¿sigue abierto?
 const TIMER_GAME: usize = 6;
+/// Mientras Dark Boost o Zoom escuchan su tecla.
+const TIMER_HOLD: usize = 7;
 const HOTKEY_EMERGENCY: i32 = 1;
 const HOTKEY_TOGGLE: i32 = 2;
 
@@ -83,6 +88,9 @@ const HEALTH_INTERVAL_MS: u32 = 1000;
 const IDENTIFY_MS: u32 = 2500;
 const MODE_TICK_MS: u32 = 250;
 const GAME_POLL_MS: u32 = 3000;
+/// Lectura de la tecla de Dark Boost y Zoom (el mínimo de los timers de
+/// Windows: en la práctica, unos 15 ms).
+const HOLD_POLL_MS: u32 = 10;
 /// Tope para esperar un cambio de modo en curso antes de restaurar.
 const JOB_WAIT: Duration = Duration::from_secs(2);
 
@@ -101,6 +109,8 @@ pub struct EngineSettings {
     pub crosshair: CrosshairSettings,
     /// Perfiles por juego.
     pub profiles: ProfileSettings,
+    /// Dark Boost y Zoom.
+    pub enhancers: EnhancerSettings,
 }
 
 impl Default for EngineSettings {
@@ -112,6 +122,7 @@ impl Default for EngineSettings {
             confirm_seconds: DEFAULT_CONFIRM_SECONDS,
             crosshair: CrosshairSettings::default(),
             profiles: ProfileSettings::default(),
+            enhancers: EnhancerSettings::default(),
         }
     }
 }
@@ -208,6 +219,8 @@ pub enum EngineEvent {
     Log(String),
     /// Cambió el perfil en uso (`None`: el escritorio).
     Profile(Option<String>),
+    /// Cambió el estado de Dark Boost o Zoom.
+    Enhancers(EnhancerState),
 }
 
 /// Estado inicial, al terminar de arrancar.
@@ -392,6 +405,24 @@ impl Hardware for WinHardware {
     }
 }
 
+impl WinHardware {
+    /// Zoom de pantalla completa (`1.0, 0, 0` lo quita).
+    fn set_zoom(&self, level: f32, x: i32, y: i32) -> Result<(), String> {
+        let magnifier = self
+            .magnifier
+            .as_ref()
+            .ok_or_else(|| "magnification api unavailable".to_owned())?;
+        magnifier
+            .set_transform(level, x, y)
+            .map_err(|error| error.to_string())
+    }
+
+    /// Deja listo el zoom de Windows con un aumento imperceptible.
+    fn warm_up_zoom(&self) -> bool {
+        self.set_zoom(ZOOM_WARMUP_LEVEL, 0, 0).is_ok() && self.set_zoom(1.0, 0, 0).is_ok()
+    }
+}
+
 /// Ejecuta un trabajo de resolución o HDR. Corre en un hilo auxiliar (o en el
 /// del motor al restaurar).
 fn execute_job(job: &ModeJob) -> JobResult {
@@ -481,6 +512,19 @@ struct Shell {
     /// Resolución que aplicó un perfil (para revertirla al cerrar el juego).
     profile_resolution: Option<SavedMode>,
     game_timer_armed: bool,
+    /// Hay un juego conocido (o agregado) al frente.
+    in_game: bool,
+    hold_timer_armed: bool,
+    dark_boost: HoldTracker,
+    zoom: HoldTracker,
+    /// Dark Boost que está aplicado.
+    dark_boost_effect: Option<vres_core::enhancers::DarkBoost>,
+    /// Zoom aplicado: aumento y desplazamiento.
+    zoom_applied: Option<(f32, i32, i32)>,
+    /// Ya se preparó el zoom de Windows en esta sesión.
+    zoom_warmed: bool,
+    /// Último estado avisado a la interfaz.
+    enhancer_state: EnhancerState,
     shutdown_reply: Option<Sender<()>>,
 }
 
@@ -532,7 +576,7 @@ impl Shell {
                 }
                 // Un juego a pantalla completa puede pisar la rampa (se
                 // verifica) y puede tener un perfil (se mira cuál es).
-                if self.core.is_active() || self.settings.profiles.auto_switch {
+                if self.core.is_active() || self.watches_foreground() {
                     window::set_timer(self.hwnd, TIMER_FOREGROUND, 150);
                 }
                 Some(0)
@@ -540,6 +584,7 @@ impl Shell {
             WM_QUERYENDSESSION => Some(1),
             WM_ENDSESSION => {
                 if wparam != 0 {
+                    self.release_enhancers();
                     self.restore_modes();
                     self.core.restore_all();
                     self.after_change(true);
@@ -597,6 +642,7 @@ impl Shell {
                 }
                 self.observe_games();
             }
+            TIMER_HOLD => self.poll_hold(),
             TIMER_IDENTIFY => {
                 window::kill_timer(self.hwnd, TIMER_IDENTIFY);
                 self.identify = None;
@@ -633,6 +679,8 @@ impl Shell {
         if let Some(requested) = latest {
             self.desktop = requested;
             self.apply_effective();
+            // La pausa también frena Dark Boost y Zoom.
+            self.update_listening();
         }
         if refresh {
             self.displays_dirty = true;
@@ -648,6 +696,7 @@ impl Shell {
             self.emergency_reset();
         }
         if let Some(reply) = shutdown {
+            self.release_enhancers();
             self.restore_modes();
             self.core.restore_all();
             self.after_change(true);
@@ -764,6 +813,8 @@ impl Shell {
             Command::SuspendHotkeys(suspended) => {
                 self.hotkeys_suspended = suspended;
                 self.register_toggle_hotkey();
+                // Mientras se graba una tecla, Dark Boost y Zoom no escuchan.
+                self.update_listening();
             }
             Command::Set(..)
             | Command::Identify
@@ -1022,10 +1073,15 @@ impl Shell {
     /// Mira qué juego está al frente y aplica (o quita) su perfil.
     fn observe_games(&mut self) {
         let profiles = self.settings.profiles.clone();
-        if profiles.auto_switch {
-            let foreground = process::foreground_process().and_then(|process| {
+        let foreground = if self.watches_foreground() {
+            process::foreground_process().and_then(|process| {
                 match_game(&process.exe, &profiles.custom_games).map(|id| (id, process))
-            });
+            })
+        } else {
+            None
+        };
+        self.in_game = foreground.is_some();
+        if profiles.auto_switch {
             if let Some((id, process)) = &foreground
                 && self.game.as_ref().map(|(_, current)| current) != Some(process)
             {
@@ -1048,6 +1104,140 @@ impl Shell {
             window::kill_timer(self.hwnd, TIMER_GAME);
         }
         self.game_timer_armed = want_timer;
+        self.update_listening();
+    }
+
+    /// Hace falta saber qué juego está al frente: perfiles automáticos, o Dark
+    /// Boost o Zoom armados solo para juegos.
+    fn watches_foreground(&self) -> bool {
+        let enhancers = &self.settings.enhancers;
+        let for_games = |armed: bool, scope: EnhancerScope| armed && scope == EnhancerScope::Games;
+        self.settings.profiles.auto_switch
+            || for_games(enhancers.dark_boost.armed, enhancers.dark_boost.scope)
+            || for_games(enhancers.zoom.armed, enhancers.zoom.scope)
+    }
+
+    /// Arranca o frena la lectura de las teclas de Dark Boost y Zoom, y suelta
+    /// lo que deja de escucharse (por ejemplo, al salir del juego).
+    fn update_listening(&mut self) {
+        let enhancers = &self.settings.enhancers;
+        let blocked = self.hotkeys_suspended || self.desktop.paused;
+        let dark = !blocked
+            && listens(
+                enhancers.dark_boost.armed,
+                enhancers.dark_boost.scope,
+                self.in_game,
+            );
+        let zoom = !blocked && listens(enhancers.zoom.armed, enhancers.zoom.scope, self.in_game);
+        if !dark {
+            self.dark_boost.release();
+        }
+        if !zoom {
+            self.zoom.release();
+        }
+        let want_timer = dark || zoom;
+        if want_timer && !self.hold_timer_armed {
+            window::set_timer(self.hwnd, TIMER_HOLD, HOLD_POLL_MS);
+        } else if !want_timer && self.hold_timer_armed {
+            window::kill_timer(self.hwnd, TIMER_HOLD);
+        }
+        self.hold_timer_armed = want_timer;
+        if zoom && !self.zoom_warmed {
+            // Se prepara ahora (una vez por sesión), no al apretar la tecla.
+            self.zoom_warmed = self.core.hardware_mut().warm_up_zoom();
+        }
+        self.sync_enhancers(dark, zoom);
+    }
+
+    /// Lee las teclas (solo mientras escuchan).
+    fn poll_hold(&mut self) {
+        let enhancers = &self.settings.enhancers;
+        let (dark, zoom) = (
+            self.enhancer_state.dark_boost_listening,
+            self.enhancer_state.zoom_listening,
+        );
+        let mut changed = false;
+        if dark && let Some(vk) = keyboard::binding_virtual_key(&enhancers.dark_boost.binding) {
+            changed |= self
+                .dark_boost
+                .update(enhancers.dark_boost.mode, keyboard::is_down(vk));
+        }
+        if zoom && let Some(vk) = keyboard::binding_virtual_key(&enhancers.zoom.binding) {
+            changed |= self.zoom.update(enhancers.zoom.mode, keyboard::is_down(vk));
+        }
+        if changed {
+            self.sync_enhancers(dark, zoom);
+        }
+    }
+
+    /// Aplica Dark Boost y Zoom según sus teclas y avisa si cambió algo.
+    fn sync_enhancers(&mut self, dark_listening: bool, zoom_listening: bool) {
+        let effect = self
+            .dark_boost
+            .active()
+            .then(|| self.settings.enhancers.dark_boost.effect.clone());
+        if effect != self.dark_boost_effect {
+            self.dark_boost_effect.clone_from(&effect);
+            self.core.set_dark_boost(effect);
+            let changed = self.core.reconcile(false);
+            self.after_change(changed);
+        }
+        let zoom = if self.zoom.active() {
+            self.zoom_transform()
+        } else {
+            None
+        };
+        if zoom != self.zoom_applied {
+            self.apply_zoom(zoom);
+        }
+        let state = EnhancerState {
+            dark_boost_listening: dark_listening,
+            dark_boost: self.dark_boost_effect.is_some(),
+            zoom_listening,
+            zoom: self.zoom_applied.is_some(),
+        };
+        if state != self.enhancer_state {
+            self.enhancer_state = state;
+            (self.sink)(EngineEvent::Enhancers(state));
+        }
+    }
+
+    /// Aumento y desplazamiento que hacen zoom sobre el centro de su pantalla.
+    fn zoom_transform(&self) -> Option<(f32, i32, i32)> {
+        let config = &self.settings.enhancers.zoom;
+        let display = config
+            .display_id
+            .as_deref()
+            .and_then(|id| self.display(id))
+            .or_else(|| self.core.displays().iter().find(|d| d.primary).cloned())
+            .or_else(|| self.core.displays().first().cloned())?;
+        let (x, y) = zoom_offset(config.level, display.bounds.center());
+        Some((config.level, x, y))
+    }
+
+    fn apply_zoom(&mut self, wanted: Option<(f32, i32, i32)>) {
+        let (level, x, y) = wanted.unwrap_or((1.0, 0, 0));
+        match self.core.hardware_mut().set_zoom(level, x, y) {
+            Ok(()) => self.zoom_applied = wanted,
+            Err(error) => {
+                self.zoom_applied = None;
+                if wanted.is_some() {
+                    (self.sink)(EngineEvent::Notice(ReasonCode::ZoomUnavailable));
+                }
+                (self.sink)(EngineEvent::Log(format!("zoom failed: {error}")));
+            }
+        }
+    }
+
+    /// Suelta Dark Boost y Zoom (atajo de emergencia, cierre de sesión, salida).
+    fn release_enhancers(&mut self) {
+        self.dark_boost.release();
+        self.zoom.release();
+        self.dark_boost_effect = None;
+        self.core.set_dark_boost(None);
+        if self.zoom_applied.is_some() {
+            self.apply_zoom(None);
+        }
     }
 
     fn apply_session(&mut self, plan: SessionPlan) {
@@ -1108,6 +1298,7 @@ impl Shell {
     }
 
     fn emergency_reset(&mut self) {
+        self.release_enhancers();
         self.desktop.color_enabled = false;
         let requested = self.effective_requested();
         self.core.set_requested(requested);
@@ -1120,6 +1311,7 @@ impl Shell {
             self.emit_resolution();
         }
         (self.sink)(EngineEvent::EmergencyReset);
+        self.update_listening();
     }
 
     fn identify(&mut self) {
@@ -1253,6 +1445,14 @@ fn run(
         session: SessionPlan::default(),
         profile_resolution: None,
         game_timer_armed: false,
+        in_game: false,
+        hold_timer_armed: false,
+        dark_boost: HoldTracker::default(),
+        zoom: HoldTracker::default(),
+        dark_boost_effect: None,
+        zoom_applied: None,
+        zoom_warmed: false,
+        enhancer_state: EnhancerState::default(),
         shutdown_reply: None,
     }));
 
@@ -1298,6 +1498,8 @@ fn run(
             toggle_hotkey_registered: toggle_ok,
         };
         let _ = ready.send(Ok((window.handle(), snapshot)));
+        // Un juego ya abierto puede tener perfil; Dark Boost y Zoom pueden escuchar.
+        shell.observe_games();
     }
 
     window::run_message_loop();

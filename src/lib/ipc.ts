@@ -11,6 +11,7 @@ import type { Bootstrap } from "./bindings/Bootstrap";
 import type { Crosshair } from "./bindings/Crosshair";
 import type { CrosshairPreset } from "./bindings/CrosshairPreset";
 import type { DisplayInfo } from "./bindings/DisplayInfo";
+import type { EnhancerState } from "./bindings/EnhancerState";
 import type { EngineStatus } from "./bindings/EngineStatus";
 import type { GameInfo } from "./bindings/GameInfo";
 import type { Hotkey } from "./bindings/Hotkey";
@@ -135,6 +136,10 @@ export const ipc = {
   gamesList: () => call<GameInfo[]>("games_list"),
   /** Perfil de juego en uso (`null`: el escritorio). */
   profileActive: () => call<string | null>("profile_active"),
+  /** Dark Boost y Zoom: si escuchan su tecla o están activos. */
+  enhancersState: () => call<EnhancerState>("enhancers_state"),
+  /** Si una tecla física sirve para Dark Boost o Zoom. */
+  enhancersKeySupported: (code: string) => call<boolean>("enhancers_key_supported", { code }),
   /** Programas abiertos con ventana, para agregar un juego propio. */
   gamesRunningCandidates: () => call<RunningApp[]>("games_running_candidates"),
 

@@ -28,7 +28,7 @@ Para sumar tu PC, abre un [reporte de compatibilidad](https://github.com/Gxnza48
 | 9 | ¿Llegan los atajos con cada juego en primer plano? | Backend de atajos | F1/F7 | — |
 | 10 | Resolución temporal: ¿persiste al cambiar de foco? ¿GDI o CCD para estirar en cada GPU? | Red de seguridad y orden de F2 | F2 | ✅ GDI estira en las dos GPU; Windows revierte solo si el proceso muere |
 | 11 | Crosshair: siempre encima, centrado con DPI mixto, oculto en capturas | F4 | F4 | — |
-| 12 | Zoom con el monitor externo a la izquierda y a la derecha | F7 | F7 | — |
+| 12 | Zoom con el monitor externo a la izquierda y a la derecha | F7 | F7 | ✅ A la izquierda (coordenadas negativas): centro fijo, verificado por captura (a la derecha: sin probar) |
 
 ## F0 — Ciclo de vida de la ventana
 
@@ -174,3 +174,31 @@ Medido el 2026-11-24 con `vres-cli overlay test` (un píxel magenta en el centro
 ### Pendiente de F4
 
 - A ojo: que no robe el foco ni los clics sobre un juego en ventana sin bordes, y que no aparezca en OBS con "ocultar en capturas".
+
+## F6 — Perfiles por juego
+
+- `vres-cli fg watch` reconoce el programa al frente por la lista de procesos (`CreateToolhelp32Snapshot`), sin abrir ningún proceso.
+
+### Pendiente de F6
+
+- A ojo: abrir cada juego instalado activa su perfil, Alt+Tab vuelve al escritorio y cerrar el juego devuelve la resolución, sin parpadeos.
+
+## F7 — Dark Boost y Zoom
+
+Medido el 2026-11-24 con `vres-cli zoom test` (dos cuadrados de color: uno en el centro de la pantalla y otro corrido 80 px; con zoom 2× el del centro tiene que quedar fijo y el corrido tiene que verse a 160 px).
+
+| Pantalla | Centro | Desplazamiento (2×) | Relectura | Centro fijo | Corrido al doble | Vuelve |
+|---|---|---|---|---|---|---|
+| ATNA40CU05-0 (interno) | (1440, 900) | (720, 450) | ✅ | ✅ | ✅ | ✅ |
+| MAG 255F E20 (a la izquierda) | (−960, 540) | (−480, 270) | ✅ | ✅ | ✅ | ✅ |
+
+- `desplazamiento = centro × (1 − 1/aumento)` vale para todo el escritorio virtual, también con coordenadas negativas.
+- La captura de pantalla (`BitBlt`) muestra el zoom, igual que muestra el filtro de color. Con un filtro de color activo (el VRes instalado estaba abierto con un look), los colores capturados no son los puros: la prueba compara contra la captura previa.
+- **La primera llamada con zoom tarda 330–670 ms** (Windows prepara la lupa); las siguientes, 0,01 ms. Un "precalentamiento" con aumento 1,0001× (menos de un tercio de píxel) absorbe esa demora: el motor lo hace una vez por sesión, cuando el zoom empieza a escuchar su tecla, y no al apretarla. Con aumento 1,0 no sirve.
+- `vres-cli input probe`: unas 66 lecturas por segundo (cada ~15 ms, el mínimo de los timers de Windows).
+- `vres-cli probe engine-enhancers` (motor real): arranca en ~100 ms, escucha las dos teclas al armarlos en "cualquier programa", deja de escucharlas al desarmarlos y no deja zoom aplicado ✅.
+
+### Pendiente de F7
+
+- A ojo: mantener el botón hace zoom al instante y soltarlo lo quita; el juego sigue recibiendo el botón; Dark Boost aclara las sombras sin lavar todo; el precalentamiento no se nota.
+- Zoom con el monitor externo a la derecha del principal.

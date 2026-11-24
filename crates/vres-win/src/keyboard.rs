@@ -1,8 +1,11 @@
 //! Traducción de atajos (tecla física + modificadores) a lo que pide
 //! `RegisterHotKey`.
 
-use vres_core::keys::{Hotkey, KeySpec, key_spec};
-use windows::Win32::UI::Input::KeyboardAndMouse::{MAPVK_VSC_TO_VK_EX, MapVirtualKeyW};
+use vres_core::enhancers::Binding;
+use vres_core::keys::{Hotkey, KeySpec, hold_key_spec, key_spec};
+use windows::Win32::UI::Input::KeyboardAndMouse::{
+    GetAsyncKeyState, MAPVK_VSC_TO_VK_EX, MapVirtualKeyW,
+};
 
 const MOD_ALT: u32 = 0x1;
 const MOD_CONTROL: u32 = 0x2;
@@ -20,6 +23,25 @@ pub fn virtual_key(spec: KeySpec) -> Option<u32> {
             (vk != 0).then_some(vk)
         }
     }
+}
+
+/// Tecla virtual de lo que hay que apretar para Dark Boost o Zoom.
+pub fn binding_virtual_key(binding: &Binding) -> Option<u32> {
+    match binding {
+        Binding::Key { code } => virtual_key(hold_key_spec(code)?),
+        Binding::Mouse { button } => Some(button.virtual_key()),
+    }
+}
+
+/// `true` si la tecla (o el botón del mouse) está apretada ahora. Solo lee:
+/// no la consume, así que el programa al frente la recibe igual.
+pub fn is_down(vk: u32) -> bool {
+    let Ok(vk) = i32::try_from(vk) else {
+        return false;
+    };
+    // SAFETY: solo consulta el estado de una tecla virtual.
+    let state = unsafe { GetAsyncKeyState(vk) };
+    (state as u16) & 0x8000 != 0
 }
 
 /// `(modificadores, tecla virtual)` para `RegisterHotKey`. `None` si la tecla

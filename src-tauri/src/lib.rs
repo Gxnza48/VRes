@@ -110,6 +110,8 @@ pub fn run() {
             commands::share::games_list,
             commands::profiles::profile_active,
             commands::profiles::games_running_candidates,
+            commands::enhancers::enhancers_state,
+            commands::enhancers::enhancers_key_supported,
         ])
         .build(tauri::generate_context!())
         .expect("VRes no pudo iniciar");

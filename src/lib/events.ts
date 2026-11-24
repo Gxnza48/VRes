@@ -5,6 +5,7 @@ import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
 import type { DisplayInfo } from "./bindings/DisplayInfo";
+import type { EnhancerState } from "./bindings/EnhancerState";
 import type { EngineStatus } from "./bindings/EngineStatus";
 import type { ModeResolved } from "./bindings/ModeResolved";
 import type { Notice } from "./bindings/Notice";
@@ -36,6 +37,8 @@ export const events = {
     on("resolution:resolved", handler),
   /** Cambiaron los ajustes (por ejemplo, se confirmó un modo nuevo). */
   onSettingsChanged: (handler: (settings: Settings) => void) => on("settings:changed", handler),
+  /** Dark Boost o Zoom empezaron (o dejaron) de escuchar su tecla, o de estar activos. */
+  onEnhancers: (handler: (state: EnhancerState) => void) => on("enhancers:state", handler),
   /** Cambió el perfil de juego en uso (`null`: el escritorio). */
   onProfileActive: (handler: (game: string | null) => void) => on("profile:active", handler),
   /** La ventana actual ganó o perdió el foco (el popup rápido se cierra al perderlo). */

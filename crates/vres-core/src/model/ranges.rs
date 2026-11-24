@@ -83,8 +83,21 @@ pub const CROSSHAIR_SCALE: Range = Range::new(25.0, 400.0, 100.0, 5.0);
 /// Crosshair: desplazamiento desde el centro (px).
 pub const CROSSHAIR_OFFSET: Range = Range::new(-200.0, 200.0, 0.0, 1.0);
 
+/// Dark Boost: cuánto se levantan las sombras.
+pub const DARK_BOOST: Range = Range::new(0.0, 100.0, 50.0, 1.0);
+/// Dark Boost: cuánto se levantan los negros.
+pub const BLACK_LEVEL: Range = Range::new(0.0, 100.0, 20.0, 1.0);
+/// Dark Boost: intensidad del tinte.
+pub const TINT_AMOUNT: Range = Range::new(0.0, 100.0, 40.0, 1.0);
+/// Zoom: aumento.
+pub const ZOOM: Range = Range::new(1.5, 4.0, 2.0, 0.1);
+
 /// Todos los rangos, con el nombre con el que los usa la interfaz.
 pub const ALL: &[(&str, Range)] = &[
+    ("darkBoost", DARK_BOOST),
+    ("blackLevel", BLACK_LEVEL),
+    ("tintAmount", TINT_AMOUNT),
+    ("zoom", ZOOM),
     ("crosshairLength", CROSSHAIR_LENGTH),
     ("crosshairThickness", CROSSHAIR_THICKNESS),
     ("crosshairGap", CROSSHAIR_GAP),

@@ -87,6 +87,8 @@ pub enum ReasonCode {
     HdrChangeFailed,
     /// Otro programa ya usa ese atajo.
     HotkeyTaken,
+    /// No se pudo hacer zoom (por ejemplo, con la Lupa de Windows abierta).
+    ZoomUnavailable,
     /// VRes arrancó en modo seguro tras un cierre inesperado.
     SafeModeAfterCrash,
 }

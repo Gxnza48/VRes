@@ -31,6 +31,8 @@ mod resolution;
 mod share;
 #[cfg(windows)]
 mod vibrance;
+#[cfg(windows)]
+mod zoom;
 
 /// Resultado de un comando: JSON para scripts y texto para personas.
 pub struct Report {
@@ -115,6 +117,12 @@ enum Command {
     /// Programa en primer plano (detección de juegos).
     #[command(subcommand)]
     Fg(FgCommand),
+    /// Zoom de pantalla completa (lo que usa Zoom).
+    #[command(subcommand)]
+    Zoom(ZoomCommand),
+    /// Lectura de botones del mouse (lo que usan Dark Boost y Zoom).
+    #[command(subcommand)]
+    Input(InputCommand),
     /// Mediciones en hardware real.
     #[command(subcommand)]
     Probe(ProbeCommand),
@@ -169,6 +177,32 @@ enum ModeCommand {
         /// Confirma que la pantalla puede parpadear y cambiar unos segundos.
         #[arg(long)]
         allow_mode_switch: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum ZoomCommand {
+    /// Hace zoom sobre el centro de cada pantalla, lo verifica y lo quita.
+    Test {
+        /// Solo esta pantalla (id o \\.\DISPLAYn).
+        #[arg(long)]
+        display: Option<String>,
+        /// Aumento (1,5 a 4).
+        #[arg(long, default_value_t = 2.0)]
+        level: f32,
+        /// Cuánto dura el zoom en cada pantalla, en milisegundos.
+        #[arg(long, default_value_t = 600)]
+        hold_ms: u64,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum InputCommand {
+    /// Anota los botones del mouse que se aprietan (derecho, rueda, laterales).
+    Probe {
+        /// Cuánto tiempo mirar, en segundos.
+        #[arg(long, default_value_t = 5)]
+        seconds: u64,
     },
 }
 
@@ -343,6 +377,12 @@ enum ProbeCommand {
         #[arg(long, default_value_t = 1500)]
         hold_ms: u64,
     },
+    /// El motor real escucha las teclas de Dark Boost y Zoom solo mientras están armados.
+    EngineEnhancers {
+        /// Cuánto tiempo dejarlos armados, en milisegundos.
+        #[arg(long, default_value_t = 800)]
+        hold_ms: u64,
+    },
     /// El motor real aplica, deja vencer, conserva y restaura un modo.
     EngineModes {
         #[arg(long)]
@@ -432,6 +472,9 @@ fn run(command: Command) -> Report {
         Command::Probe(ProbeCommand::Timing { display, samples }) => {
             hw::probe_timing(display.as_deref(), samples.clamp(2, 500))
         }
+        Command::Probe(ProbeCommand::EngineEnhancers { hold_ms }) => {
+            zoom::probe_engine(hold(hold_ms))
+        }
         Command::Probe(ProbeCommand::EngineVibrance { value, hold_ms }) => {
             vibrance::probe_engine(value.clamp(0.0, 100.0), hold(hold_ms))
         }
@@ -465,6 +508,18 @@ fn run(command: Command) -> Report {
             Duration::from_millis(hold_ms.min(resolution::MAX_MODE_HOLD_MS)),
             allow_mode_switch,
         ),
+        Command::Zoom(ZoomCommand::Test {
+            display,
+            level,
+            hold_ms,
+        }) => zoom::test(
+            display.as_deref(),
+            level,
+            Duration::from_millis(hold_ms.clamp(100, 5000)),
+        ),
+        Command::Input(InputCommand::Probe { seconds }) => {
+            zoom::input_probe(Duration::from_secs(seconds.clamp(1, 120)))
+        }
         Command::Fg(FgCommand::Watch { seconds }) => {
             foreground::watch(Duration::from_secs(seconds.clamp(1, 600)))
         }

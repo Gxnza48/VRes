@@ -10,6 +10,7 @@ use std::time::{Duration, Instant};
 
 use vres_core::color::matrix::ColorMatrix;
 use vres_core::color::ramp::{GammaRamp, RampRule, build_ramp};
+use vres_core::enhancers::DarkBoost;
 use vres_core::model::display::DisplayInfo;
 use vres_core::model::state::{RestoreDisplay, RestoreState};
 use vres_core::model::vibrance::VibranceInfo;
@@ -89,6 +90,8 @@ pub struct Core<H: Hardware> {
     displays: Vec<DisplayInfo>,
     originals: BTreeMap<String, Original>,
     requested: Requested,
+    /// Dark Boost activo (mientras se mantiene su tecla).
+    dark_boost: Option<DarkBoost>,
     notes: Vec<PlanNote>,
     applied_matrix: ColorMatrix,
     matrix_report: LayerReport,
@@ -119,6 +122,7 @@ impl<H: Hardware> Core<H> {
             displays: Vec::new(),
             originals: BTreeMap::new(),
             requested: Requested::default(),
+            dark_boost: None,
             notes: Vec::new(),
             applied_matrix: ColorMatrix::IDENTITY,
             matrix_report: report(Layer::Matrix, None, LayerStatus::Off, None, None),
@@ -232,6 +236,17 @@ impl<H: Hardware> Core<H> {
         self.requested = requested;
     }
 
+    /// Prende (`Some`) o apaga Dark Boost (todavía no aplica: llamar a
+    /// [`Core::reconcile`]).
+    pub fn set_dark_boost(&mut self, boost: Option<DarkBoost>) {
+        self.dark_boost = boost;
+    }
+
+    /// El hardware, para lo que no pasa por el planificador (el zoom).
+    pub fn hardware_mut(&mut self) -> &mut H {
+        &mut self.hw
+    }
+
     /// Estado actual.
     pub fn status(&self) -> &EngineStatus {
         &self.status
@@ -271,7 +286,12 @@ impl<H: Hardware> Core<H> {
     /// Devuelve `true` si cambió el estado.
     pub fn reconcile(&mut self, force: bool) -> bool {
         let capable: BTreeSet<String> = self.vibrance_ranges.keys().cloned().collect();
-        let plan = planner::plan_with(&self.requested, &self.displays, &capable);
+        let plan = planner::plan_full(
+            &self.requested,
+            &self.displays,
+            &capable,
+            self.dark_boost.as_ref(),
+        );
         self.apply_vibrance(&plan.vibrance, force);
         self.apply_ramps(&plan.ramps, force);
         self.apply_matrix(&plan.matrix, force);
@@ -1032,6 +1052,31 @@ mod tests {
         let dir = std::env::temp_dir().join(format!("vres-engine-{name}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         dir.join("restore.json")
+    }
+
+    #[test]
+    fn dark_boost_lifts_shadows_while_held_even_with_color_off() {
+        let mut core = core(FakeHardware::default(), None);
+        core.set_requested(Requested {
+            color_enabled: false,
+            ..Requested::default()
+        });
+        core.reconcile(false);
+        assert!(!core.is_active());
+        let original = core.hw.ramps.get(r"\\.\a").cloned().unwrap_or_default();
+
+        core.set_dark_boost(Some(DarkBoost::default()));
+        core.reconcile(false);
+        assert!(core.is_active(), "las sombras se levantan");
+        assert_ne!(core.hw.ramps[r"\\.\a"], original);
+
+        core.set_dark_boost(None);
+        core.reconcile(false);
+        assert!(!core.is_active());
+        assert_eq!(
+            core.hw.ramps[r"\\.\a"], original,
+            "vuelve la rampa original"
+        );
     }
 
     #[test]

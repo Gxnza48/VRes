@@ -3,4 +3,4 @@
 /**
  * Por qué una capa está limitada o falló.
  */
-export type ReasonCode = "hdrActive" | "partialTargets" | "exclusiveFullscreen" | "magUnavailable" | "magDropped" | "magConflict" | "rampOutOfRange" | "rampRejected" | "rampConflict" | "vibranceBackendMissing" | "vibranceApproximated" | "driverError" | "displayGone" | "paused" | "compareHeld" | "notInGame" | "modeNotSupported" | "modeChangeFailed" | "scalingIgnored" | "hdrChangeFailed" | "hotkeyTaken" | "safeModeAfterCrash";
+export type ReasonCode = "hdrActive" | "partialTargets" | "exclusiveFullscreen" | "magUnavailable" | "magDropped" | "magConflict" | "rampOutOfRange" | "rampRejected" | "rampConflict" | "vibranceBackendMissing" | "vibranceApproximated" | "driverError" | "displayGone" | "paused" | "compareHeld" | "notInGame" | "modeNotSupported" | "modeChangeFailed" | "scalingIgnored" | "hdrChangeFailed" | "hotkeyTaken" | "zoomUnavailable" | "safeModeAfterCrash";

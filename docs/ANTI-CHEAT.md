@@ -11,7 +11,9 @@ VRes **sí** usa:
 - las APIs públicas de NVIDIA y AMD para el vibrance digital, las mismas que usan sus paneles de control;
 - una ventana transparente que no recibe clics, para el crosshair;
 - el cambio de resolución estándar de Windows;
-- el nombre del programa en primer plano, para cambiar de perfil (sin abrir su proceso).
+- el nombre del programa en primer plano, para cambiar de perfil (sin abrir su proceso);
+- la lupa de pantalla completa de Windows, para el zoom (solo visual: el mouse no cambia);
+- la lectura del estado de **una** tecla o botón (`GetAsyncKeyState`) para Dark Boost y Zoom, solo mientras están armados y en su alcance. Solo lee: no la consume ni la intercepta, y el juego la recibe igual.
 
 VRes **no**:
 
