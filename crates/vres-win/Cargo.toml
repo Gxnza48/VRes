@@ -1,0 +1,18 @@
+[package]
+name = "vres-win"
+description = "Acceso a Windows y a los drivers de video para VRes. Único crate con `unsafe`."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+thiserror.workspace = true
+vres-core.workspace = true
+windows.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,14 @@
+# Configuración de Cargo compartida por todo el equipo.
+#
+# La carpeta de compilación (target-dir) NO se define acá: el repo puede vivir
+# dentro de OneDrive y no queremos que sincronice gigas de compilación. La define
+# `.cargo/config.local.toml`, que genera `scripts/setup-dev.ps1` y git ignora.
+include = [{ path = "config.local.toml", optional = true }]
+
+# Ejecutables autocontenidos: no exigen instalar el redistribuible de Visual C++.
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
+
+[env]
+# ts-rs escribe acá los tipos de TypeScript generados desde Rust (`cargo test`).
+TS_RS_EXPORT_DIR = { value = "src/lib/bindings", relative = true }

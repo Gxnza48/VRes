@@ -1,0 +1,67 @@
+name: Release
+
+# Se publica una versión al empujar un tag `vX.Y.Z` que coincida con la
+# versión del workspace (lo verifica scripts/check-version.mjs).
+on:
+  push:
+    tags: ["v*"]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  release:
+    name: Publicar instalador
+    permissions:
+      contents: write
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: La versión coincide con el tag
+        run: node scripts/check-version.mjs ${{ github.ref_name }}
+
+      - name: Compilar, firmar y publicar
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "VRes ${{ github.ref_name }}"
+          releaseBody: |
+            Instalador de VRes para Windows 10 y 11 (64 bits): descarga el archivo `VRes_*_x64-setup.exe`.
+
+            - Si ya tienes VRes, se actualiza solo desde **Más → Actualizaciones**.
+            - Windows SmartScreen puede avisar que el editor es desconocido: el instalador todavía no está firmado. Los cambios de esta versión están en [CHANGELOG.md](https://github.com/Gxnza48/VRes/blob/main/CHANGELOG.md).
+            - `vres-cli.exe` es la herramienta de consola (diagnóstico y `vres-cli reset`).
+
+            _Windows 10/11 installer: download `VRes_*_x64-setup.exe`._
+          releaseDraft: false
+          prerelease: false
+
+      - name: Publicar vres-cli y las sumas SHA-256
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cargo build --release -p vres-cli
+          $files = @(Get-ChildItem target/release/bundle/nsis/*-setup.exe) + @(Get-Item target/release/vres-cli.exe)
+          $lines = foreach ($file in $files) {
+            '{0}  {1}' -f (Get-FileHash $file.FullName -Algorithm SHA256).Hash.ToLower(), $file.Name
+          }
+          $lines | Set-Content -Path SHA256SUMS.txt -Encoding ascii
+          gh release upload "${{ github.ref_name }}" target/release/vres-cli.exe SHA256SUMS.txt --clobber

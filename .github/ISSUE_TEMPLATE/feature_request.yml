@@ -1,0 +1,21 @@
+name: Proponer una idea
+description: Una función nueva o una mejora.
+labels: ["idea"]
+body:
+  - type: markdown
+    attributes:
+      value: Antes de proponer, revisa la [hoja de ruta](https://github.com/Gxnza48/VRes/blob/main/docs/ROADMAP.md) por si ya está planeada.
+  - type: textarea
+    id: problem
+    attributes:
+      label: ¿Qué problema resolvería?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: ¿Cómo te imaginas la solución?
+  - type: input
+    id: games
+    attributes:
+      label: Juegos en los que la usarías

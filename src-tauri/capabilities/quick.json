@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "quick",
+  "description": "Permisos del popup rápido de color (llega en F5).",
+  "windows": ["quick"],
+  "permissions": ["core:default"]
+}

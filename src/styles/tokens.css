@@ -1,0 +1,29 @@
+/*
+ * Tokens visuales de VRes.
+ *
+ * Es el ÚNICO lugar de la interfaz con colores literales (junto con
+ * src/components/ui). `npm run check:tokens` lo verifica. El diseño definitivo
+ * llega más adelante: rediseñar empieza por cambiar este archivo.
+ */
+:root {
+  color-scheme: dark;
+
+  --vr-bg: #0b0d12;
+  --vr-surface: #11141b;
+  --vr-surface-2: #1a1e28;
+  --vr-border: #252b38;
+
+  --vr-fg: #e9ecf3;
+  --vr-muted: #8d95a8;
+
+  --vr-accent: #8b5cf6;
+  --vr-accent-fg: #ffffff;
+  --vr-accent-soft: rgb(139 92 246 / 0.3);
+
+  --vr-success: #22c55e;
+  --vr-warning: #f59e0b;
+  --vr-danger: #ef4444;
+
+  --vr-radius-card: 16px;
+  --vr-font-sans: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+}

@@ -1,0 +1,151 @@
+{
+  "app": {
+    "name": "VRes",
+    "tagline": "Display tuning for gaming",
+    "error": {
+      "title": "Something went wrong",
+      "description": "The interface hit an unexpected error. Your display was not changed.",
+      "reload": "Reload"
+    }
+  },
+  "nav": {
+    "label": "Sections",
+    "display": "Display",
+    "library": "Library",
+    "resolution": "Resolution",
+    "monitor": "Monitor",
+    "customize": "Customize",
+    "crosshair": "Crosshair",
+    "profiles": "Profiles",
+    "enhancers": "Dark Boost & Zoom",
+    "more": "More"
+  },
+  "phase": {
+    "badge": "Coming in phase {{phase}}",
+    "upcoming": "What it will bring",
+    "roadmap": "See the roadmap"
+  },
+  "pages": {
+    "display": {
+      "title": "Display",
+      "subtitle": "Saturation up to 300%, digital vibrance and fine color tuning, monitor by monitor.",
+      "items": [
+        "Saturation from 0 to 300% (100 is the game as it ships)",
+        "Brightness, contrast, gamma, temperature, shadows and highlights per monitor",
+        "Choose which monitors it applies to and identify each screen",
+        "Compare against the original image with a single button",
+        "Driver-level digital vibrance on NVIDIA and AMD"
+      ]
+    },
+    "library": {
+      "title": "Library",
+      "subtitle": "Your looks, crosshairs, resolutions and profiles, stored on your PC.",
+      "items": [
+        "Color looks, crosshairs, resolutions and profiles in one place",
+        "Search and filter by game",
+        "Share with a text code (over Discord or WhatsApp) and import a friend's",
+        "Everything stays on your PC: no account and no servers"
+      ]
+    },
+    "resolution": {
+      "title": "Resolution",
+      "subtitle": "Stretched resolution, refresh rate and HDR, with automatic rollback.",
+      "items": [
+        "Current mode of each monitor: resolution, Hz, scaling and HDR",
+        "4:3, 5:4 and 16:10 stretched presets computed for your monitor",
+        "Custom resolution builder",
+        "Countdown: if you don't confirm, it goes back on its own",
+        "Hotkey to switch between native and stretched resolution"
+      ]
+    },
+    "monitor": {
+      "title": "Monitor",
+      "subtitle": "What your monitor lets you adjust in hardware.",
+      "items": [
+        "Details for each screen: model, GPU, HDR and scale",
+        "Hardware brightness and contrast (DDC/CI) on compatible monitors",
+        "Per-monitor gamma and warmth"
+      ]
+    },
+    "customize": {
+      "title": "Customize",
+      "subtitle": "Make VRes look the way you like.",
+      "items": [
+        "Interface themes",
+        "Background with your own image or GIF",
+        "Window opacity"
+      ]
+    },
+    "crosshair": {
+      "title": "Crosshair",
+      "subtitle": "An overlay crosshair, drawn on the screen and not inside the game.",
+      "items": [
+        "Transparent window that doesn't intercept clicks",
+        "Shape by parts, size, thickness, gap, outline, color and opacity",
+        "Crosshair from your own image",
+        "Presets, saved designs, history and share code",
+        "Option to hide it from recordings and streams"
+      ]
+    },
+    "profiles": {
+      "title": "Profiles",
+      "subtitle": "Each game with its own setup, applied automatically when it opens.",
+      "items": [
+        "Per-game profile: look, crosshair, resolution and tools",
+        "Detects Fortnite, VALORANT, CS2, Apex Legends, Rust and Rainbow Six Siege",
+        "When you leave the game, everything goes back to how it was",
+        "Add any other game in two clicks"
+      ]
+    },
+    "enhancers": {
+      "title": "Dark Boost & Zoom",
+      "subtitle": "Tools to see better in specific moments.",
+      "items": [
+        "Dark Boost: lifts the shadows while you hold a key",
+        "1.5× to 4× zoom while you hold a key or a mouse button",
+        "They pause on their own when you leave the game",
+        "Off by default: some games may consider them an advantage"
+      ]
+    }
+  },
+  "more": {
+    "title": "More",
+    "subtitle": "Language, updates and information about VRes.",
+    "language": {
+      "title": "Language",
+      "description": "Interface language."
+    },
+    "languages": {
+      "es": "Español",
+      "en": "English",
+      "pt-BR": "Português (Brasil)"
+    },
+    "updates": {
+      "title": "Updates",
+      "description": "VRes checks GitHub for new versions. It's the only internet connection it makes.",
+      "check": "Check for updates",
+      "checking": "Checking…",
+      "upToDate": "You have the latest version.",
+      "available": "A new version is available: {{version}}",
+      "install": "Install and restart",
+      "installing": "Downloading… {{percent}}%",
+      "error": "Couldn't complete: {{message}}",
+      "onlyInApp": "Only available in the installed app."
+    },
+    "safety": {
+      "title": "If something looks wrong",
+      "description": "When you close VRes, your display goes back to how it was. Starting in phase F1, the Ctrl + Alt + Shift + R shortcut resets it at any time, even with the window closed."
+    },
+    "about": {
+      "title": "About",
+      "version": "Version {{version}}",
+      "license": "Free software under the GPL-3.0 license. No account and no telemetry.",
+      "repository": "Source code",
+      "report": "Report a problem"
+    }
+  },
+  "quick": {
+    "title": "Quick color popup",
+    "description": "Coming in phase F5."
+  }
+}

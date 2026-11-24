@@ -1,0 +1,36 @@
+# Dependencias y compilación
+node_modules/
+dist/
+dist-ssr/
+target/
+*.local
+
+# Configuración local (target-dir fuera de OneDrive, ver scripts/setup-dev.ps1)
+.cargo/config.local.toml
+
+# Generado por Tauri al compilar
+src-tauri/gen/schemas/
+
+# Copia privada del plan de trabajo (no se publica)
+.plan/
+
+# Logs
+logs/
+*.log
+
+# Secretos: nunca versionar claves ni variables de entorno
+*.key
+.env
+.env.*
+
+# Editores y sistema
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.sw?
+
+# Estado local de herramientas
+.claude/

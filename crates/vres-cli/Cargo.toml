@@ -1,0 +1,26 @@
+[package]
+name = "vres-cli"
+description = "Herramienta de consola de VRes: diagnóstico, pruebas en hardware real y restauración."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "vres-cli"
+path = "src/main.rs"
+
+[dependencies]
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+vres-core.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+vres-win.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,49 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+/* Utilidades de Tailwind derivadas de los tokens: bg-surface, text-muted, etc. */
+@theme inline {
+  --color-bg: var(--vr-bg);
+  --color-surface: var(--vr-surface);
+  --color-surface-2: var(--vr-surface-2);
+  --color-border: var(--vr-border);
+  --color-fg: var(--vr-fg);
+  --color-muted: var(--vr-muted);
+  --color-accent: var(--vr-accent);
+  --color-accent-fg: var(--vr-accent-fg);
+  --color-success: var(--vr-success);
+  --color-warning: var(--vr-warning);
+  --color-danger: var(--vr-danger);
+
+  --radius-card: var(--vr-radius-card);
+  --font-sans: var(--vr-font-sans);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-bg font-sans text-fg antialiased;
+    /* Sensación de app nativa: el texto no se selecciona por accidente. */
+    user-select: none;
+  }
+
+  input,
+  textarea,
+  select {
+    user-select: text;
+  }
+
+  ::selection {
+    background-color: var(--vr-accent-soft);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--vr-accent);
+    outline-offset: 2px;
+  }
+}

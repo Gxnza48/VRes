@@ -1,0 +1,43 @@
+name: Reporte de compatibilidad
+description: Cuéntanos cómo funciona VRes en tu PC (GPU, monitores, juegos).
+labels: ["compatibilidad"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Estos reportes alimentan la [tabla de compatibilidad](https://github.com/Gxnza48/VRes/blob/main/docs/hardware/RESULTADOS.md). Si puedes, adjunta la salida de `vres-cli diag --json` (desde la v0.1).
+  - type: input
+    id: version
+    attributes:
+      label: Versión de VRes
+    validations:
+      required: true
+  - type: input
+    id: gpu
+    attributes:
+      label: Placa(s) de video y versión del driver
+      placeholder: "AMD Radeon 780M + NVIDIA RTX 5060 Laptop, drivers 25.x / 59x.xx"
+    validations:
+      required: true
+  - type: input
+    id: monitors
+    attributes:
+      label: Monitores
+      placeholder: "Panel interno 2880×1800 a 120 Hz (OLED, HDR) + externo 1920×1080 a 200 Hz"
+  - type: dropdown
+    id: hdr
+    attributes:
+      label: ¿HDR activado?
+      options: ["No", "Sí", "En un solo monitor"]
+  - type: textarea
+    id: results
+    attributes:
+      label: ¿Qué funcionó y qué no?
+      description: Por ejemplo, saturación en borderless sí, en pantalla completa no; resolución estirada sin barras; etc.
+    validations:
+      required: true
+  - type: textarea
+    id: diag
+    attributes:
+      label: Salida de vres-cli diag --json (opcional)
+      render: json

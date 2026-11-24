@@ -1,0 +1,39 @@
+[package]
+name = "vres"
+description = "VRes: ajustes de pantalla para gaming. Gratis, local y de código abierto."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish.workspace = true
+default-run = "vres"
+
+[lib]
+# El sufijo `_lib` evita que la biblioteca y el ejecutable compartan nombre.
+name = "vres_lib"
+crate-type = ["rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+sys-locale = "0.3"
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-autostart = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-single-instance = "2"
+tauri-plugin-updater = "2"
+tokio = { version = "1", features = ["time"] }
+tracing.workspace = true
+tracing-subscriber = { version = "0.3", features = ["fmt"] }
+vres-core.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+vres-win.workspace = true
+
+[lints]
+workspace = true

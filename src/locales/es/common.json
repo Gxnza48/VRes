@@ -1,0 +1,151 @@
+{
+  "app": {
+    "name": "VRes",
+    "tagline": "Ajustes de pantalla para gaming",
+    "error": {
+      "title": "Algo salió mal",
+      "description": "La interfaz encontró un error inesperado. Tu pantalla no se modificó.",
+      "reload": "Recargar"
+    }
+  },
+  "nav": {
+    "label": "Secciones",
+    "display": "Pantalla",
+    "library": "Biblioteca",
+    "resolution": "Resolución",
+    "monitor": "Monitor",
+    "customize": "Personalizar",
+    "crosshair": "Crosshair",
+    "profiles": "Perfiles",
+    "enhancers": "Dark Boost y Zoom",
+    "more": "Más"
+  },
+  "phase": {
+    "badge": "Llega en la fase {{phase}}",
+    "upcoming": "Qué va a traer",
+    "roadmap": "Ver la hoja de ruta"
+  },
+  "pages": {
+    "display": {
+      "title": "Pantalla",
+      "subtitle": "Saturación hasta 300 %, vibrance digital y ajuste fino del color, monitor por monitor.",
+      "items": [
+        "Saturación de 0 a 300 % (100 es el juego tal como viene)",
+        "Brillo, contraste, gamma, temperatura, sombras y altas luces por monitor",
+        "Elegir a qué monitores se aplica e identificar cada pantalla",
+        "Comparar contra la imagen original con un solo botón",
+        "Vibrance digital por driver en NVIDIA y AMD"
+      ]
+    },
+    "library": {
+      "title": "Biblioteca",
+      "subtitle": "Tus looks, crosshairs, resoluciones y perfiles, guardados en tu PC.",
+      "items": [
+        "Looks de color, crosshairs, resoluciones y perfiles en un solo lugar",
+        "Búsqueda y filtro por juego",
+        "Compartir con un código de texto (por Discord o WhatsApp) e importar el de un amigo",
+        "Todo queda en tu PC: sin cuenta y sin servidores"
+      ]
+    },
+    "resolution": {
+      "title": "Resolución",
+      "subtitle": "Resolución estirada, frecuencia y HDR, con vuelta atrás automática.",
+      "items": [
+        "Modo actual de cada monitor: resolución, Hz, escalado y HDR",
+        "Presets estirados 4:3, 5:4 y 16:10 calculados para tu monitor",
+        "Constructor de resolución personalizada",
+        "Cuenta regresiva: si no confirmas, vuelve sola a la anterior",
+        "Atajo para alternar entre la resolución nativa y la estirada"
+      ]
+    },
+    "monitor": {
+      "title": "Monitor",
+      "subtitle": "Lo que tu monitor permite ajustar por hardware.",
+      "items": [
+        "Ficha de cada pantalla: modelo, GPU, HDR y escala",
+        "Brillo y contraste por hardware (DDC/CI) en monitores compatibles",
+        "Gamma y calidez propias de cada monitor"
+      ]
+    },
+    "customize": {
+      "title": "Personalizar",
+      "subtitle": "El aspecto de VRes, a tu gusto.",
+      "items": [
+        "Temas de la interfaz",
+        "Fondo con tu propia imagen o GIF",
+        "Opacidad de la ventana"
+      ]
+    },
+    "crosshair": {
+      "title": "Crosshair",
+      "subtitle": "Un crosshair superpuesto, dibujado sobre la pantalla y no dentro del juego.",
+      "items": [
+        "Ventana transparente que no intercepta clics",
+        "Forma por partes, tamaño, grosor, separación, contorno, color y opacidad",
+        "Crosshair con tu propia imagen",
+        "Presets, guardados, historial y código para compartir",
+        "Opción para ocultarlo en grabaciones y streams"
+      ]
+    },
+    "profiles": {
+      "title": "Perfiles",
+      "subtitle": "Cada juego con su configuración, aplicada sola al abrirlo.",
+      "items": [
+        "Perfil por juego: look, crosshair, resolución y herramientas",
+        "Detección de Fortnite, VALORANT, CS2, Apex Legends, Rust y Rainbow Six Siege",
+        "Al salir del juego, todo vuelve a como estaba",
+        "Agregar cualquier otro juego en dos clics"
+      ]
+    },
+    "enhancers": {
+      "title": "Dark Boost y Zoom",
+      "subtitle": "Herramientas para ver mejor en momentos puntuales.",
+      "items": [
+        "Dark Boost: aclara las sombras mientras mantienes una tecla",
+        "Zoom de 1,5× a 4× mientras mantienes una tecla o un botón del mouse",
+        "Se pausan solos al salir del juego",
+        "Vienen apagados: algunos juegos pueden considerarlos una ventaja"
+      ]
+    }
+  },
+  "more": {
+    "title": "Más",
+    "subtitle": "Idioma, actualizaciones e información de VRes.",
+    "language": {
+      "title": "Idioma",
+      "description": "Idioma de la interfaz."
+    },
+    "languages": {
+      "es": "Español",
+      "en": "English",
+      "pt-BR": "Português (Brasil)"
+    },
+    "updates": {
+      "title": "Actualizaciones",
+      "description": "VRes busca versiones nuevas en GitHub. Es la única conexión a internet que hace.",
+      "check": "Buscar actualizaciones",
+      "checking": "Buscando…",
+      "upToDate": "Tienes la última versión.",
+      "available": "Hay una versión nueva: {{version}}",
+      "install": "Instalar y reiniciar",
+      "installing": "Descargando… {{percent}} %",
+      "error": "No se pudo completar: {{message}}",
+      "onlyInApp": "Disponible solo en la app instalada."
+    },
+    "safety": {
+      "title": "Si algo se ve mal",
+      "description": "Al cerrar VRes, la pantalla vuelve a como estaba. Desde la fase F1, el atajo Ctrl + Alt + Shift + R la restablece en cualquier momento, aunque la ventana esté cerrada."
+    },
+    "about": {
+      "title": "Acerca de",
+      "version": "Versión {{version}}",
+      "license": "Software libre bajo licencia GPL-3.0. Sin cuenta y sin telemetría.",
+      "repository": "Código fuente",
+      "report": "Reportar un problema"
+    }
+  },
+  "quick": {
+    "title": "Popup rápido de color",
+    "description": "Llega en la fase F5."
+  }
+}

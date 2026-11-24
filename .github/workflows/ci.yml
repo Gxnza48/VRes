@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  core:
+    name: Lógica pura (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Tests de vres-core
+        run: cargo test -p vres-core
+
+  windows:
+    name: App completa (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar la interfaz (Tauri la embebe)
+        run: npm run build
+
+      - name: Formato de Rust
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Tests de Rust
+        run: cargo test --workspace
+
+      - name: Tipos de TypeScript generados al día
+        run: git diff --exit-code src/lib/bindings
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Tests de la interfaz
+        run: npx vitest --run
+
+      - name: Traducciones, tokens y versión
+        run: |
+          npm run check:i18n
+          npm run check:tokens
+          npm run check:version
+
+      - name: Compilar la app
+        run: npm run tauri build -- --debug --no-bundle
