@@ -61,7 +61,9 @@ Está pensado para la comunidad gamer de Latinoamérica: es **gratis de verdad**
 **Requisitos:** Windows 10 (versión 2004 o posterior) u 11, de 64 bits. El instalador agrega WebView2 si falta (Windows 11 ya lo trae).
 
 > [!NOTE]
-> Windows SmartScreen puede decir que el editor es desconocido: el instalador **todavía no está firmado** (la firma está planeada para la v1.0). Cada release publica `SHA256SUMS.txt` para verificar el archivo, y también puedes [compilar VRes tú mismo](#compilar-desde-el-código).
+> **Si Windows dice "Windows protegió tu PC":** toca **Más información** y después **Ejecutar de todas formas**. Pasa porque el instalador **todavía no está firmado** y es nuevo, no porque tenga un virus: Microsoft Defender no detecta nada en él. Si el navegador dice que el archivo "no se descarga habitualmente", elige **Conservar**.
+>
+> Cada release publica `SHA256SUMS.txt` para verificar el archivo, y también puedes [compilar VRes tú mismo](#compilar-desde-el-código).
 
 ## Cómo funciona, sin misterio
 

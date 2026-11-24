@@ -53,7 +53,9 @@ It is built for the Latin-American gaming community: **truly free** (no paid pla
 **Requirements:** Windows 10 (version 2004 or later) or 11, 64-bit. The installer adds WebView2 if it's missing.
 
 > [!NOTE]
-> Windows SmartScreen may say the publisher is unknown: the installer is **not signed yet** (planned for v1.0). Each release publishes `SHA256SUMS.txt`, and you can always [build VRes yourself](#build-from-source).
+> **If Windows says "Windows protected your PC":** click **More info** and then **Run anyway**. It happens because the installer is **not signed yet** and is new, not because it has a virus: Microsoft Defender finds nothing in it. If your browser says the file "isn't commonly downloaded", choose **Keep**.
+>
+> Each release publishes `SHA256SUMS.txt`, and you can always [build VRes yourself](#build-from-source).
 
 ## How it works
 
