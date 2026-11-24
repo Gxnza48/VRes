@@ -11,7 +11,6 @@ import type { Look } from "@/lib/bindings/Look";
 import ranges from "@/lib/bindings/ranges.json";
 import type { Requested } from "@/lib/bindings/Requested";
 import type { Tone } from "@/lib/bindings/Tone";
-import { cn } from "@/lib/utils";
 import { useEngineStore } from "@/state/engine";
 
 import {
@@ -186,10 +185,16 @@ export function DisplayPage() {
             <span className="text-xs text-muted">{t("display.saturation.hint")}</span>
           </CardHeader>
           <CardContent>
+            <p
+              aria-hidden
+              className="font-display text-4xl font-black tabular-nums tracking-wide text-accent"
+            >
+              {formatPercent(look.saturation, language)}
+            </p>
             <ParamSlider
               id="saturation"
               label={t("display.saturation.title")}
-              className={cn("[&_label]:sr-only")}
+              hideHeader
               value={look.saturation}
               range={ranges.saturation}
               display={formatPercent(look.saturation, language)}
@@ -198,9 +203,6 @@ export function DisplayPage() {
               onChange={(value) => previewLook({ ...look, saturation: value })}
               onCommit={(value) => commitLook({ ...look, saturation: value })}
             />
-            <p className="text-4xl font-semibold tabular-nums tracking-tight text-fg">
-              {formatPercent(look.saturation, language)}
-            </p>
             {matrixLayer?.reason && (
               <p className="text-sm text-warning">{t(`reasons.${matrixLayer.reason}`)}</p>
             )}

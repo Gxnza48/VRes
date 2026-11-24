@@ -1,8 +1,6 @@
 <div align="center">
 
-<img src="assets/brand/icon.svg" width="96" alt="" />
-
-# VRes
+<img src="assets/brand/logo.png" width="460" alt="VRes" />
 
 **Display tuning for gaming. Free, local and open source.**
 
@@ -15,10 +13,12 @@ Saturation up to 300%, digital vibrance, stretched resolution, crosshair, per-ga
 
 [Español](README.md) · **English**
 
+<img src="assets/screenshots/display.png" width="860" alt="The VRes Display tab: monitors, saturation and fine tuning" />
+
 </div>
 
 > [!IMPORTANT]
-> **VRes is in alpha.** The app foundation exists today (system tray, automatic updates, interface in three languages) and features land phase by phase. See the [feature table](#features) and the [roadmap](docs/ROADMAP.md) (in Spanish).
+> **VRes is in alpha.** Version 0.1 brings the **Display** tab (saturation up to 300% and per-monitor fine tuning) with its safety net, and features land phase by phase. See the [feature table](#features) and the [roadmap](docs/ROADMAP.md) (in Spanish).
 
 ---
 
@@ -32,8 +32,8 @@ It is built for the Latin-American gaming community: **truly free** (no paid pla
 
 | Feature | Status | Version |
 |---|---|---|
-| App foundation: system tray, automatic updates, Spanish / English / Portuguese | ✅ Available | v0.0 |
-| **Display:** 0–300% saturation and per-monitor fine tuning (brightness, contrast, gamma, temperature, shadows, highlights) | 🚧 In progress | v0.1 |
+| App foundation: system tray, automatic updates, Spanish / English / Portuguese | ✅ Available | v0.1 |
+| **Display:** 0–300% saturation and per-monitor fine tuning (brightness, contrast, gamma, temperature, shadows, highlights, blacks, whites and tints) | ✅ Available | v0.1 |
 | **Resolution:** stretched 4:3, 5:4 and 16:10, refresh rate and HDR, with automatic rollback | 🗓 Planned | v0.2 |
 | **Digital vibrance** through the driver: NVIDIA and AMD (Intel experimental) | 🗓 Planned | v0.3 |
 | **Crosshair** overlay: shapes, colors, your own image and share codes | 🗓 Planned | v0.4 |
@@ -94,7 +94,7 @@ VRes doesn't interact with games and uses the same API families as GPU control p
 ## Keeping your display safe
 
 - **Closing VRes restores everything** (colors, vibrance and resolution).
-- **Emergency shortcut:** `Ctrl + Alt + Shift + R` resets the display at any time, even with the window closed (from v0.1).
+- **Emergency shortcut:** `Ctrl + Alt + Shift + R` resets the display at any time, even with the window closed.
 - A **"VRes — Reset display"** Start-menu shortcut, plus `vres.exe --reset` and `vres-cli reset`.
 - **If VRes is killed** (power loss, forced close), it saves the original values before changing anything and restores them on the next start.
 - **Resolution changes ask for confirmation** and revert on their own otherwise.

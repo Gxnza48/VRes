@@ -22,8 +22,8 @@ use crate::{WinError, WinResult};
 
 const CLASS: PCWSTR = w!("VRes.Identify");
 const SIZE: i32 = 240;
-const BACKGROUND: COLORREF = COLORREF(0x0018_1411); // RGB(17, 20, 24)
-const FOREGROUND: COLORREF = COLORREF(0x00F3_ECE9); // RGB(233, 236, 243)
+const BACKGROUND: COLORREF = COLORREF(0x0000_0000); // negro
+const FOREGROUND: COLORREF = COLORREF(0x0012_FA9E); // verde lima #9EFA12 (COLORREF es BGR)
 
 /// Las ventanas con los números; se cierran al destruirse.
 #[derive(Debug, Default)]

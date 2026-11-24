@@ -17,6 +17,7 @@
 
   --radius-card: var(--vr-radius-card);
   --font-sans: var(--vr-font-sans);
+  --font-display: var(--vr-font-display);
 }
 
 @layer base {

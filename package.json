@@ -1,7 +1,7 @@
 {
   "name": "vres",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Ajustes de pantalla para gaming: saturación, vibrance, resolución estirada y crosshair. Gratis, local y de código abierto.",
   "license": "GPL-3.0-or-later",
   "repository": {
@@ -22,6 +22,7 @@
     "check:version": "node scripts/check-version.mjs"
   },
   "dependencies": {
+    "@fontsource/orbitron": "^5.3.0",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
     "class-variance-authority": "^0.7.1",

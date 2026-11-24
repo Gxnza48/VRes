@@ -1,8 +1,6 @@
 <div align="center">
 
-<img src="assets/brand/icon.svg" width="96" alt="" />
-
-# VRes
+<img src="assets/brand/logo.png" width="460" alt="VRes" />
 
 **Ajustes de pantalla para gaming. Gratis, local y de código abierto.**
 
@@ -15,10 +13,12 @@ Saturación hasta 300 %, vibrance digital, resolución estirada, crosshair, perf
 
 **Español** · [English](README.en.md)
 
+<img src="assets/screenshots/display.png" width="860" alt="La pestaña Pantalla de VRes: monitores, saturación y ajuste fino" />
+
 </div>
 
 > [!IMPORTANT]
-> **VRes está en alfa.** Hoy existe la base de la app (bandeja del sistema, actualizaciones automáticas, interfaz en tres idiomas) y se van sumando funciones por fases. Mira en qué está cada una en la [tabla de funciones](#funciones) y en la [hoja de ruta](docs/ROADMAP.md).
+> **VRes está en alfa.** La versión 0.1 trae la pestaña **Pantalla** (saturación hasta 300 % y ajuste fino por monitor) con su red de seguridad, y se van sumando funciones por fases. Mira en qué está cada una en la [tabla de funciones](#funciones) y en la [hoja de ruta](docs/ROADMAP.md).
 
 ---
 
@@ -32,8 +32,8 @@ Está pensado para la comunidad gamer de Latinoamérica: es **gratis de verdad**
 
 | Función | Estado | Versión |
 |---|---|---|
-| Base de la app: bandeja del sistema, actualizaciones automáticas, español / inglés / portugués | ✅ Disponible | v0.0 |
-| **Pantalla:** saturación de 0 a 300 % y ajuste fino por monitor (brillo, contraste, gamma, temperatura, sombras, altas luces) | 🚧 En desarrollo | v0.1 |
+| Base de la app: bandeja del sistema, actualizaciones automáticas, español / inglés / portugués | ✅ Disponible | v0.1 |
+| **Pantalla:** saturación de 0 a 300 % y ajuste fino por monitor (brillo, contraste, gamma, temperatura, sombras, altas luces, negros, blancos y tintes) | ✅ Disponible | v0.1 |
 | **Resolución:** estirada 4:3, 5:4 y 16:10, Hz y HDR, con vuelta atrás automática | 🗓 Planeado | v0.2 |
 | **Vibrance digital** por driver: NVIDIA y AMD (Intel, experimental) | 🗓 Planeado | v0.3 |
 | **Crosshair** superpuesto: formas, colores, imagen propia y código para compartir | 🗓 Planeado | v0.4 |
@@ -111,7 +111,7 @@ El **crosshair**, el **zoom** y el **Dark Boost** pueden considerarse trampa seg
 ## La seguridad de tu pantalla
 
 - **Al cerrar VRes, todo vuelve a como estaba** (colores, vibrance y resolución).
-- **Atajo de emergencia:** `Ctrl + Alt + Shift + R` restablece la pantalla en cualquier momento, aunque la ventana esté cerrada (desde la v0.1).
+- **Atajo de emergencia:** `Ctrl + Alt + Shift + R` restablece la pantalla en cualquier momento, aunque la ventana esté cerrada.
 - **Acceso directo** "VRes — Restablecer pantalla" en el menú Inicio, y `vres.exe --reset` / `vres-cli reset` desde una terminal.
 - **Si VRes se cierra de golpe** (corte de luz, cierre forzado), guarda los valores originales antes de cambiar nada y los restaura al abrirse de nuevo.
 - **Los cambios de resolución piden confirmación:** si no confirmas, vuelve sola a la anterior.

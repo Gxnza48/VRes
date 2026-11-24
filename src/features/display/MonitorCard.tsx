@@ -32,7 +32,10 @@ export function MonitorCard({ index, display, checked, reason, onToggle }: Monit
     >
       <span
         aria-hidden
-        className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border text-lg font-semibold"
+        className={cn(
+          "flex size-10 shrink-0 items-center justify-center rounded-lg border font-display text-lg font-black",
+          checked ? "border-accent bg-accent text-accent-fg" : "border-border text-muted",
+        )}
       >
         {index}
       </span>

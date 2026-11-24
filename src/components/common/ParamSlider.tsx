@@ -25,6 +25,8 @@ interface ParamSliderProps {
   onChange: (value: number) => void;
   /** Al soltar, con teclado o con doble clic (se guarda). */
   onCommit: (value: number) => void;
+  /** Oculta la etiqueta y el valor (cuando la tarjeta ya los muestra). */
+  hideHeader?: boolean;
   className?: string;
 }
 
@@ -40,13 +42,19 @@ export function ParamSlider({
   resetTitle,
   onChange,
   onCommit,
+  hideHeader,
   className,
 }: ParamSliderProps) {
   const commitFrom = (target: EventTarget) => onCommit(Number((target as HTMLInputElement).value));
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <div className="flex items-baseline justify-between gap-3 text-sm">
+      <div
+        className={cn(
+          "flex items-baseline justify-between gap-3 text-sm",
+          hideHeader && "sr-only",
+        )}
+      >
         <label htmlFor={id} className="text-fg">
           {label}
         </label>

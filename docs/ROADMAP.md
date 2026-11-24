@@ -4,8 +4,8 @@ VRes se construye por **fases**. Cada fase termina en una versión instalable: c
 
 | Fase | Entrega | Versión | Estado |
 |---|---|---|---|
-| **F0** | Repo, base de la app, documentación, CI y actualizaciones automáticas | v0.0.x | 🚧 |
-| **F1** | Motor de color + pestaña Pantalla | v0.1 | 🚧 |
+| **F0** | Repo, base de la app, documentación, CI y actualizaciones automáticas | v0.1 | ✅ |
+| **F1** | Motor de color + pestaña Pantalla | v0.1 | ✅ |
 | **F2** | Resolución estirada, Hz y HDR | v0.2 | 🗓 |
 | **F3** | Vibrance por driver | v0.3 | 🗓 |
 | **F4** | Crosshair | v0.4 | 🗓 |
@@ -29,7 +29,8 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 - [x] Instancia única; `vres.exe --shutdown`, `--reset` y `--version`
 - [x] `vres-cli status | reset | shutdown`
 - [x] CI: formato, clippy, tests de Rust y de la interfaz, traducciones, tokens, compilación
-- [ ] Release automático firmado y actualización automática verificada (v0.0.1 → v0.0.2)
+- [x] Release automático firmado (v0.1.0)
+- [ ] Verificar la actualización automática con la próxima versión
 - [x] Medición del ciclo de vida de WebView2: al cerrar la ventana se liberan ~455 MB ([resultados](hardware/RESULTADOS.md))
 
 ## F1 — Motor de color y pestaña Pantalla
@@ -41,7 +42,8 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 - [x] Red de seguridad: originales guardados antes de tocar nada, restauración al salir, ante un fallo y al próximo arranque (modo seguro); atajo `Ctrl + Alt + Shift + R`; `vres.exe --reset`; verificada de punta a punta en hardware real
 - [x] Pestaña **Pantalla**: monitores con tilde, Identificar, estado en vivo, Comparar, Restablecer, saturación 0–300 % y ajuste fino
 - [x] Bandeja con Pausar y Restablecer; Más: iniciar con Windows y copiar diagnóstico
-- [ ] Prueba a ojo de la interfaz (lista manual de la fase) y publicación de la v0.1
+- [x] Publicación de la v0.1.0, con el logo y la identidad visual nuevos
+- [ ] Prueba a ojo de la interfaz por parte de la comunidad (lista manual de la fase)
 
 ## F2 — Resolución
 

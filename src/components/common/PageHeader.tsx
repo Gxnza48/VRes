@@ -11,7 +11,7 @@ export function PageHeader({ title, subtitle, aside }: PageHeaderProps) {
   return (
     <header className="mb-6 flex items-start justify-between gap-6">
       <div className="flex flex-col gap-1.5">
-        <h1 className="text-3xl font-semibold tracking-tight text-fg">{title}</h1>
+        <h1 className="font-display text-3xl font-black tracking-wide text-fg">{title}</h1>
         <p className="max-w-2xl text-sm text-muted">{subtitle}</p>
       </div>
       {aside}

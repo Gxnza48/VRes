@@ -21,7 +21,9 @@
         "minHeight": 600,
         "center": true,
         "visible": false,
-        "dragDropEnabled": false
+        "dragDropEnabled": false,
+        "theme": "Dark",
+        "backgroundColor": "#000000"
       },
       {
         "label": "quick",
@@ -34,7 +36,9 @@
         "alwaysOnTop": true,
         "skipTaskbar": true,
         "resizable": false,
-        "visible": false
+        "visible": false,
+        "theme": "Dark",
+        "backgroundColor": "#000000"
       }
     ],
     "security": {
@@ -44,7 +48,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "PENDING_UPDATER_PUBKEY",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDIxQTIyMDBBRTE0MkVFQUQKUldTdDdrTGhDaUNpSVoxVHI2c1RXa24wRENDNVZrSGhwc0czVUl4MVp1NE91NW5nVXp2NUFrcGoK",
       "endpoints": [
         "https://github.com/Gxnza48/VRes/releases/latest/download/latest.json"
       ],
@@ -55,7 +59,9 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis"],
+    "targets": [
+      "nsis"
+    ],
     "createUpdaterArtifacts": true,
     "publisher": "VRes",
     "homepage": "https://github.com/Gxnza48/VRes",
@@ -77,7 +83,11 @@
       },
       "nsis": {
         "installMode": "currentUser",
-        "languages": ["SpanishInternational", "English", "PortugueseBR"],
+        "languages": [
+          "SpanishInternational",
+          "English",
+          "PortugueseBR"
+        ],
         "displayLanguageSelector": false,
         "installerHooks": "./windows/hooks.nsh"
       }
