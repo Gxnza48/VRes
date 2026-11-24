@@ -11,6 +11,7 @@ Saturación hasta 300 %, vibrance digital, resolución estirada, crosshair, perf
 [![Licencia: GPL-3.0](https://img.shields.io/badge/licencia-GPL--3.0-blue)](LICENSE)
 ![Windows 10 y 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6)
 [![Discord](https://img.shields.io/badge/Discord-comunidad-5865F2?logo=discord&logoColor=white)](https://discord.gg/aG2ByWDHfG)
+[![Sitio web](https://img.shields.io/badge/sitio-vresolution.vercel.app-9EFA12?labelColor=000000)](https://vresolution.vercel.app)
 
 **Español** · [English](README.en.md)
 

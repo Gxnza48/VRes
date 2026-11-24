@@ -10,6 +10,7 @@ Saturation up to 300%, digital vibrance, stretched resolution, crosshair, per-ga
 [![Release](https://img.shields.io/github/v/release/Gxnza48/VRes?include_prereleases)](https://github.com/Gxnza48/VRes/releases)
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-community-5865F2?logo=discord&logoColor=white)](https://discord.gg/aG2ByWDHfG)
+[![Website](https://img.shields.io/badge/website-vresolution.vercel.app-9EFA12?labelColor=000000)](https://vresolution.vercel.app)
 ![Windows 10 and 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6)
 
 [Español](README.md) · **English**
