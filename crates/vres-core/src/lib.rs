@@ -9,7 +9,10 @@
 //! `cargo test`.
 #![forbid(unsafe_code)]
 
+pub mod color;
 pub mod ipc;
+pub mod model;
+pub mod status;
 
 /// Identificador de la aplicación: carpetas de datos, instalador y WebView2.
 pub const APP_IDENTIFIER: &str = "io.github.gxnza48.vres";

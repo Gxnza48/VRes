@@ -68,7 +68,19 @@ scripts/             verificaciones y utilidades
 
 Las pruebas que tocan la pantalla **siempre restauran**: usan un guardián que deshace los cambios al terminar, incluso ante un error o `Ctrl + C`, y tienen un tiempo máximo. Usan valores suaves y breves (nada de parpadeos ni inversión de colores). Los cambios de resolución exigen `--allow-mode-switch`, usan solo modos que el monitor informa y vuelven solos en 3 segundos.
 
-Si algo quedó mal: `cargo run -p vres-cli -- reset`.
+Si algo quedó mal: `cargo run -p vres-cli -- reset` (o `ramp reset` / `mag reset`).
+
+| Comando | Qué hace | ¿Cambia la pantalla? |
+|---|---|---|
+| `vres-cli monitors` | Lista las pantallas: nombre, modo, GPU, HDR | No |
+| `vres-cli diag` | Pantallas, estado de la matriz y de cada rampa | No |
+| `vres-cli selftest` | Saturación 130 % y gamma 1,05 durante 0,3 s; verifica por lectura y en pantalla; restaura | Sí, suave y breve |
+| `vres-cli mag set --saturation 150 --hold-ms 2000` | Aplica una saturación, la mantiene y la restaura | Sí |
+| `vres-cli ramp set --display 1 --gamma 1.2` | Aplica un ajuste fino a una pantalla y restaura la original | Sí |
+| `vres-cli probe timing` | Mide cuánto tarda escribir rampas y la matriz (cambios mínimos) | Casi imperceptible |
+| `vres-cli probe ramp-limits` | Busca el límite de las rampas: **aclara la pantalla un instante varias veces**, con pausas de 0,6 s | Sí, visible |
+
+Todos aceptan `--json`. Las pantallas se eligen con `--display` por número (`1`), nombre GDI (`\\.\DISPLAY1`) o identificador estable (`d-…`).
 
 Los resultados se registran en [hardware/RESULTADOS.md](hardware/RESULTADOS.md).
 

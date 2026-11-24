@@ -34,11 +34,11 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 
 ## F1 — Motor de color y pestaña Pantalla
 
-- Matemática de color con pruebas de propiedades: matriz de saturación con límite seguro, rampas de gamma monótonas compuestas sobre la calibración de cada monitor
-- Enumeración de monitores con nombre real, Hz exactos, GPU y estado de HDR
+- [x] Matemática de color con pruebas de propiedades: matriz de saturación con límite seguro, rampas de gamma monótonas compuestas sobre la calibración de cada monitor
+- [x] Enumeración de monitores con nombre real, Hz exactos, GPU y estado de HDR
+- [x] `vres-cli monitors | diag | mag | ramp | probe | selftest`, verificados en hardware real ([resultados](hardware/RESULTADOS.md))
 - Motor en un hilo propio: aplica solo lo que cambió, lo relee para confirmarlo y reaplica tras Alt+Tab, bloqueo, suspensión o cambio de pantalla
 - Red de seguridad: originales guardados antes de tocar nada, restauración al salir, ante un fallo y al próximo arranque; atajo `Ctrl + Alt + Shift + R`
-- `vres-cli monitors | diag | mag | ramp | selftest | probe`
 - Pestaña **Pantalla**: monitores con tilde, Identificar, estado en vivo, Comparar, Restablecer, saturación 0–300 % y ajuste fino
 
 ## F2 — Resolución
