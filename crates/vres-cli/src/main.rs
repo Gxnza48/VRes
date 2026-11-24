@@ -24,6 +24,8 @@ mod guard;
 mod hw;
 #[cfg(windows)]
 mod resolution;
+#[cfg(windows)]
+mod vibrance;
 
 /// Resultado de un comando: JSON para scripts y texto para personas.
 pub struct Report {
@@ -96,6 +98,9 @@ enum Command {
     /// HDR de cada pantalla.
     #[command(subcommand)]
     Hdr(HdrCommand),
+    /// Vibrance del driver (NVIDIA y AMD), por pantalla.
+    #[command(subcommand)]
+    Vibrance(VibranceCommand),
     /// Mediciones en hardware real.
     #[command(subcommand)]
     Probe(ProbeCommand),
@@ -150,6 +155,27 @@ enum ModeCommand {
         /// Confirma que la pantalla puede parpadear y cambiar unos segundos.
         #[arg(long)]
         allow_mode_switch: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum VibranceCommand {
+    /// Rango y valor actual de cada pantalla.
+    Get {
+        /// Pantalla: número, `\.DISPLAYn` o identificador `d-…`.
+        #[arg(long)]
+        display: Option<String>,
+    },
+    /// Aplica un valor, lo relee, lo mantiene y vuelve al original.
+    Set {
+        #[arg(long)]
+        display: String,
+        /// Escala de VRes: 0–100 (50 = normal del driver).
+        #[arg(long, default_value_t = 70.0)]
+        value: f32,
+        /// Cuánto tiempo mantenerlo, en milisegundos.
+        #[arg(long, default_value_t = 2000)]
+        hold_ms: u64,
     },
 }
 
@@ -255,6 +281,15 @@ enum ProbeCommand {
         #[arg(long, default_value_t = 30)]
         samples: usize,
     },
+    /// El motor real aplica la vibrance del driver y la devuelve al apagarse.
+    EngineVibrance {
+        /// Escala de VRes: 0–100 (50 = normal del driver).
+        #[arg(long, default_value_t = 30.0)]
+        value: f32,
+        /// Cuánto tiempo mantenerla, en milisegundos.
+        #[arg(long, default_value_t = 1500)]
+        hold_ms: u64,
+    },
     /// El motor real aplica, deja vencer, conserva y restaura un modo.
     EngineModes {
         #[arg(long)]
@@ -344,6 +379,9 @@ fn run(command: Command) -> Report {
         Command::Probe(ProbeCommand::Timing { display, samples }) => {
             hw::probe_timing(display.as_deref(), samples.clamp(2, 500))
         }
+        Command::Probe(ProbeCommand::EngineVibrance { value, hold_ms }) => {
+            vibrance::probe_engine(value.clamp(0.0, 100.0), hold(hold_ms))
+        }
         Command::Probe(ProbeCommand::EngineModes {
             display,
             mode,
@@ -374,6 +412,12 @@ fn run(command: Command) -> Report {
             Duration::from_millis(hold_ms.min(resolution::MAX_MODE_HOLD_MS)),
             allow_mode_switch,
         ),
+        Command::Vibrance(VibranceCommand::Get { display }) => vibrance::get(display.as_deref()),
+        Command::Vibrance(VibranceCommand::Set {
+            display,
+            value,
+            hold_ms,
+        }) => vibrance::set(&display, value.clamp(0.0, 100.0), hold(hold_ms)),
         Command::Hdr(HdrCommand::Get) => resolution::hdr_get(),
         Command::Hdr(HdrCommand::Set {
             display,

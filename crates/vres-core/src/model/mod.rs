@@ -5,3 +5,4 @@ pub mod look;
 pub mod ranges;
 pub mod resolution;
 pub mod state;
+pub mod vibrance;

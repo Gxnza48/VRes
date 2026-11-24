@@ -18,7 +18,7 @@ Saturación hasta 300 %, vibrance digital, resolución estirada, crosshair, perf
 </div>
 
 > [!IMPORTANT]
-> **VRes está en alfa.** Ya están las pestañas **Pantalla** (saturación hasta 300 % y ajuste fino por monitor) y **Resolución** (estirada, HDR y atajo nativa ↔ estirada), con su red de seguridad, y se van sumando funciones por fases. Mira en qué está cada una en la [tabla de funciones](#funciones) y en la [hoja de ruta](docs/ROADMAP.md).
+> **VRes está en alfa.** Ya están las pestañas **Pantalla** (saturación hasta 300 %, vibrance por driver NVIDIA y AMD, y ajuste fino por monitor) y **Resolución** (estirada, HDR y atajo nativa ↔ estirada), con su red de seguridad, y se van sumando funciones por fases. Mira en qué está cada una en la [tabla de funciones](#funciones) y en la [hoja de ruta](docs/ROADMAP.md).
 
 ---
 
@@ -35,7 +35,7 @@ Está pensado para la comunidad gamer de Latinoamérica: es **gratis de verdad**
 | Base de la app: bandeja del sistema, actualizaciones automáticas, español / inglés / portugués | ✅ Disponible | v0.1 |
 | **Pantalla:** saturación de 0 a 300 % y ajuste fino por monitor (brillo, contraste, gamma, temperatura, sombras, altas luces, negros, blancos y tintes) | ✅ Disponible | v0.1 |
 | **Resolución:** estirada 4:3, 5:4 y 16:10, Hz y HDR, con vuelta atrás automática y atajo nativa ↔ estirada | ✅ Disponible | v0.2 |
-| **Vibrance digital** por driver: NVIDIA y AMD (Intel, experimental) | 🗓 Planeado | v0.3 |
+| **Vibrance digital** por driver, monitor por monitor: NVIDIA y AMD (en Intel, emulada) | ✅ Disponible | v0.3 |
 | **Crosshair** superpuesto: formas, colores, imagen propia y código para compartir | 🗓 Planeado | v0.4 |
 | **Looks y Biblioteca:** presets por juego, códigos para compartir, tono, ayudas para daltonismo, cuidado visual | 🗓 Planeado | v0.5 |
 | **Perfiles por juego:** Fortnite, VALORANT, CS2, Apex Legends, Rust y Rainbow Six Siege, y cualquier otro | 🗓 Planeado | v0.6 |
@@ -136,7 +136,7 @@ VRes no toca el juego, pero ningún programa puede garantizar qué decide un ant
 <details>
 <summary><b>¿Por qué no se ve el cambio de color en pantalla completa?</b></summary>
 
-En pantalla completa **exclusiva**, el juego le habla directo al monitor y salta la capa de color de Windows. Usa **ventana sin bordes**; el vibrance por driver (v0.3) sí funciona en exclusiva.
+En pantalla completa **exclusiva**, el juego le habla directo al monitor y salta la capa de color de Windows. Usa **ventana sin bordes**; el vibrance por driver sí funciona en exclusiva.
 </details>
 
 <details>

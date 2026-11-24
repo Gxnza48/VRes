@@ -7,7 +7,7 @@ VRes se construye por **fases**. Cada fase termina en una versión instalable: c
 | **F0** | Repo, base de la app, documentación, CI y actualizaciones automáticas | v0.1 | ✅ |
 | **F1** | Motor de color + pestaña Pantalla | v0.1 | ✅ |
 | **F2** | Resolución estirada, Hz y HDR | v0.2 | ✅ |
-| **F3** | Vibrance por driver | v0.3 | 🗓 |
+| **F3** | Vibrance por driver | v0.3 | ✅ |
 | **F4** | Crosshair | v0.4 | 🗓 |
 | **F5** | Looks, Biblioteca, códigos y color avanzado | v0.5 | 🗓 |
 | **F6** | Perfiles por juego | v0.6 | 🗓 |
@@ -58,8 +58,13 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 
 ## F3 — Vibrance por driver
 
-- NVIDIA (NVAPI) y AMD (ADL), elegidos por monitor según la GPU que lo maneja; Intel experimental
-- Nivel original guardado y restaurado; funciona en pantalla completa exclusiva
+- [x] NVIDIA (NVAPI, variante `Ex` y clásica) y AMD (ADL), elegidos por monitor según la GPU que lo maneja (LUID); DLL cargadas solo desde System32
+- [x] Escala de VRes 0–100 (50 = sin tocar el driver) traducida por tramos al rango real de cada driver
+- [x] Nivel original guardado en `restore.json` antes de tocarlo y restaurado al salir, ante un fallo y al próximo arranque; reparación si otro programa lo cambia (sin pelear indefinidamente)
+- [x] Planificador: vibrance por driver en los monitores que la tienen, emulada en la matriz si ninguno la tiene, y aproximación de la saturación cuando la matriz queda en pausa
+- [x] Tarjeta **Vibrance digital** en Pantalla, con el driver y el valor original de cada monitor
+- [x] `vres-cli vibrance get | set` y `probe engine-vibrance`, verificados en las dos GPU ([resultados](hardware/RESULTADOS.md))
+- [ ] Intel (IGCL): queda emulada hasta que alguien de la comunidad pueda probarla
 
 ## F4 — Crosshair
 

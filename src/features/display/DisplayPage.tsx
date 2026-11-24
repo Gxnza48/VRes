@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ParamSlider, type SliderRange } from "@/components/common/ParamSlider";
 import { type OverallStatus, StatusBadge } from "@/components/common/StatusBadge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { EngineStatus } from "@/lib/bindings/EngineStatus";
@@ -206,6 +207,62 @@ export function DisplayPage() {
             {matrixLayer?.reason && (
               <p className="text-sm text-warning">{t(`reasons.${matrixLayer.reason}`)}</p>
             )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex-row items-baseline justify-between">
+            <CardTitle>{t("display.vibrance.title")}</CardTitle>
+            <span className="text-xs text-muted">{t("display.vibrance.hint")}</span>
+          </CardHeader>
+          <CardContent>
+            <p
+              aria-hidden
+              className="font-display text-4xl font-black tabular-nums tracking-wide text-accent"
+            >
+              {Math.round(look.vibrance)}
+            </p>
+            <ParamSlider
+              id="vibrance"
+              label={t("display.vibrance.title")}
+              hideHeader
+              value={look.vibrance}
+              range={ranges.vibrance}
+              display={String(Math.round(look.vibrance))}
+              disabled={!enabled}
+              resetTitle={t("display.resetParam")}
+              onChange={(value) => previewLook({ ...look, vibrance: value })}
+              onCommit={(value) => commitLook({ ...look, vibrance: value })}
+            />
+            <ul className="flex flex-col gap-1.5 text-sm">
+              {displays.map((display, index) => {
+                const support = status?.vibrance?.[display.id];
+                const reason = status?.layers.find(
+                  (layer) => layer.layer === "vibrance" && layer.display === display.id,
+                )?.reason;
+                return (
+                  <li key={display.id} className="flex flex-wrap items-center gap-2">
+                    <span className="font-display font-black text-muted">{index + 1}</span>
+                    <span className="text-fg">{display.friendlyName || display.gdiName}</span>
+                    <Badge tone={support ? "accent" : "neutral"}>
+                      {support
+                        ? t("display.vibrance.driver", {
+                            backend: support.backend === "nvidia" ? "NVIDIA" : "AMD",
+                          })
+                        : t("display.vibrance.emulated")}
+                    </Badge>
+                    {support && (
+                      <span className="text-xs text-muted">
+                        {t("display.vibrance.original", { value: support.original })}
+                      </span>
+                    )}
+                    {reason && isTicked(display.id) && (
+                      <span className="text-xs text-warning">{t(`reasons.${reason}`)}</span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
           </CardContent>
         </Card>
 

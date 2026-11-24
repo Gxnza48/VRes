@@ -24,6 +24,7 @@ pub mod mag;
 pub mod modes;
 pub mod probe;
 pub mod sound;
+pub mod vibrance;
 pub mod window;
 
 pub use error::{WinError, WinResult};

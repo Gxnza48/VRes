@@ -42,6 +42,9 @@ pub struct RestoreDisplay {
     pub gdi_name: String,
     /// Rampa original en hexadecimal (`WORD[3][256]`, little-endian).
     pub ramp: String,
+    /// Nivel original de la vibrance del driver, si VRes la cambió.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub vibrance: Option<i32>,
 }
 
 impl RestoreDisplay {
@@ -50,6 +53,7 @@ impl RestoreDisplay {
         Self {
             gdi_name: gdi_name.to_owned(),
             ramp: to_hex(&ramp.to_le_bytes()),
+            vibrance: None,
         }
     }
 
@@ -152,6 +156,7 @@ mod tests {
         let saved = RestoreDisplay {
             gdi_name: String::new(),
             ramp: "zz".into(),
+            vibrance: None,
         };
         assert_eq!(saved.ramp(), None);
     }

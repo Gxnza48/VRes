@@ -25,6 +25,7 @@ use vres_core::model::resolution::{
     DisplayMode, DisplayModes, ModeRequest, ModeResolved, PendingMode, ResolutionState, is_listed,
     presets,
 };
+use vres_core::model::vibrance::VibranceInfo;
 use vres_core::planner::Requested;
 use vres_core::settings::{DEFAULT_CONFIRM_SECONDS, SavedMode};
 use vres_core::status::{EngineStatus, ReasonCode};
@@ -32,6 +33,7 @@ use vres_win::control::{self, ACK, RemoteCommand};
 use vres_win::identify::IdentifyOverlay;
 use vres_win::mag::Magnifier;
 use vres_win::sound::{self, Tone};
+use vres_win::vibrance::DriverVibrance;
 use vres_win::window::{self, ForegroundHook, HiddenWindow};
 use vres_win::{displays, gamma, keyboard, modes};
 
@@ -230,7 +232,13 @@ pub fn recover_from_disk() -> bool {
     let found = displays::enumerate().unwrap_or_default();
     let mut recovered = false;
     if let Some(path) = restore_path() {
-        let mut core = Core::new(WinHardware { magnifier: None }, Some(path));
+        let mut core = Core::new(
+            WinHardware {
+                magnifier: None,
+                vibrance: DriverVibrance::load(),
+            },
+            Some(path),
+        );
         recovered |= core.recover(&found);
     }
     let mut manager = ResolutionManager::new(modes_restore_path());
@@ -285,6 +293,8 @@ impl EngineHandle {
 static EMERGENCY_ORIGINALS: Mutex<Vec<(String, GammaRamp)>> = Mutex::new(Vec::new());
 /// Trabajos que deshacen los cambios de resolución y HDR vigentes.
 static EMERGENCY_MODE_JOBS: Mutex<Vec<ModeJob>> = Mutex::new(Vec::new());
+/// Vibrance original de las pantallas que VRes modificó.
+static EMERGENCY_VIBRANCE: Mutex<Vec<(DisplayInfo, i32)>> = Mutex::new(Vec::new());
 
 /// Restauración de emergencia. Se puede llamar desde cualquier hilo. La matriz
 /// de color no hace falta: Windows la quita sola al terminar el proceso.
@@ -297,6 +307,14 @@ pub fn emergency_restore() {
             break;
         }
         std::thread::sleep(Duration::from_millis(10));
+    }
+    if let Ok(originals) = EMERGENCY_VIBRANCE.try_lock()
+        && !originals.is_empty()
+    {
+        let mut driver = DriverVibrance::load();
+        for (display, raw) in originals.iter() {
+            let _ = driver.set(display, *raw);
+        }
     }
     for _ in 0..20 {
         if let Ok(jobs) = EMERGENCY_MODE_JOBS.try_lock() {
@@ -311,6 +329,7 @@ pub fn emergency_restore() {
 
 struct WinHardware {
     magnifier: Option<Magnifier>,
+    vibrance: DriverVibrance,
 }
 
 impl Hardware for WinHardware {
@@ -338,6 +357,20 @@ impl Hardware for WinHardware {
 
     fn write_ramp(&mut self, gdi_name: &str, ramp: &GammaRamp) -> Result<bool, String> {
         gamma::write_ramp(gdi_name, ramp).map_err(|error| error.to_string())
+    }
+
+    fn vibrance(&mut self, display: &DisplayInfo) -> Option<VibranceInfo> {
+        self.vibrance.info(display)
+    }
+
+    fn set_vibrance(&mut self, display: &DisplayInfo, raw: i32) -> Result<(), String> {
+        self.vibrance
+            .set(display, raw)
+            .map_err(|error| error.to_string())
+    }
+
+    fn forget_displays(&mut self) {
+        self.vibrance.forget_displays();
     }
 }
 
@@ -899,6 +932,9 @@ impl Shell {
         if let Ok(mut originals) = EMERGENCY_ORIGINALS.lock() {
             *originals = self.core.originals_to_restore();
         }
+        if let Ok(mut originals) = EMERGENCY_VIBRANCE.lock() {
+            *originals = self.core.vibrance_to_restore();
+        }
         let active = self.core.is_active();
         if active && !self.health_armed {
             window::set_timer(self.hwnd, TIMER_HEALTH, HEALTH_INTERVAL_MS);
@@ -950,7 +986,13 @@ fn run(
 ) {
     // La sesión de Magnification es de este hilo.
     let magnifier = Magnifier::init().ok();
-    let mut core = Core::new(WinHardware { magnifier }, config.restore_path);
+    let mut core = Core::new(
+        WinHardware {
+            magnifier,
+            vibrance: DriverVibrance::load(),
+        },
+        config.restore_path,
+    );
 
     // Primero se deshace lo que haya quedado de una sesión anterior; recién
     // después se capturan los originales.

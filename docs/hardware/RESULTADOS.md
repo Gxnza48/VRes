@@ -21,8 +21,8 @@ Para sumar tu PC, abre un [reporte de compatibilidad](https://github.com/Gxnza48
 | 2 | Matriz: ¿funciona con dos GPU? ¿la relectura es fiel? ¿desaparece con el proceso? ¿hay dominante de color a 300 %? | Base de F1 | F1 | ✅ Sí, fiel al píxel; desaparece sola (dominante a 300 %: pendiente de ver a ojo) |
 | 3 | Rampas: límites reales, éxito falso, latencia, convivencia con Luz nocturna | Tolerancias y en qué hilo se escriben | F1 | ✅ Límite exacto 128; sin éxito falso; AMD ~8,7 ms (Luz nocturna: pendiente) |
 | 4 | Lo mismo con HDR activo | Reglas de HDR | F1 | — |
-| 5 | NVIDIA: rango de la variante `Ex`; qué devuelve para el panel de la otra GPU; persistencia | Backend NVIDIA | F3 | — |
-| 6 | AMD: saturación por ADL en la 780M con el panel interno | Backend AMD | F3 | — |
+| 5 | NVIDIA: rango de la variante `Ex`; qué devuelve para el panel de la otra GPU; persistencia | Backend NVIDIA | F3 | ✅ `Ex`: 0–100, normal 50; el panel de AMD no tiene handle de NVIDIA |
+| 6 | AMD: saturación por ADL en la 780M con el panel interno | Backend AMD | F3 | ✅ 0–200, normal 100 |
 | 7 | ¿La matriz o el crosshair sacan al juego de *independent flip*? (PresentMon) | Texto de compatibilidad | F1/F4 | — |
 | 8 | Pantalla completa exclusiva: ¿se detecta bien? | Estado `ExclusiveFullscreen` | F1 | — |
 | 9 | ¿Llegan los atajos con cada juego en primer plano? | Backend de atajos | F1/F7 | — |
@@ -141,3 +141,20 @@ El EDID del monitor externo informa 60 Hz como modo preferido aunque se use a 20
 ### Pendiente de F2
 
 - A ojo: la estirada llena la pantalla sin barras en cada monitor.
+
+## F3 — Vibrance por driver
+
+Medido el 2026-11-24 con `vres-cli` (cada prueba vuelve sola al valor original).
+
+| Pantalla | Driver | Rango | Normal | Valor del usuario | Escritura |
+|---|---|---|---|---|---|
+| ATNA40CU05-0 (AMD 780M) | ADL, saturación de la pantalla | 0–200 | 100 | **200** (máximo) | 2,4 ms, releída exacta |
+| MAG 255F E20 (RTX 5060) | NVAPI, `NvAPI_SetDVCLevelEx` | 0–100 | 50 | **100** (máximo) | 14 ms, releída exacta |
+
+- Las dos placas se manejan a la vez, cada una con su driver, según el LUID del adaptador de cada pantalla.
+- El usuario ya tenía la vibrance al máximo en los dos paneles: VRes la toma como original y siempre vuelve a ella. Por eso 50 en VRes significa "no tocar el driver".
+- `probe engine-vibrance` (motor real): vibrance 30 → AMD 60 y NVIDIA 30, verificadas; al apagar el motor, AMD 200 y NVIDIA 100 ✅.
+
+### Pendiente de F3
+
+- A ojo: que el realce se note en cada monitor por separado y en un juego en pantalla completa exclusiva.

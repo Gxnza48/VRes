@@ -72,14 +72,14 @@ describe("DisplayPage", () => {
       ready: true,
       displays: [display("a", "Monitor A", 0), display("b", "Monitor B", 1920)],
       requested,
-      status: { rev: 1, layers: [] },
+      status: { rev: 1, layers: [], vibrance: { a: { backend: "nvidia", original: 100 } } },
       notices: [],
     });
   });
 
   it("muestra cada monitor tildado y permite destildarlo", async () => {
     render(<DisplayPage />);
-    expect(screen.getByText("Monitor A")).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Monitor A" })).toBeChecked();
     const checkbox = screen.getByRole("checkbox", { name: "Monitor B" });
     expect(checkbox).toBeChecked();
     await userEvent.click(checkbox);
@@ -107,9 +107,38 @@ describe("DisplayPage", () => {
       status: {
         rev: 2,
         layers: [{ layer: "matrix", display: null, status: "ok", reason: null, detail: null }],
+        vibrance: {},
       },
     });
     render(<DisplayPage />);
     expect(screen.getByRole("status")).toHaveTextContent("En vivo");
+  });
+});
+
+describe("vibrance", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    useEngineStore.setState({
+      ready: true,
+      displays: [display("a", "Monitor A", 0), display("b", "Monitor B", 1920)],
+      requested,
+      status: { rev: 1, layers: [], vibrance: { a: { backend: "nvidia", original: 100 } } },
+      notices: [],
+    });
+  });
+
+  it("muestra qué monitor tiene vibrance del driver y su valor original", () => {
+    render(<DisplayPage />);
+    expect(screen.getByText("Driver NVIDIA")).toBeInTheDocument();
+    expect(screen.getByText("En tu panel: 100")).toBeInTheDocument();
+    expect(screen.getByText("Emulada (sin driver)")).toBeInTheDocument();
+  });
+
+  it("el control de vibrance confirma el look al soltar", () => {
+    render(<DisplayPage />);
+    const slider = screen.getByRole("slider", { name: "Vibrance digital" });
+    fireEvent.change(slider, { target: { value: "75" } });
+    fireEvent.pointerUp(slider, { target: { value: "75" } });
+    expect(ipc.lookCommit).toHaveBeenCalledWith(expect.objectContaining({ vibrance: 75 }));
   });
 });

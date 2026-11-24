@@ -3,8 +3,12 @@
 //! El motor nunca emite frases: emite un [`ReasonCode`] y la interfaz lo
 //! traduce a los tres idiomas.
 
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
+
+use crate::model::vibrance::VibranceBackend;
 
 /// Capas que maneja el motor.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, TS)]
@@ -101,6 +105,16 @@ pub struct LayerReport {
     pub detail: Option<String>,
 }
 
+/// Vibrance del driver de una pantalla.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct DisplayVibrance {
+    pub backend: VibranceBackend,
+    /// El valor que tenía el driver antes de VRes, en la escala de VRes (0–100).
+    pub original: u32,
+}
+
 /// Estado completo del motor (evento `engine:status`).
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
@@ -111,6 +125,9 @@ pub struct EngineStatus {
     pub rev: u64,
     /// Estado de cada capa (y de cada pantalla, para las capas por monitor).
     pub layers: Vec<LayerReport>,
+    /// Pantallas con vibrance del driver.
+    #[serde(default)]
+    pub vibrance: BTreeMap<String, DisplayVibrance>,
 }
 
 impl EngineStatus {

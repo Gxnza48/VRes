@@ -188,7 +188,14 @@
     },
     "resetParam": "Clique duas vezes para voltar ao neutro",
     "emergency": "Se algo parecer errado: Ctrl + Alt + Shift + R restaura a tela a qualquer momento.",
-    "unavailable": "O motor do VRes não está disponível."
+    "unavailable": "O motor do VRes não está disponível.",
+    "vibrance": {
+      "title": "Vibrance digital",
+      "hint": "50 deixa a vibrance como está no painel da sua placa",
+      "driver": "Driver {{backend}}",
+      "emulated": "Emulada (sem driver)",
+      "original": "No seu painel: {{value}}"
+    }
   },
   "reasons": {
     "hdrActive": "HDR ativo: o ajuste fino não se aplica neste monitor.",

@@ -4,6 +4,19 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.3.0] - 2026-11-24
+
+**Vibrance por driver** (fase F3 de la [hoja de ruta](docs/ROADMAP.md)).
+
+### Agregado
+
+- **Vibrance digital** en la pestaña Pantalla, monitor por monitor, con el driver de cada uno: NVIDIA (NVAPI) y AMD (ADL), aunque convivan en la misma notebook. Funciona también en pantalla completa exclusiva.
+- 50 deja la vibrance como la tengas en el panel de tu placa; VRes muestra tu valor original y siempre vuelve a él al cerrar, ante un fallo o al volver a abrir tras un cierre inesperado.
+- Si otro programa cambia la vibrance mientras VRes la usa, VRes la repara unas veces y después deja de pelear y avisa.
+- Monitores sin driver compatible (por ejemplo, Intel): la vibrance se emula con el filtro de color de Windows cuando ningún monitor tildado tiene driver.
+- Con monitores sin tildar, la saturación se aproxima con la vibrance del driver en los tildados.
+- `vres-cli vibrance get | set` y `probe engine-vibrance`.
+
 ## [0.2.0] - 2026-11-24
 
 La pestaña **Resolución** (fase F2 de la [hoja de ruta](docs/ROADMAP.md)).
@@ -41,6 +54,7 @@ Primera versión pública: la base de la app y la pestaña **Pantalla** (fases F
 - Matemática de color con más de 70 pruebas (incluidas pruebas de propiedades) y resultados de las pruebas en hardware real en [docs/hardware/RESULTADOS.md](docs/hardware/RESULTADOS.md).
 - Documentación: arquitectura, motor de color, anti-cheat, contrato interno, códigos para compartir, desarrollo y hoja de ruta.
 
-[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.2.0...HEAD
+[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Gxnza48/VRes/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Gxnza48/VRes/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Gxnza48/VRes/releases/tag/v0.1.0

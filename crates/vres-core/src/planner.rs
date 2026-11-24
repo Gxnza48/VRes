@@ -13,6 +13,7 @@ use crate::color::matrix::{self, ColorMatrix, DEFAULT_COEFFICIENT_LIMIT};
 use crate::color::ramp::RampParams;
 use crate::model::display::DisplayInfo;
 use crate::model::look::{DisplayTrim, Look};
+use crate::model::vibrance::approximate_with_saturation;
 use crate::status::{Layer, LayerStatus, ReasonCode};
 
 /// Lo que pide el usuario.
@@ -64,6 +65,15 @@ pub enum RampTarget {
     Custom(RampParams),
 }
 
+/// Qué hacer con la vibrance del driver de una pantalla.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum VibranceTarget {
+    /// El valor original del driver (sin cambios de VRes).
+    Original,
+    /// Un valor en la escala de VRes (0–100, 50 = normal del driver).
+    Level(f32),
+}
+
 /// Nota del planificador sobre una capa (limitación conocida de antemano).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PlanNote {
@@ -80,6 +90,8 @@ pub struct Plan {
     pub matrix: ColorMatrix,
     /// Rampa de cada pantalla, por identificador estable.
     pub ramps: BTreeMap<String, RampTarget>,
+    /// Vibrance del driver de cada pantalla con backend.
+    pub vibrance: BTreeMap<String, VibranceTarget>,
     /// Limitaciones conocidas.
     pub notes: Vec<PlanNote>,
 }
@@ -93,6 +105,7 @@ impl Plan {
                 .iter()
                 .map(|display| (display.id.clone(), RampTarget::Original))
                 .collect(),
+            vibrance: BTreeMap::new(),
             notes: Vec::new(),
         }
     }
@@ -104,11 +117,31 @@ impl Plan {
                 .ramps
                 .values()
                 .all(|ramp| matches!(ramp, RampTarget::Original))
+            && self
+                .vibrance
+                .values()
+                .all(|target| matches!(target, VibranceTarget::Original))
     }
 }
 
-/// Calcula el plan para las pantallas `displays`.
+/// Calcula el plan para las pantallas `displays`, sin vibrance del driver.
 pub fn plan(requested: &Requested, displays: &[DisplayInfo]) -> Plan {
+    plan_with(requested, displays, &BTreeSet::new())
+}
+
+/// Calcula el plan. `vibrance_capable` son las pantallas cuyo driver tiene
+/// vibrance (NVIDIA o AMD).
+///
+/// Reglas de la vibrance:
+/// - se aplica por driver en las pantallas tildadas que lo tienen;
+/// - se emula en la matriz solo si **ninguna** pantalla tildada lo tiene;
+/// - si la matriz queda en pausa por haber pantallas sin tildar, la
+///   saturación se aproxima con la vibrance del driver de las tildadas.
+pub fn plan_with(
+    requested: &Requested,
+    displays: &[DisplayInfo],
+    vibrance_capable: &BTreeSet<String>,
+) -> Plan {
     let mut plan = Plan::neutral(displays);
 
     if !requested.color_enabled {
@@ -130,22 +163,60 @@ pub fn plan(requested: &Requested, displays: &[DisplayInfo]) -> Plan {
     }
 
     let look = requested.look.clamped();
+    let targeted: Vec<&DisplayInfo> = displays
+        .iter()
+        .filter(|display| requested.targets_display(&display.id))
+        .collect();
+    let driver_vibrance = targeted
+        .iter()
+        .any(|display| vibrance_capable.contains(&display.id));
+    let all_targeted = targeted.len() == displays.len();
 
     // Matriz: global. Si hay pantallas sin tildar, se pausa (no se puede
     // aplicar solo a algunas).
-    let built = matrix::build_matrix(&look, None, DEFAULT_COEFFICIENT_LIMIT);
+    let emulated = (!driver_vibrance).then_some(look.vibrance);
+    let built = matrix::build_matrix(&look, emulated, DEFAULT_COEFFICIENT_LIMIT);
+    let mut approximate = false;
     if !built.matrix.is_identity(1e-6) {
-        let all_targeted = displays
-            .iter()
-            .all(|display| requested.targets_display(&display.id));
         if all_targeted {
             plan.matrix = built.matrix;
         } else {
+            approximate = driver_vibrance && (look.saturation - 100.0).abs() > f32::EPSILON;
             plan.notes.push(PlanNote {
                 layer: Layer::Matrix,
                 display: None,
                 status: LayerStatus::Limited,
                 reason: ReasonCode::PartialTargets,
+            });
+        }
+    }
+
+    // Vibrance del driver: por pantalla tildada con backend.
+    let vibrance = if approximate {
+        approximate_with_saturation(look.vibrance, look.saturation)
+    } else {
+        look.vibrance
+    };
+    for display in &targeted {
+        if vibrance_capable.contains(&display.id) {
+            if (vibrance - 50.0).abs() > f32::EPSILON {
+                plan.vibrance
+                    .insert(display.id.clone(), VibranceTarget::Level(vibrance));
+            }
+            if approximate {
+                plan.notes.push(PlanNote {
+                    layer: Layer::Vibrance,
+                    display: Some(display.id.clone()),
+                    status: LayerStatus::Limited,
+                    reason: ReasonCode::VibranceApproximated,
+                });
+            }
+        } else if driver_vibrance && (look.vibrance - 50.0).abs() > f32::EPSILON {
+            plan.notes.push(PlanNote {
+                layer: Layer::Vibrance,
+                display: Some(display.id.clone()),
+                status: LayerStatus::Limited,
+                reason: ReasonCode::VibranceBackendMissing,
             });
         }
     }
@@ -229,6 +300,88 @@ mod tests {
             },
             ..Requested::default()
         }
+    }
+
+    fn capable(ids: &[&str]) -> BTreeSet<String> {
+        ids.iter().map(|id| (*id).to_owned()).collect()
+    }
+
+    fn with_vibrance(vibrance: f32) -> Requested {
+        Requested {
+            look: Look {
+                vibrance,
+                ..Look::default()
+            },
+            ..Requested::default()
+        }
+    }
+
+    #[test]
+    fn driver_vibrance_goes_to_capable_displays_only() {
+        let plan = plan_with(&with_vibrance(80.0), &two_displays(), &capable(&["a"]));
+        assert_eq!(plan.vibrance.get("a"), Some(&VibranceTarget::Level(80.0)));
+        assert!(!plan.vibrance.contains_key("b"));
+        assert!(
+            plan.matrix.is_identity(1e-6),
+            "con driver en algún monitor no se emula"
+        );
+        assert!(plan.notes.iter().any(|note| note.layer == Layer::Vibrance
+            && note.display.as_deref() == Some("b")
+            && note.reason == ReasonCode::VibranceBackendMissing));
+    }
+
+    #[test]
+    fn vibrance_is_emulated_when_no_display_has_a_driver() {
+        let plan = plan_with(&with_vibrance(80.0), &two_displays(), &BTreeSet::new());
+        assert!(plan.vibrance.is_empty());
+        assert!(
+            !plan.matrix.is_identity(1e-6),
+            "la matriz emula la vibrance"
+        );
+    }
+
+    #[test]
+    fn neutral_vibrance_leaves_the_driver_alone() {
+        let plan = plan_with(
+            &Requested::default(),
+            &two_displays(),
+            &capable(&["a", "b"]),
+        );
+        assert!(plan.vibrance.is_empty());
+        assert!(plan.is_neutral());
+    }
+
+    #[test]
+    fn saturation_is_approximated_with_the_driver_on_partial_targets() {
+        let mut request = vivid();
+        request.targets = Some(capable(&["a"]));
+        let plan = plan_with(&request, &two_displays(), &capable(&["a", "b"]));
+        assert!(plan.matrix.is_identity(1e-6), "la matriz queda en pausa");
+        // 160 % de saturación → 50 + 60 / 4 = 65.
+        assert_eq!(plan.vibrance.get("a"), Some(&VibranceTarget::Level(65.0)));
+        assert!(!plan.vibrance.contains_key("b"), "b no está tildada");
+        assert!(
+            plan.notes.iter().any(|note| note.layer == Layer::Vibrance
+                && note.reason == ReasonCode::VibranceApproximated)
+        );
+    }
+
+    #[test]
+    fn paused_or_disabled_returns_the_driver_vibrance() {
+        let mut request = with_vibrance(90.0);
+        request.paused = true;
+        assert!(
+            plan_with(&request, &two_displays(), &capable(&["a"]))
+                .vibrance
+                .is_empty()
+        );
+        request.paused = false;
+        request.color_enabled = false;
+        assert!(
+            plan_with(&request, &two_displays(), &capable(&["a"]))
+                .vibrance
+                .is_empty()
+        );
     }
 
     #[test]

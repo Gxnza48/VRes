@@ -188,7 +188,14 @@
     },
     "resetParam": "Double-click to go back to neutral",
     "emergency": "If something looks wrong: Ctrl + Alt + Shift + R resets the display at any time.",
-    "unavailable": "The VRes engine is not available."
+    "unavailable": "The VRes engine is not available.",
+    "vibrance": {
+      "title": "Digital vibrance",
+      "hint": "50 leaves vibrance as you have it in your graphics panel",
+      "driver": "{{backend}} driver",
+      "emulated": "Emulated (no driver)",
+      "original": "In your panel: {{value}}"
+    }
   },
   "reasons": {
     "hdrActive": "HDR is on: fine tuning doesn't apply on this monitor.",

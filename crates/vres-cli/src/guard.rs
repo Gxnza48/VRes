@@ -20,6 +20,7 @@ pub fn install_interrupt_handler() {
 }
 
 fn restore_pending() {
+    crate::vibrance::restore_pending();
     if let Ok(pending) = PENDING.lock() {
         for (gdi_name, ramp) in pending.iter() {
             let _ = gamma::write_ramp(gdi_name, ramp);

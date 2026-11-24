@@ -12,8 +12,11 @@ use vres_core::color::matrix::ColorMatrix;
 use vres_core::color::ramp::{GammaRamp, RampRule, build_ramp};
 use vres_core::model::display::DisplayInfo;
 use vres_core::model::state::{RestoreDisplay, RestoreState};
-use vres_core::planner::{self, PlanNote, RampTarget, Requested};
-use vres_core::status::{EngineStatus, Layer, LayerReport, LayerStatus, ReasonCode};
+use vres_core::model::vibrance::VibranceInfo;
+use vres_core::planner::{self, PlanNote, RampTarget, Requested, VibranceTarget};
+use vres_core::status::{
+    DisplayVibrance, EngineStatus, Layer, LayerReport, LayerStatus, ReasonCode,
+};
 use vres_core::store::{self, Loaded};
 
 /// Tolerancia al releer una rampa: un escalón de 8 bits.
@@ -31,6 +34,23 @@ pub trait Hardware {
     fn read_ramp(&mut self, gdi_name: &str) -> Result<GammaRamp, String>;
     /// Devuelve `true` si Windows dijo que la aceptó.
     fn write_ramp(&mut self, gdi_name: &str, ramp: &GammaRamp) -> Result<bool, String>;
+    /// Rango y valor de la vibrance del driver (`None`: la pantalla no tiene).
+    fn vibrance(&mut self, display: &DisplayInfo) -> Option<VibranceInfo> {
+        let _ = display;
+        None
+    }
+    /// Escribe un nivel de vibrance del driver.
+    fn set_vibrance(&mut self, display: &DisplayInfo, raw: i32) -> Result<(), String> {
+        let _ = (display, raw);
+        Err("no vibrance backend".into())
+    }
+    /// Cambiaron las pantallas: olvidar lo que se sabía de ellas.
+    fn forget_displays(&mut self) {}
+}
+
+/// Clave de las reparaciones y conflictos de la vibrance de una pantalla.
+fn vibrance_key(id: &str) -> String {
+    format!("vibrance:{id}")
 }
 
 #[derive(Debug, Clone)]
@@ -76,6 +96,14 @@ pub struct Core<H: Hardware> {
     ramp_reports: BTreeMap<String, LayerReport>,
     repairs: BTreeMap<String, Repairs>,
     conflicted: BTreeSet<String>,
+    /// Rango de la vibrance del driver, por pantalla que la tiene.
+    vibrance_ranges: BTreeMap<String, VibranceInfo>,
+    /// Nivel del driver antes de que VRes lo tocara.
+    vibrance_originals: BTreeMap<String, i32>,
+    /// Pantallas cuya vibrance tocó VRes desde la última limpieza.
+    vibrance_touched: BTreeSet<String>,
+    applied_vibrance: BTreeMap<String, i32>,
+    vibrance_reports: BTreeMap<String, LayerReport>,
     status: EngineStatus,
     /// Escrituras de hardware realizadas (para pruebas y diagnóstico).
     pub writes: u64,
@@ -98,6 +126,11 @@ impl<H: Hardware> Core<H> {
             ramp_reports: BTreeMap::new(),
             repairs: BTreeMap::new(),
             conflicted: BTreeSet::new(),
+            vibrance_ranges: BTreeMap::new(),
+            vibrance_originals: BTreeMap::new(),
+            vibrance_touched: BTreeSet::new(),
+            applied_vibrance: BTreeMap::new(),
+            vibrance_reports: BTreeMap::new(),
             status: EngineStatus::default(),
             writes: 0,
         }
@@ -118,13 +151,16 @@ impl<H: Hardware> Core<H> {
             return false;
         }
         for display in displays {
-            if let Some(ramp) = saved
-                .displays
-                .get(&display.id)
-                .and_then(RestoreDisplay::ramp)
-            {
+            let Some(entry) = saved.displays.get(&display.id) else {
+                continue;
+            };
+            if let Some(ramp) = entry.ramp() {
                 self.writes += 1;
                 let _ = self.hw.write_ramp(&display.gdi_name, &ramp);
+            }
+            if let Some(raw) = entry.vibrance {
+                self.writes += 1;
+                let _ = self.hw.set_vibrance(display, raw);
             }
         }
         self.restore = RestoreState::default();
@@ -134,6 +170,19 @@ impl<H: Hardware> Core<H> {
 
     /// Actualiza las pantallas y captura la rampa original de las nuevas.
     pub fn set_displays(&mut self, displays: Vec<DisplayInfo>) {
+        self.hw.forget_displays();
+        for display in &displays {
+            if !self.vibrance_ranges.contains_key(&display.id)
+                && let Some(info) = self.hw.vibrance(display)
+            {
+                // El original se toma una sola vez: si la pantalla vuelve a
+                // conectarse con un valor de VRes, se conserva el verdadero.
+                self.vibrance_originals
+                    .entry(display.id.clone())
+                    .or_insert(info.current);
+                self.vibrance_ranges.insert(display.id.clone(), info);
+            }
+        }
         for display in &displays {
             match self.originals.get_mut(&display.id) {
                 // El nombre GDI puede cambiar (por ejemplo, al reconectar).
@@ -154,6 +203,9 @@ impl<H: Hardware> Core<H> {
         let present = |id: &String| displays.iter().any(|display| &display.id == id);
         self.applied_ramps.retain(|id, _| present(id));
         self.ramp_reports.retain(|id, _| present(id));
+        self.vibrance_ranges.retain(|id, _| present(id));
+        self.applied_vibrance.retain(|id, _| present(id));
+        self.vibrance_reports.retain(|id, _| present(id));
         self.displays = displays;
         if self.restore.dirty {
             self.persist_dirty_marker();
@@ -187,7 +239,21 @@ impl<H: Hardware> Core<H> {
 
     /// `true` si VRes tiene algo aplicado (hay que vigilarlo).
     pub fn is_active(&self) -> bool {
-        !self.applied_matrix.is_identity(1e-6) || !self.applied_ramps.is_empty()
+        !self.applied_matrix.is_identity(1e-6)
+            || !self.applied_ramps.is_empty()
+            || !self.applied_vibrance.is_empty()
+    }
+
+    /// Vibrance original de las pantallas que VRes modificó (para la
+    /// restauración de emergencia desde otro hilo).
+    pub fn vibrance_to_restore(&self) -> Vec<(DisplayInfo, i32)> {
+        self.applied_vibrance
+            .keys()
+            .filter_map(|id| {
+                let display = self.displays.iter().find(|display| &display.id == id)?;
+                Some((display.clone(), *self.vibrance_originals.get(id)?))
+            })
+            .collect()
     }
 
     /// Rampas originales de las pantallas que VRes modificó (para la
@@ -204,14 +270,90 @@ impl<H: Hardware> Core<H> {
     /// reescribe todo: tras un cambio de pantalla o al desbloquear la sesión).
     /// Devuelve `true` si cambió el estado.
     pub fn reconcile(&mut self, force: bool) -> bool {
-        let plan = planner::plan(&self.requested, &self.displays);
+        let capable: BTreeSet<String> = self.vibrance_ranges.keys().cloned().collect();
+        let plan = planner::plan_with(&self.requested, &self.displays, &capable);
+        self.apply_vibrance(&plan.vibrance, force);
         self.apply_ramps(&plan.ramps, force);
         self.apply_matrix(&plan.matrix, force);
         self.notes = plan.notes;
-        if self.applied_ramps.is_empty() && self.restore.dirty {
+        self.clean_if_nothing_applied();
+        self.refresh_status()
+    }
+
+    fn clean_if_nothing_applied(&mut self) {
+        if self.applied_ramps.is_empty() && self.applied_vibrance.is_empty() && self.restore.dirty {
             self.mark_clean();
         }
-        self.refresh_status()
+    }
+
+    /// Escribe un nivel de vibrance y lo relee.
+    fn write_vibrance_verified(&mut self, display: &DisplayInfo, raw: i32) -> Result<(), String> {
+        self.writes += 1;
+        self.hw.set_vibrance(display, raw)?;
+        match self.hw.vibrance(display) {
+            Some(info) if info.current == raw => Ok(()),
+            Some(info) => Err(format!("read back {} instead of {raw}", info.current)),
+            None => Err("vibrance unavailable after the write".into()),
+        }
+    }
+
+    fn apply_vibrance(&mut self, targets: &BTreeMap<String, VibranceTarget>, force: bool) {
+        for display in self.displays.clone() {
+            let id = display.id.clone();
+            let Some(range) = self.vibrance_ranges.get(&id).copied() else {
+                continue;
+            };
+            let original = self
+                .vibrance_originals
+                .get(&id)
+                .copied()
+                .unwrap_or(range.current);
+            let desired = match targets.get(&id) {
+                Some(VibranceTarget::Level(value)) => Some(range.raw_for(*value)),
+                _ => None,
+            };
+            let applied = self.applied_vibrance.get(&id).copied();
+            if desired == applied && !(force && desired.is_some()) {
+                continue;
+            }
+            match desired {
+                None => {
+                    if applied.is_some() {
+                        self.writes += 1;
+                        let _ = self.hw.set_vibrance(&display, original);
+                        self.applied_vibrance.remove(&id);
+                    }
+                    self.vibrance_reports.insert(
+                        id.clone(),
+                        report(Layer::Vibrance, Some(&id), LayerStatus::Off, None, None),
+                    );
+                }
+                Some(_) if self.conflicted.contains(&vibrance_key(&id)) => {}
+                Some(raw) => {
+                    // El original se guarda en disco ANTES de modificar nada.
+                    self.mark_vibrance_dirty(&id);
+                    let entry = match self.write_vibrance_verified(&display, raw) {
+                        Ok(()) => {
+                            self.applied_vibrance.insert(id.clone(), raw);
+                            report(Layer::Vibrance, Some(&id), LayerStatus::Ok, None, None)
+                        }
+                        Err(error) => {
+                            self.applied_vibrance.remove(&id);
+                            self.writes += 1;
+                            let _ = self.hw.set_vibrance(&display, original);
+                            report(
+                                Layer::Vibrance,
+                                Some(&id),
+                                LayerStatus::Failed,
+                                Some(ReasonCode::DriverError),
+                                Some(error),
+                            )
+                        }
+                    };
+                    self.vibrance_reports.insert(id.clone(), entry);
+                }
+            }
+        }
     }
 
     fn write_verified(&mut self, gdi_name: &str, ramp: &GammaRamp) -> Result<bool, String> {
@@ -431,10 +573,65 @@ impl<H: Hardware> Core<H> {
             }
         }
 
-        if self.applied_ramps.is_empty() && self.restore.dirty {
-            self.mark_clean();
+        let applied: Vec<(String, i32)> = self
+            .applied_vibrance
+            .iter()
+            .map(|(id, raw)| (id.clone(), *raw))
+            .collect();
+        for (id, raw) in applied {
+            let Some(display) = self
+                .displays
+                .iter()
+                .find(|display| display.id == id)
+                .cloned()
+            else {
+                continue;
+            };
+            let Some(info) = self.hw.vibrance(&display) else {
+                continue;
+            };
+            if info.current == raw {
+                continue;
+            }
+            let key = vibrance_key(&id);
+            if self.count_repair(&key) > MAX_REPAIRS_PER_MINUTE {
+                // Otro programa (el panel de la placa, un perfil de juego) la cambia.
+                self.applied_vibrance.remove(&id);
+                self.conflicted.insert(key);
+                self.vibrance_reports.insert(
+                    id.clone(),
+                    report(
+                        Layer::Vibrance,
+                        Some(&id),
+                        LayerStatus::Limited,
+                        Some(ReasonCode::DriverError),
+                        Some("another program keeps changing the vibrance".into()),
+                    ),
+                );
+            } else {
+                let _ = self.write_vibrance_verified(&display, raw);
+            }
         }
+
+        self.clean_if_nothing_applied();
         self.refresh_status()
+    }
+
+    /// Cuenta una reparación de `key` en el último minuto.
+    fn count_repair(&mut self, key: &str) -> u32 {
+        let now = Instant::now();
+        let repairs = self.repairs.entry(key.to_owned()).or_insert(Repairs {
+            since: now,
+            count: 0,
+        });
+        if now.duration_since(repairs.since) > Duration::from_secs(60) {
+            *repairs = Repairs {
+                since: now,
+                count: 0,
+            };
+        }
+        repairs.count += 1;
+        repairs.count
     }
 
     /// Vuelve todo al original (salida, fin de sesión, emergencia).
@@ -447,6 +644,14 @@ impl<H: Hardware> Core<H> {
             }
         }
         self.applied_ramps.clear();
+        for (display, raw) in self.vibrance_to_restore() {
+            self.writes += 1;
+            let _ = self.hw.set_vibrance(&display, raw);
+        }
+        self.applied_vibrance.clear();
+        for (id, entry) in self.vibrance_reports.iter_mut() {
+            *entry = report(Layer::Vibrance, Some(id), LayerStatus::Off, None, None);
+        }
         if !self.applied_matrix.is_identity(1e-6) {
             self.writes += 1;
             let _ = self.hw.set_matrix(&ColorMatrix::IDENTITY);
@@ -467,6 +672,14 @@ impl<H: Hardware> Core<H> {
         }
     }
 
+    /// Como `mark_dirty`, y además guarda el original de la vibrance de `id`.
+    fn mark_vibrance_dirty(&mut self, id: &str) {
+        if self.vibrance_touched.insert(id.to_owned()) || !self.restore.dirty {
+            self.restore.dirty = true;
+            self.persist_dirty_marker();
+        }
+    }
+
     fn persist_dirty_marker(&mut self) {
         self.restore.pid = std::process::id();
         self.restore.app_version = vres_core::APP_VERSION.to_owned();
@@ -480,11 +693,32 @@ impl<H: Hardware> Core<H> {
                 )
             })
             .collect();
+        for id in &self.vibrance_touched {
+            let Some(&raw) = self.vibrance_originals.get(id) else {
+                continue;
+            };
+            let gdi_name = self
+                .displays
+                .iter()
+                .find(|display| &display.id == id)
+                .map(|display| display.gdi_name.clone())
+                .unwrap_or_default();
+            self.restore
+                .displays
+                .entry(id.clone())
+                .or_insert_with(|| RestoreDisplay {
+                    gdi_name,
+                    ramp: String::new(),
+                    vibrance: None,
+                })
+                .vibrance = Some(raw);
+        }
         self.persist_restore();
     }
 
     fn mark_clean(&mut self) {
         self.restore = RestoreState::default();
+        self.vibrance_touched.clear();
         self.persist_restore();
     }
 
@@ -520,12 +754,59 @@ impl<H: Hardware> Core<H> {
                 entry.reason = Some(note.reason);
             }
             layers.push(entry);
+
+            let note = self.notes.iter().find(|note| {
+                note.layer == Layer::Vibrance
+                    && note.display.as_deref() == Some(display.id.as_str())
+            });
+            let vibrance = self.vibrance_reports.get(&display.id).cloned();
+            if vibrance.is_some()
+                || note.is_some()
+                || self.vibrance_ranges.contains_key(&display.id)
+            {
+                let mut entry = vibrance.unwrap_or_else(|| {
+                    report(
+                        Layer::Vibrance,
+                        Some(&display.id),
+                        LayerStatus::Off,
+                        None,
+                        None,
+                    )
+                });
+                if let Some(note) = note
+                    && matches!(entry.status, LayerStatus::Off | LayerStatus::Ok)
+                {
+                    entry.status = note.status;
+                    entry.reason = Some(note.reason);
+                }
+                layers.push(entry);
+            }
         }
 
-        if layers == self.status.layers {
+        let vibrance: BTreeMap<String, DisplayVibrance> = self
+            .vibrance_ranges
+            .iter()
+            .map(|(id, info)| {
+                let original = self
+                    .vibrance_originals
+                    .get(id)
+                    .copied()
+                    .unwrap_or(info.current);
+                (
+                    id.clone(),
+                    DisplayVibrance {
+                        backend: info.backend,
+                        original: info.value_for(original).round() as u32,
+                    },
+                )
+            })
+            .collect();
+
+        if layers == self.status.layers && vibrance == self.status.vibrance {
             return false;
         }
         self.status.layers = layers;
+        self.status.vibrance = vibrance;
         self.status.rev += 1;
         true
     }
@@ -544,6 +825,7 @@ mod tests {
         ramps: HashMap<String, GammaRamp>,
         reject_ramps: bool,
         matrix_unavailable: bool,
+        vibrance: HashMap<String, VibranceInfo>,
     }
 
     impl Hardware for FakeHardware {
@@ -567,6 +849,141 @@ mod tests {
             self.ramps.insert(gdi_name.to_owned(), ramp.clone());
             Ok(true)
         }
+        fn vibrance(&mut self, display: &DisplayInfo) -> Option<VibranceInfo> {
+            self.vibrance.get(&display.gdi_name).copied()
+        }
+        fn set_vibrance(&mut self, display: &DisplayInfo, raw: i32) -> Result<(), String> {
+            let info = self
+                .vibrance
+                .get_mut(&display.gdi_name)
+                .ok_or_else(|| "no backend".to_owned())?;
+            info.current = raw.clamp(info.min, info.max);
+            Ok(())
+        }
+    }
+
+    /// Una pantalla AMD con la vibrance del driver al máximo (como la del usuario).
+    fn amd_at_max(hw: &mut FakeHardware, id: &str) {
+        hw.vibrance.insert(
+            format!(r"\\.\{id}"),
+            VibranceInfo {
+                backend: vres_core::model::vibrance::VibranceBackend::Amd,
+                current: 200,
+                min: 0,
+                max: 200,
+                default: 100,
+            },
+        );
+    }
+
+    fn with_vibrance(value: f32) -> Requested {
+        Requested {
+            look: Look {
+                vibrance: value,
+                ..Look::default()
+            },
+            ..Requested::default()
+        }
+    }
+
+    #[test]
+    fn driver_vibrance_is_applied_verified_and_restored() {
+        let mut hw = FakeHardware::default();
+        amd_at_max(&mut hw, "a");
+        let mut core = core(hw, None);
+        core.set_requested(with_vibrance(30.0));
+        core.reconcile(false);
+        assert_eq!(core.hw.vibrance[r"\\.\a"].current, 60, "30 → 60 en 0–200");
+        assert!(core.is_active());
+        let entry = core
+            .status()
+            .layers
+            .iter()
+            .find(|layer| layer.layer == Layer::Vibrance)
+            .expect("capa de vibrance");
+        assert_eq!(entry.status, LayerStatus::Ok);
+        assert_eq!(
+            core.status().vibrance["a"].original,
+            100,
+            "200 es 100 en la escala de VRes"
+        );
+
+        core.set_requested(Requested::default());
+        core.reconcile(false);
+        assert_eq!(
+            core.hw.vibrance[r"\\.\a"].current, 200,
+            "vuelve al original del usuario"
+        );
+        assert!(!core.is_active());
+    }
+
+    #[test]
+    fn vibrance_original_is_on_disk_before_the_first_write() {
+        let path = temp_path("vibrance");
+        let mut hw = FakeHardware::default();
+        amd_at_max(&mut hw, "a");
+        let mut core = core(hw, Some(path.clone()));
+        core.set_requested(with_vibrance(80.0));
+        core.reconcile(false);
+        let saved = match store::read_json::<RestoreState>(&path) {
+            Loaded::Ok(saved) => saved,
+            other => panic!("restore.json: {other:?}"),
+        };
+        assert!(saved.dirty);
+        assert_eq!(saved.displays["a"].vibrance, Some(200));
+
+        core.restore_all();
+        assert_eq!(core.hw.vibrance[r"\\.\a"].current, 200);
+    }
+
+    #[test]
+    fn a_dirty_session_gets_its_vibrance_back() {
+        let path = temp_path("vibrance-recover");
+        let saved = RestoreState {
+            dirty: true,
+            displays: [(
+                "a".to_owned(),
+                RestoreDisplay {
+                    gdi_name: r"\\.\a".into(),
+                    ramp: String::new(),
+                    vibrance: Some(200),
+                },
+            )]
+            .into(),
+            ..RestoreState::default()
+        };
+        store::write_json_atomic(&path, &saved).expect("restore.json");
+        let mut hw = FakeHardware::default();
+        amd_at_max(&mut hw, "a");
+        hw.vibrance.get_mut(r"\\.\a").expect("pantalla").current = 140;
+        let mut core = core(hw, Some(path));
+        assert!(core.recover(&[display("a", 0)]));
+        assert_eq!(core.hw.vibrance[r"\\.\a"].current, 200);
+    }
+
+    #[test]
+    fn vibrance_changed_by_another_program_is_repaired_then_left_alone() {
+        let mut hw = FakeHardware::default();
+        amd_at_max(&mut hw, "a");
+        let mut core = core(hw, None);
+        core.set_requested(with_vibrance(70.0));
+        core.reconcile(false);
+        for _ in 0..MAX_REPAIRS_PER_MINUTE {
+            core.hw
+                .vibrance
+                .get_mut(r"\\.\a")
+                .expect("pantalla")
+                .current = 10;
+            core.health_check();
+            assert_eq!(core.hw.vibrance[r"\\.\a"].current, 140, "se repara");
+        }
+        core.hw
+            .vibrance
+            .get_mut(r"\\.\a")
+            .expect("pantalla")
+            .current = 10;
+        core.health_check();
+        assert_eq!(core.hw.vibrance[r"\\.\a"].current, 10, "deja de pelear");
     }
 
     fn display(id: &str, x: i32) -> DisplayInfo {
