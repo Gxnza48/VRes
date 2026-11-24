@@ -3,4 +3,4 @@
 /**
  * Código estable de error. La interfaz traduce por código, nunca por mensaje.
  */
-export type ErrorCode = "internal" | "windowFailed" | "updateCheckFailed" | "updateUnavailable" | "updateInstallFailed";
+export type ErrorCode = "internal" | "windowFailed" | "updateCheckFailed" | "updateUnavailable" | "updateInstallFailed" | "engineUnavailable";

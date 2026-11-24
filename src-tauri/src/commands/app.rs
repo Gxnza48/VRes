@@ -5,14 +5,22 @@ use vres_core::ipc::{Bootstrap, IpcError};
 
 use crate::LaunchInfo;
 use crate::app_windows;
+use crate::engine_bridge::EngineState;
 
 /// Datos iniciales para la interfaz.
 #[tauri::command]
-pub async fn app_bootstrap(launch: State<'_, LaunchInfo>) -> Result<Bootstrap, IpcError> {
+pub async fn app_bootstrap(
+    launch: State<'_, LaunchInfo>,
+    engine: State<'_, EngineState>,
+) -> Result<Bootstrap, IpcError> {
     Ok(Bootstrap {
         app_version: vres_core::APP_VERSION.to_owned(),
         system_language: sys_locale::get_locale(),
         autostarted: launch.autostarted,
+        displays: engine.displays(),
+        requested: engine.requested(),
+        status: engine.status(),
+        notices: engine.take_notices(),
     })
 }
 

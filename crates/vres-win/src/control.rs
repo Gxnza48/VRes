@@ -32,6 +32,10 @@ use crate::{WinError, WinResult};
 
 /// Clase de la ventana de control.
 pub const WINDOW_CLASS: PCWSTR = w!("VRes.Engine");
+/// Clase de la ventana de control, como texto.
+pub const WINDOW_CLASS_NAME: &str = "VRes.Engine";
+/// Nombre del mensaje registrado que transporta los [`RemoteCommand`].
+pub const REMOTE_MESSAGE_NAME: &str = "VRes.Remote.v1";
 
 /// Nombre del mensaje registrado que transporta los [`RemoteCommand`].
 const REMOTE_MESSAGE: PCWSTR = w!("VRes.Remote.v1");
@@ -49,7 +53,8 @@ pub enum RemoteCommand {
 }
 
 impl RemoteCommand {
-    fn from_wparam(value: usize) -> Option<Self> {
+    /// Interpreta el `wparam` del mensaje remoto.
+    pub fn from_wparam(value: usize) -> Option<Self> {
         match value {
             1 => Some(Self::EmergencyReset),
             2 => Some(Self::Shutdown),

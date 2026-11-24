@@ -26,17 +26,6 @@
     "roadmap": "Ver o roadmap"
   },
   "pages": {
-    "display": {
-      "title": "Tela",
-      "subtitle": "Saturação até 300%, vibrance digital e ajuste fino de cor, monitor por monitor.",
-      "items": [
-        "Saturação de 0 a 300% (100 é o jogo como ele vem)",
-        "Brilho, contraste, gama, temperatura, sombras e realces por monitor",
-        "Escolher em quais monitores aplicar e identificar cada tela",
-        "Comparar com a imagem original com um único botão",
-        "Vibrance digital pelo driver em NVIDIA e AMD"
-      ]
-    },
     "library": {
       "title": "Biblioteca",
       "subtitle": "Seus looks, miras, resoluções e perfis, guardados no seu PC.",
@@ -134,18 +123,111 @@
     },
     "safety": {
       "title": "Se algo parecer errado",
-      "description": "Ao fechar o VRes, a tela volta a ser como era. A partir da fase F1, o atalho Ctrl + Alt + Shift + R a restaura a qualquer momento, mesmo com a janela fechada."
+      "description": "Ao fechar o VRes, a tela volta a ser como era. O atalho Ctrl + Alt + Shift + R a restaura a qualquer momento, mesmo com a janela fechada, assim como “Restaurar tela” na bandeja."
     },
     "about": {
       "title": "Sobre",
       "version": "Versão {{version}}",
       "license": "Software livre sob a licença GPL-3.0. Sem conta e sem telemetria.",
       "repository": "Código-fonte",
-      "report": "Reportar um problema"
+      "report": "Reportar um problema",
+      "copyDiagnostics": "Copiar diagnóstico",
+      "copied": "Copiado"
+    },
+    "startup": {
+      "title": "Inicialização",
+      "description": "O VRes abre com o Windows direto na bandeja, sem abrir a janela, e aplica o seu último look.",
+      "label": "Iniciar com o Windows"
     }
   },
   "quick": {
     "title": "Popup rápido de cor",
     "description": "Chega na fase F5."
+  },
+  "display": {
+    "title": "Tela",
+    "subtitle": "Saturação e ajuste fino de cor, monitor por monitor.",
+    "enabled": "Cor",
+    "on": "Ligada",
+    "off": "Desligada",
+    "compare": "Comparar",
+    "compareHint": "Segure para ver a imagem original",
+    "reset": "Restaurar",
+    "resetHint": "Volta todos os valores ao neutro",
+    "status": {
+      "ok": "Ao vivo",
+      "limited": "Limitado",
+      "failed": "Com erros",
+      "off": "Sem mudanças",
+      "paused": "Em pausa",
+      "disabled": "Desligado"
+    },
+    "targets": {
+      "title": "Aplicar em",
+      "description": "Monitores desmarcados mantêm as próprias cores.",
+      "identify": "Identificar telas",
+      "primary": "principal",
+      "internal": "interno",
+      "hdr": "HDR",
+      "partial": "Há monitores desmarcados: a saturação fica em pausa, porque o Windows a aplica à área de trabalho inteira de uma vez. O ajuste fino continua valendo nos monitores marcados.",
+      "none": "Nenhum monitor marcado: as mudanças estão em pausa.",
+      "noDisplays": "Nenhuma tela encontrada."
+    },
+    "saturation": {
+      "title": "Saturação",
+      "hint": "100 é a imagem como ela vem"
+    },
+    "fineTune": {
+      "title": "Ajuste fino",
+      "description": "Aplicado por monitor, sobre a calibração de cada um."
+    },
+    "params": {
+      "brightness": "Brilho",
+      "contrast": "Contraste",
+      "gamma": "Gama",
+      "temperature": "Temperatura",
+      "highlights": "Realces",
+      "shadows": "Sombras",
+      "blacks": "Pretos",
+      "whites": "Brancos",
+      "shadowTint": "Tom das sombras",
+      "highlightTint": "Tom dos realces"
+    },
+    "scale": {
+      "cool": "frio",
+      "warm": "quente"
+    },
+    "resetParam": "Clique duas vezes para voltar ao neutro",
+    "emergency": "Se algo parecer errado: Ctrl + Alt + Shift + R restaura a tela a qualquer momento.",
+    "unavailable": "O motor do VRes não está disponível."
+  },
+  "reasons": {
+    "hdrActive": "HDR ativo: o ajuste fino não se aplica neste monitor.",
+    "partialTargets": "Em pausa porque há monitores desmarcados.",
+    "exclusiveFullscreen": "Um jogo em tela cheia exclusiva não mostra esta camada. Use janela sem bordas.",
+    "magUnavailable": "O Windows não permitiu aplicar a saturação.",
+    "magDropped": "O Windows descartou a saturação.",
+    "magConflict": "Outro app (por exemplo, a Lupa ou os filtros de cor do Windows) está usando o filtro de cor.",
+    "rampOutOfRange": "A curva pedida passa do que o Windows permite: foi aplicada a mais próxima.",
+    "rampRejected": "O Windows rejeitou o ajuste fino neste monitor.",
+    "rampConflict": "Outro app (Luz noturna, f.lux, um calibrador) está mudando as cores deste monitor.",
+    "vibranceBackendMissing": "Este monitor não tem vibrance pelo driver.",
+    "vibranceApproximated": "A saturação é aproximada com a vibrance do driver.",
+    "driverError": "O driver retornou um erro.",
+    "displayGone": "A tela não está mais conectada.",
+    "paused": "Em pausa.",
+    "compareHeld": "Mostrando a imagem original.",
+    "notInGame": "Só funciona com o jogo em primeiro plano.",
+    "modeNotSupported": "O monitor não aceita esse modo.",
+    "hotkeyTaken": "Outro programa usa esse atalho.",
+    "safeModeAfterCrash": "Modo seguro após um fechamento inesperado."
+  },
+  "notices": {
+    "recovered": "O VRes não fechou direito da última vez: já restaurou as cores originais.",
+    "safeMode": "Por segurança, o VRes abriu com a cor desligada. Ligue quando quiser.",
+    "emergencyReset": "Tela restaurada: a cor ficou desligada.",
+    "hotkeyTaken": "Outro programa usa Ctrl + Alt + Shift + R, então o atalho de emergência não está disponível. Você pode restaurar a tela pela bandeja.",
+    "engineUnavailable": "O motor do VRes não conseguiu iniciar. Reinicie o app; se continuar, reporte.",
+    "dismiss": "Fechar aviso"
   }
 }

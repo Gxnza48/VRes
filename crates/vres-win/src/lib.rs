@@ -18,7 +18,9 @@ pub mod displays;
 pub mod dpi;
 pub mod error;
 pub mod gamma;
+pub mod identify;
 pub mod mag;
 pub mod probe;
+pub mod window;
 
 pub use error::{WinError, WinResult};

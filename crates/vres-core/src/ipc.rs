@@ -6,8 +6,29 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+use crate::model::display::DisplayInfo;
+use crate::planner::Requested;
+use crate::status::EngineStatus;
+
+/// Avisos para el usuario (evento `app:notice` y al arrancar).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub enum Notice {
+    /// Había cambios de una sesión que no cerró bien: se restauraron.
+    Recovered,
+    /// VRes arrancó con el color apagado tras un cierre inesperado.
+    SafeMode,
+    /// Se restableció la pantalla (atajo de emergencia o pedido externo).
+    EmergencyReset,
+    /// Otro programa usa el atajo de emergencia.
+    HotkeyTaken,
+    /// El motor no pudo arrancar.
+    EngineUnavailable,
+}
+
 /// Datos que la interfaz pide una sola vez, al arrancar.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export)]
 pub struct Bootstrap {
@@ -17,6 +38,14 @@ pub struct Bootstrap {
     pub system_language: Option<String>,
     /// `true` si VRes arrancó solo con Windows (sin abrir la ventana).
     pub autostarted: bool,
+    /// Pantallas activas.
+    pub displays: Vec<DisplayInfo>,
+    /// Lo que está pedido (look, pantallas tildadas, interruptores).
+    pub requested: Requested,
+    /// Estado de cada capa.
+    pub status: EngineStatus,
+    /// Avisos pendientes (recuperación, modo seguro…).
+    pub notices: Vec<Notice>,
 }
 
 /// Una actualización disponible en GitHub Releases.
@@ -62,6 +91,8 @@ pub enum ErrorCode {
     UpdateUnavailable,
     /// La descarga o la instalación de la actualización falló.
     UpdateInstallFailed,
+    /// El motor no está disponible.
+    EngineUnavailable,
 }
 
 /// Error que devuelven todos los comandos de Tauri.
@@ -96,11 +127,17 @@ mod tests {
             app_version: "0.0.1".into(),
             system_language: Some("es-AR".into()),
             autostarted: false,
+            displays: Vec::new(),
+            requested: Requested::default(),
+            status: EngineStatus::default(),
+            notices: vec![Notice::SafeMode],
         })
         .expect("serializable");
         assert_eq!(value["appVersion"], "0.0.1");
         assert_eq!(value["systemLanguage"], "es-AR");
         assert_eq!(value["autostarted"], false);
+        assert_eq!(value["requested"]["colorEnabled"], true);
+        assert_eq!(value["notices"][0], "safeMode");
     }
 
     #[test]

@@ -34,12 +34,20 @@ pub fn reset() -> Report {
             json!({ "ok": true, "running": true }),
             "Listo: VRes restableció la pantalla.",
         ),
-        // Sin instancia en ejecución no hay cambios activos de esta sesión. La
-        // restauración desde `restore.json` llega con el motor (F1b).
-        Ok(None) => Report::ok(
-            json!({ "ok": true, "running": false }),
-            "VRes no está corriendo: no hay cambios activos que restablecer.",
-        ),
+        // Sin instancia en ejecución: se deshace lo que haya quedado de un
+        // cierre inesperado (restore.json).
+        Ok(None) => {
+            let recovered = vres_engine::recover_from_disk();
+            let message = if recovered {
+                "VRes no estaba corriendo: se restauraron los colores que quedaron de un cierre inesperado."
+            } else {
+                "VRes no está corriendo y no había cambios pendientes."
+            };
+            Report::ok(
+                json!({ "ok": true, "running": false, "recovered": recovered }),
+                message,
+            )
+        }
         Err(error) => Report::fail(
             json!({ "ok": false, "error": error.to_string() }),
             "No se pudo contactar a VRes.",

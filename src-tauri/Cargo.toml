@@ -33,6 +33,7 @@ tracing-subscriber = { version = "0.3", features = ["fmt"] }
 vres-core.workspace = true
 
 [target.'cfg(windows)'.dependencies]
+vres-engine.workspace = true
 vres-win.workspace = true
 
 [lints]

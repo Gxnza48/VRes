@@ -1,0 +1,81 @@
+import type { ReactNode } from "react";
+
+import { cn } from "@/lib/utils";
+
+export interface SliderRange {
+  min: number;
+  max: number;
+  default: number;
+  step: number;
+}
+
+interface ParamSliderProps {
+  id: string;
+  label: string;
+  value: number;
+  range: SliderRange;
+  /** Texto del valor (por ejemplo "130 %"). */
+  display: string;
+  /** Extremos de la escala (por ejemplo "frío" y "cálido"). */
+  scale?: [ReactNode, ReactNode];
+  disabled?: boolean;
+  /** Título de ayuda (doble clic para volver al neutro). */
+  resetTitle: string;
+  /** Mientras se arrastra (vista previa). */
+  onChange: (value: number) => void;
+  /** Al soltar, con teclado o con doble clic (se guarda). */
+  onCommit: (value: number) => void;
+  className?: string;
+}
+
+/** Control deslizante de un parámetro, con vista previa y confirmación. */
+export function ParamSlider({
+  id,
+  label,
+  value,
+  range,
+  display,
+  scale,
+  disabled,
+  resetTitle,
+  onChange,
+  onCommit,
+  className,
+}: ParamSliderProps) {
+  const commitFrom = (target: EventTarget) => onCommit(Number((target as HTMLInputElement).value));
+
+  return (
+    <div className={cn("flex flex-col gap-1.5", className)}>
+      <div className="flex items-baseline justify-between gap-3 text-sm">
+        <label htmlFor={id} className="text-fg">
+          {label}
+        </label>
+        <span className="tabular-nums text-muted">{display}</span>
+      </div>
+      <input
+        id={id}
+        type="range"
+        min={range.min}
+        max={range.max}
+        step={range.step}
+        value={value}
+        disabled={disabled}
+        title={resetTitle}
+        onChange={(event) => onChange(Number(event.target.value))}
+        onPointerUp={(event) => commitFrom(event.target)}
+        onKeyUp={(event) => commitFrom(event.target)}
+        onDoubleClick={() => {
+          onChange(range.default);
+          onCommit(range.default);
+        }}
+        className="w-full cursor-pointer accent-accent disabled:cursor-not-allowed disabled:opacity-50"
+      />
+      {scale && (
+        <div className="flex justify-between text-[11px] text-muted">
+          <span>{scale[0]}</span>
+          <span>{scale[1]}</span>
+        </div>
+      )}
+    </div>
+  );
+}

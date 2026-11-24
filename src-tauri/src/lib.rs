@@ -1,8 +1,8 @@
 //! VRes: aplicación de escritorio (Tauri 2).
 //!
 //! Este crate solo conecta piezas: la interfaz (WebView) ⇄ los comandos ⇄ el
-//! motor. La lógica vive en `vres-core` (pura) y el acceso a Windows en
-//! `vres-win`.
+//! motor. La lógica vive en `vres-core` (pura), el acceso a Windows en
+//! `vres-win` y el motor en `vres-engine`.
 //!
 //! Reglas de Tauri que hay que respetar (verificadas en su código fuente):
 //! - todos los comandos son `async` (los síncronos corren en el hilo principal);
@@ -16,6 +16,7 @@
 mod app_windows;
 mod commands;
 mod early;
+mod engine_bridge;
 mod i18n;
 mod lifecycle;
 mod logging;
@@ -39,6 +40,14 @@ pub struct LaunchInfo {
 
 /// Arranca la aplicación. No retorna: al salir, Tauri termina el proceso.
 pub fn run() {
+    // Ante un error interno, la pantalla vuelve a la normalidad antes de
+    // terminar (la matriz de color la quita Windows sola con el proceso).
+    let default_hook = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |info| {
+        vres_engine::emergency_restore();
+        default_hook(info);
+    }));
+
     let app = tauri::Builder::default()
         // Debe ser el primer plugin: una segunda instancia le pasa sus
         // argumentos a la primera y termina.
@@ -61,6 +70,19 @@ pub fn run() {
             commands::app::app_quit,
             commands::update::update_check,
             commands::update::update_install,
+            commands::engine::displays_list,
+            commands::engine::displays_identify,
+            commands::engine::displays_set_targets,
+            commands::engine::look_preview,
+            commands::engine::look_commit,
+            commands::engine::look_reset,
+            commands::engine::look_set_enabled,
+            commands::engine::look_compare,
+            commands::engine::engine_set_paused,
+            commands::engine::engine_emergency_reset,
+            commands::engine::engine_status,
+            commands::settings::settings_get_autostart,
+            commands::settings::settings_set_autostart,
         ])
         .build(tauri::generate_context!())
         .expect("VRes no pudo iniciar");

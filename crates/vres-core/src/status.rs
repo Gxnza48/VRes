@@ -94,3 +94,32 @@ pub struct LayerReport {
     /// Detalle técnico en inglés, solo para logs.
     pub detail: Option<String>,
 }
+
+/// Estado completo del motor (evento `engine:status`).
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct EngineStatus {
+    /// Aumenta cada vez que cambia algo.
+    #[ts(type = "number")]
+    pub rev: u64,
+    /// Estado de cada capa (y de cada pantalla, para las capas por monitor).
+    pub layers: Vec<LayerReport>,
+}
+
+impl EngineStatus {
+    /// El peor estado entre todas las capas (para el indicador "En vivo").
+    pub fn overall(&self) -> LayerStatus {
+        let rank = |status: LayerStatus| match status {
+            LayerStatus::Off => 0,
+            LayerStatus::Ok => 1,
+            LayerStatus::Limited => 2,
+            LayerStatus::Failed => 3,
+        };
+        self.layers
+            .iter()
+            .map(|layer| layer.status)
+            .max_by_key(|status| rank(*status))
+            .unwrap_or(LayerStatus::Off)
+    }
+}

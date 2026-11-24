@@ -3,17 +3,10 @@
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use tauri::{App, AppHandle, Manager, RunEvent};
+use vres_engine::Command;
 
+use crate::engine_bridge::EngineState;
 use crate::{AUTOSTART_FLAG, LaunchInfo, app_windows, logging, tray};
-
-#[cfg(windows)]
-use std::sync::Mutex;
-#[cfg(windows)]
-use vres_win::control::{ACK, ControlWindow, RemoteCommand};
-
-/// Ventana de control: recibe `--shutdown` y `--reset` desde otros procesos.
-#[cfg(windows)]
-struct ControlState(Mutex<Option<ControlWindow>>);
 
 /// Inicialización, antes de que corra el bucle de eventos.
 pub fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
@@ -24,13 +17,13 @@ pub fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
     let autostarted = std::env::args().any(|arg| arg == AUTOSTART_FLAG);
     app.manage(LaunchInfo { autostarted });
 
-    #[cfg(windows)]
-    {
-        let control = start_control_window(handle.clone())?;
-        app.manage(ControlState(Mutex::new(Some(control))));
-    }
+    // El motor arranca antes que la bandeja y la ventana: restaura lo que haya
+    // quedado de una sesión anterior y aplica la sesión guardada.
+    let engine = EngineState::start(&handle);
+    let paused = engine.requested().paused;
+    app.manage(engine);
 
-    tray::create(&handle)?;
+    tray::create(&handle, paused)?;
 
     if !autostarted {
         // En `setup` todavía no corre el bucle de eventos: crear la ventana
@@ -38,25 +31,6 @@ pub fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         app_windows::open_main(&handle);
     }
     Ok(())
-}
-
-#[cfg(windows)]
-fn start_control_window(app: AppHandle) -> Result<ControlWindow, vres_win::WinError> {
-    ControlWindow::spawn(Box::new(move |command| {
-        match command {
-            RemoteCommand::Shutdown => {
-                tracing::info!("cierre pedido desde otro proceso");
-                // No bloquea: le pide al bucle de eventos que salga.
-                app.exit(0);
-            }
-            RemoteCommand::EmergencyReset => {
-                // F1: el motor vuelve todas las capas a su estado original.
-                tracing::info!("restablecimiento pedido desde otro proceso");
-            }
-            RemoteCommand::Ping => {}
-        }
-        ACK
-    }))
 }
 
 /// Alguien abrió VRes otra vez: se enfoca la ventana existente.
@@ -68,7 +42,9 @@ pub fn on_second_instance(app: &AppHandle, args: &[String]) {
         return;
     }
     if args.iter().any(|arg| arg == "--reset") {
-        tracing::info!("restablecimiento pedido por una segunda instancia");
+        if let Some(engine) = app.try_state::<EngineState>() {
+            engine.send(Command::EmergencyReset);
+        }
         return;
     }
     app_windows::open_main_async(app);
@@ -89,7 +65,7 @@ pub fn on_run_event(app: &AppHandle, event: RunEvent) {
     }
 }
 
-/// Apaga todo lo que VRes tiene activo. Es idempotente.
+/// Restaura todo lo que VRes tiene aplicado y apaga el motor. Es idempotente.
 ///
 /// La llaman la salida normal (`RunEvent::Exit`) y el updater antes de
 /// instalar (en Windows el updater termina el proceso sin pasar por `Exit`).
@@ -99,16 +75,7 @@ pub fn shutdown(app: &AppHandle) {
         return;
     }
     tracing::info!("VRes cerrándose");
-
-    // F1: acá se apaga el motor, que restaura rampas, vibrance y resolución.
-
-    #[cfg(windows)]
-    if let Some(state) = app.try_state::<ControlState>() {
-        let control = state.0.lock().ok().and_then(|mut guard| guard.take());
-        if let Some(control) = control {
-            control.close();
-        }
+    if let Some(engine) = app.try_state::<EngineState>() {
+        engine.shutdown();
     }
-    #[cfg(not(windows))]
-    let _ = app;
 }

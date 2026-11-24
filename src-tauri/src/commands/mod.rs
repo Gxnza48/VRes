@@ -4,4 +4,6 @@
 //! y siempre devuelven `Result<T, IpcError>` con un código estable.
 
 pub mod app;
+pub mod engine;
+pub mod settings;
 pub mod update;

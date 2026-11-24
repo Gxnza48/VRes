@@ -26,17 +26,6 @@
     "roadmap": "Ver la hoja de ruta"
   },
   "pages": {
-    "display": {
-      "title": "Pantalla",
-      "subtitle": "Saturación hasta 300 %, vibrance digital y ajuste fino del color, monitor por monitor.",
-      "items": [
-        "Saturación de 0 a 300 % (100 es el juego tal como viene)",
-        "Brillo, contraste, gamma, temperatura, sombras y altas luces por monitor",
-        "Elegir a qué monitores se aplica e identificar cada pantalla",
-        "Comparar contra la imagen original con un solo botón",
-        "Vibrance digital por driver en NVIDIA y AMD"
-      ]
-    },
     "library": {
       "title": "Biblioteca",
       "subtitle": "Tus looks, crosshairs, resoluciones y perfiles, guardados en tu PC.",
@@ -134,18 +123,111 @@
     },
     "safety": {
       "title": "Si algo se ve mal",
-      "description": "Al cerrar VRes, la pantalla vuelve a como estaba. Desde la fase F1, el atajo Ctrl + Alt + Shift + R la restablece en cualquier momento, aunque la ventana esté cerrada."
+      "description": "Al cerrar VRes, la pantalla vuelve a como estaba. El atajo Ctrl + Alt + Shift + R la restablece en cualquier momento, aunque la ventana esté cerrada, igual que «Restablecer pantalla» en la bandeja."
     },
     "about": {
       "title": "Acerca de",
       "version": "Versión {{version}}",
       "license": "Software libre bajo licencia GPL-3.0. Sin cuenta y sin telemetría.",
       "repository": "Código fuente",
-      "report": "Reportar un problema"
+      "report": "Reportar un problema",
+      "copyDiagnostics": "Copiar diagnóstico",
+      "copied": "Copiado"
+    },
+    "startup": {
+      "title": "Inicio",
+      "description": "VRes arranca con Windows directo a la bandeja, sin abrir la ventana, y aplica tu último look.",
+      "label": "Iniciar con Windows"
     }
   },
   "quick": {
     "title": "Popup rápido de color",
     "description": "Llega en la fase F5."
+  },
+  "display": {
+    "title": "Pantalla",
+    "subtitle": "Saturación y ajuste fino del color, monitor por monitor.",
+    "enabled": "Color",
+    "on": "Activado",
+    "off": "Apagado",
+    "compare": "Comparar",
+    "compareHint": "Mantén presionado para ver la imagen original",
+    "reset": "Restablecer",
+    "resetHint": "Vuelve todos los valores a neutro",
+    "status": {
+      "ok": "En vivo",
+      "limited": "Limitado",
+      "failed": "Con errores",
+      "off": "Sin cambios",
+      "paused": "En pausa",
+      "disabled": "Apagado"
+    },
+    "targets": {
+      "title": "Aplicar a",
+      "description": "Los monitores sin tildar conservan sus colores.",
+      "identify": "Identificar pantallas",
+      "primary": "principal",
+      "internal": "interno",
+      "hdr": "HDR",
+      "partial": "Hay monitores sin tildar: la saturación queda en pausa, porque Windows la aplica a todo el escritorio a la vez. El ajuste fino sí se aplica a los monitores tildados.",
+      "none": "No hay monitores tildados: los cambios están en pausa.",
+      "noDisplays": "No se encontraron pantallas."
+    },
+    "saturation": {
+      "title": "Saturación",
+      "hint": "100 es la imagen tal como viene"
+    },
+    "fineTune": {
+      "title": "Ajuste fino",
+      "description": "Se aplica por monitor, sobre la calibración de cada uno."
+    },
+    "params": {
+      "brightness": "Brillo",
+      "contrast": "Contraste",
+      "gamma": "Gamma",
+      "temperature": "Temperatura",
+      "highlights": "Altas luces",
+      "shadows": "Sombras",
+      "blacks": "Negros",
+      "whites": "Blancos",
+      "shadowTint": "Tinte de sombras",
+      "highlightTint": "Tinte de altas luces"
+    },
+    "scale": {
+      "cool": "frío",
+      "warm": "cálido"
+    },
+    "resetParam": "Doble clic para volver al valor neutro",
+    "emergency": "Si algo se ve mal: Ctrl + Alt + Shift + R restablece la pantalla en cualquier momento.",
+    "unavailable": "El motor de VRes no está disponible."
+  },
+  "reasons": {
+    "hdrActive": "HDR activo: el ajuste fino no se aplica en este monitor.",
+    "partialTargets": "En pausa porque hay monitores sin tildar.",
+    "exclusiveFullscreen": "Un juego en pantalla completa exclusiva no muestra esta capa. Usa ventana sin bordes.",
+    "magUnavailable": "Windows no permitió aplicar la saturación.",
+    "magDropped": "Windows descartó la saturación.",
+    "magConflict": "Otra app (por ejemplo, la Lupa o los filtros de color de Windows) está usando el filtro de color.",
+    "rampOutOfRange": "La curva pedida supera lo que Windows permite: se aplicó la más cercana.",
+    "rampRejected": "Windows rechazó el ajuste fino en este monitor.",
+    "rampConflict": "Otra app (Luz nocturna, f.lux, un calibrador) está cambiando los colores de este monitor.",
+    "vibranceBackendMissing": "Este monitor no tiene vibrance por driver.",
+    "vibranceApproximated": "La saturación se aproxima con la vibrance del driver.",
+    "driverError": "El driver devolvió un error.",
+    "displayGone": "La pantalla ya no está conectada.",
+    "paused": "En pausa.",
+    "compareHeld": "Mostrando la imagen original.",
+    "notInGame": "Solo actúa con el juego en primer plano.",
+    "modeNotSupported": "El monitor no admite ese modo.",
+    "hotkeyTaken": "Otro programa usa ese atajo.",
+    "safeModeAfterCrash": "Modo seguro tras un cierre inesperado."
+  },
+  "notices": {
+    "recovered": "VRes no se cerró bien la última vez: ya restauró los colores originales.",
+    "safeMode": "Por seguridad, VRes arrancó con el color apagado. Actívalo cuando quieras.",
+    "emergencyReset": "Pantalla restablecida: el color quedó apagado.",
+    "hotkeyTaken": "Otro programa usa Ctrl + Alt + Shift + R, así que el atajo de emergencia no está disponible. Puedes restablecer la pantalla desde la bandeja.",
+    "engineUnavailable": "El motor de VRes no pudo arrancar. Reinicia la app; si sigue pasando, repórtalo.",
+    "dismiss": "Cerrar aviso"
   }
 }

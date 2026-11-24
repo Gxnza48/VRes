@@ -8,7 +8,11 @@ import { invoke, isTauri } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
 
 import type { Bootstrap } from "./bindings/Bootstrap";
+import type { DisplayInfo } from "./bindings/DisplayInfo";
+import type { EngineStatus } from "./bindings/EngineStatus";
 import type { IpcError } from "./bindings/IpcError";
+import type { Look } from "./bindings/Look";
+import type { Requested } from "./bindings/Requested";
 import type { UpdateInfo } from "./bindings/UpdateInfo";
 
 /** `true` dentro de la app; `false` en un navegador común o en los tests. */
@@ -26,12 +30,44 @@ function call<T>(command: string, args?: Record<string, unknown>): Promise<T> {
 }
 
 export const ipc = {
-  /** Datos iniciales: versión, idioma del sistema y modo de arranque. */
+  /** Datos iniciales: versión, pantallas, lo pedido, estado y avisos. */
   appBootstrap: () => call<Bootstrap>("app_bootstrap"),
   /** Avisa que la interfaz terminó de pintar, para mostrar la ventana. */
   appUiReady: () => call<void>("app_ui_ready"),
   /** Cierra VRes por completo (no solo la ventana). */
   appQuit: () => call<void>("app_quit"),
+
+  /** Pantallas activas. */
+  displaysList: () => call<DisplayInfo[]>("displays_list"),
+  /** Muestra el número de cada pantalla durante unos segundos. */
+  displaysIdentify: () => call<void>("displays_identify"),
+  /** Elige a qué pantallas se aplica el look (`null` = todas). */
+  displaysSetTargets: (targets: string[] | null) =>
+    call<Requested>("displays_set_targets", { targets }),
+
+  /** Vista previa mientras se arrastra un control (no se guarda). */
+  lookPreview: (look: Look) => call<void>("look_preview", { look }),
+  /** Aplica y guarda el look. */
+  lookCommit: (look: Look) => call<Requested>("look_commit", { look }),
+  /** Vuelve el look a los valores neutros. */
+  lookReset: () => call<Requested>("look_reset"),
+  /** Enciende o apaga el color. */
+  lookSetEnabled: (enabled: boolean) => call<Requested>("look_set_enabled", { enabled }),
+  /** Mientras está activo, se ve la imagen original. */
+  lookCompare: (active: boolean) => call<void>("look_compare", { active }),
+
+  /** Pausa o reanuda todo. */
+  engineSetPaused: (paused: boolean) => call<Requested>("engine_set_paused", { paused }),
+  /** Vuelve la pantalla a la normalidad y apaga el color. */
+  engineEmergencyReset: () => call<void>("engine_emergency_reset"),
+  /** Estado de cada capa. */
+  engineStatus: () => call<EngineStatus>("engine_status"),
+
+  /** `true` si VRes arranca con Windows. */
+  settingsGetAutostart: () => call<boolean>("settings_get_autostart"),
+  /** Activa o desactiva el arranque con Windows; devuelve el estado final. */
+  settingsSetAutostart: (enabled: boolean) => call<boolean>("settings_set_autostart", { enabled }),
+
   /** Consulta si hay una versión nueva en GitHub Releases. */
   updateCheck: () => call<UpdateInfo | null>("update_check"),
   /** Descarga e instala la versión nueva (VRes se reinicia). */

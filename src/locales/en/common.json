@@ -26,17 +26,6 @@
     "roadmap": "See the roadmap"
   },
   "pages": {
-    "display": {
-      "title": "Display",
-      "subtitle": "Saturation up to 300%, digital vibrance and fine color tuning, monitor by monitor.",
-      "items": [
-        "Saturation from 0 to 300% (100 is the game as it ships)",
-        "Brightness, contrast, gamma, temperature, shadows and highlights per monitor",
-        "Choose which monitors it applies to and identify each screen",
-        "Compare against the original image with a single button",
-        "Driver-level digital vibrance on NVIDIA and AMD"
-      ]
-    },
     "library": {
       "title": "Library",
       "subtitle": "Your looks, crosshairs, resolutions and profiles, stored on your PC.",
@@ -134,18 +123,111 @@
     },
     "safety": {
       "title": "If something looks wrong",
-      "description": "When you close VRes, your display goes back to how it was. Starting in phase F1, the Ctrl + Alt + Shift + R shortcut resets it at any time, even with the window closed."
+      "description": "When you close VRes, your display goes back to how it was. The Ctrl + Alt + Shift + R shortcut resets it at any time, even with the window closed, just like “Reset display” in the tray."
     },
     "about": {
       "title": "About",
       "version": "Version {{version}}",
       "license": "Free software under the GPL-3.0 license. No account and no telemetry.",
       "repository": "Source code",
-      "report": "Report a problem"
+      "report": "Report a problem",
+      "copyDiagnostics": "Copy diagnostics",
+      "copied": "Copied"
+    },
+    "startup": {
+      "title": "Startup",
+      "description": "VRes starts with Windows straight to the tray, without opening the window, and applies your last look.",
+      "label": "Start with Windows"
     }
   },
   "quick": {
     "title": "Quick color popup",
     "description": "Coming in phase F5."
+  },
+  "display": {
+    "title": "Display",
+    "subtitle": "Saturation and fine color tuning, monitor by monitor.",
+    "enabled": "Color",
+    "on": "On",
+    "off": "Off",
+    "compare": "Compare",
+    "compareHint": "Hold to see the original image",
+    "reset": "Reset",
+    "resetHint": "Sets every value back to neutral",
+    "status": {
+      "ok": "Live",
+      "limited": "Limited",
+      "failed": "With errors",
+      "off": "No changes",
+      "paused": "Paused",
+      "disabled": "Off"
+    },
+    "targets": {
+      "title": "Apply to",
+      "description": "Unticked monitors keep their own colors.",
+      "identify": "Identify screens",
+      "primary": "main",
+      "internal": "built-in",
+      "hdr": "HDR",
+      "partial": "Some monitors are unticked: saturation is paused, because Windows applies it to the whole desktop at once. Fine tuning still applies to the ticked monitors.",
+      "none": "No monitors are ticked: changes are paused.",
+      "noDisplays": "No displays were found."
+    },
+    "saturation": {
+      "title": "Saturation",
+      "hint": "100 is the image as it ships"
+    },
+    "fineTune": {
+      "title": "Fine tuning",
+      "description": "Applied per monitor, on top of each one's calibration."
+    },
+    "params": {
+      "brightness": "Brightness",
+      "contrast": "Contrast",
+      "gamma": "Gamma",
+      "temperature": "Temperature",
+      "highlights": "Highlights",
+      "shadows": "Shadows",
+      "blacks": "Blacks",
+      "whites": "Whites",
+      "shadowTint": "Shadow tint",
+      "highlightTint": "Highlight tint"
+    },
+    "scale": {
+      "cool": "cool",
+      "warm": "warm"
+    },
+    "resetParam": "Double-click to go back to neutral",
+    "emergency": "If something looks wrong: Ctrl + Alt + Shift + R resets the display at any time.",
+    "unavailable": "The VRes engine is not available."
+  },
+  "reasons": {
+    "hdrActive": "HDR is on: fine tuning doesn't apply on this monitor.",
+    "partialTargets": "Paused because some monitors are unticked.",
+    "exclusiveFullscreen": "A game in exclusive full screen doesn't show this layer. Use borderless windowed.",
+    "magUnavailable": "Windows didn't allow applying saturation.",
+    "magDropped": "Windows dropped the saturation.",
+    "magConflict": "Another app (for example, Magnifier or Windows color filters) is using the color filter.",
+    "rampOutOfRange": "The requested curve exceeds what Windows allows: the closest one was applied.",
+    "rampRejected": "Windows rejected fine tuning on this monitor.",
+    "rampConflict": "Another app (Night light, f.lux, a calibrator) is changing this monitor's colors.",
+    "vibranceBackendMissing": "This monitor has no driver vibrance.",
+    "vibranceApproximated": "Saturation is approximated with driver vibrance.",
+    "driverError": "The driver returned an error.",
+    "displayGone": "The display is no longer connected.",
+    "paused": "Paused.",
+    "compareHeld": "Showing the original image.",
+    "notInGame": "Only works with the game in the foreground.",
+    "modeNotSupported": "The monitor doesn't support that mode.",
+    "hotkeyTaken": "Another program uses that shortcut.",
+    "safeModeAfterCrash": "Safe mode after an unexpected shutdown."
+  },
+  "notices": {
+    "recovered": "VRes didn't close properly last time: it already restored the original colors.",
+    "safeMode": "For safety, VRes started with color turned off. Turn it on whenever you like.",
+    "emergencyReset": "Display reset: color is now off.",
+    "hotkeyTaken": "Another program uses Ctrl + Alt + Shift + R, so the emergency shortcut isn't available. You can reset the display from the tray.",
+    "engineUnavailable": "The VRes engine couldn't start. Restart the app; if it keeps happening, please report it.",
+    "dismiss": "Dismiss"
   }
 }

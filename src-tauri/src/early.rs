@@ -3,8 +3,9 @@
 //! - `--version`: imprime la versión.
 //! - `--shutdown`: cierra la instancia en ejecución (restaurando todo) y espera
 //!   a que termine. Lo usa el instalador antes de reemplazar archivos.
-//! - `--reset`: le pide a la instancia en ejecución que vuelva la pantalla a la
-//!   normalidad. Lo usa el acceso directo "VRes — Restablecer pantalla".
+//! - `--reset`: vuelve la pantalla a la normalidad. Si VRes está corriendo, se
+//!   lo pide; si no, deshace lo que haya quedado de un cierre inesperado. Lo
+//!   usa el acceso directo "VRes — Restablecer pantalla".
 //!
 //! Ninguno de estos flags abre la interfaz.
 
@@ -36,10 +37,12 @@ pub fn handle_early_flags() -> Option<i32> {
         }
 
         if has("--reset") {
-            // Sin instancia en ejecución no hay cambios activos de esta sesión.
-            // Desde F1, acá también se restaura lo que haya quedado en
-            // `restore.json` tras un cierre inesperado.
-            let _ = control::send(RemoteCommand::EmergencyReset, Duration::from_secs(2));
+            match control::send(RemoteCommand::EmergencyReset, Duration::from_secs(2)) {
+                Ok(Some(_)) => {}
+                _ => {
+                    vres_engine::recover_from_disk();
+                }
+            }
             return Some(0);
         }
     }

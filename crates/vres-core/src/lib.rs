@@ -12,7 +12,9 @@
 pub mod color;
 pub mod ipc;
 pub mod model;
+pub mod planner;
 pub mod status;
+pub mod store;
 
 /// Identificador de la aplicación: carpetas de datos, instalador y WebView2.
 pub const APP_IDENTIFIER: &str = "io.github.gxnza48.vres";

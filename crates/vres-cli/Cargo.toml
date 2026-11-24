@@ -20,6 +20,7 @@ serde_json.workspace = true
 vres-core.workspace = true
 
 [target.'cfg(windows)'.dependencies]
+vres-engine.workspace = true
 vres-win.workspace = true
 
 [lints]

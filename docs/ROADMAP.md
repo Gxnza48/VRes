@@ -5,7 +5,7 @@ VRes se construye por **fases**. Cada fase termina en una versión instalable: c
 | Fase | Entrega | Versión | Estado |
 |---|---|---|---|
 | **F0** | Repo, base de la app, documentación, CI y actualizaciones automáticas | v0.0.x | 🚧 |
-| **F1** | Motor de color + pestaña Pantalla | v0.1 | 🗓 |
+| **F1** | Motor de color + pestaña Pantalla | v0.1 | 🚧 |
 | **F2** | Resolución estirada, Hz y HDR | v0.2 | 🗓 |
 | **F3** | Vibrance por driver | v0.3 | 🗓 |
 | **F4** | Crosshair | v0.4 | 🗓 |
@@ -37,9 +37,11 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 - [x] Matemática de color con pruebas de propiedades: matriz de saturación con límite seguro, rampas de gamma monótonas compuestas sobre la calibración de cada monitor
 - [x] Enumeración de monitores con nombre real, Hz exactos, GPU y estado de HDR
 - [x] `vres-cli monitors | diag | mag | ramp | probe | selftest`, verificados en hardware real ([resultados](hardware/RESULTADOS.md))
-- Motor en un hilo propio: aplica solo lo que cambió, lo relee para confirmarlo y reaplica tras Alt+Tab, bloqueo, suspensión o cambio de pantalla
-- Red de seguridad: originales guardados antes de tocar nada, restauración al salir, ante un fallo y al próximo arranque; atajo `Ctrl + Alt + Shift + R`
-- Pestaña **Pantalla**: monitores con tilde, Identificar, estado en vivo, Comparar, Restablecer, saturación 0–300 % y ajuste fino
+- [x] Motor en un hilo propio: aplica solo lo que cambió, lo relee para confirmarlo y reaplica tras Alt+Tab, bloqueo, suspensión o cambio de pantalla
+- [x] Red de seguridad: originales guardados antes de tocar nada, restauración al salir, ante un fallo y al próximo arranque (modo seguro); atajo `Ctrl + Alt + Shift + R`; `vres.exe --reset`; verificada de punta a punta en hardware real
+- [x] Pestaña **Pantalla**: monitores con tilde, Identificar, estado en vivo, Comparar, Restablecer, saturación 0–300 % y ajuste fino
+- [x] Bandeja con Pausar y Restablecer; Más: iniciar con Windows y copiar diagnóstico
+- [ ] Prueba a ojo de la interfaz (lista manual de la fase) y publicación de la v0.1
 
 ## F2 — Resolución
 

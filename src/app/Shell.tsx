@@ -1,7 +1,9 @@
+import { DisplayPage } from "@/features/display/DisplayPage";
 import { MorePage } from "@/features/more/MorePage";
 import { useAppStore } from "@/state/app";
 
 import { tabById } from "./nav";
+import { Notices } from "./Notices";
 import { PlaceholderPage } from "./PlaceholderPage";
 import { Sidebar } from "./Sidebar";
 
@@ -14,7 +16,14 @@ export function Shell() {
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-5xl px-8 py-8">
-          {tab.id === "more" ? <MorePage /> : <PlaceholderPage key={tab.id} tab={tab} />}
+          <Notices />
+          {tab.id === "display" ? (
+            <DisplayPage />
+          ) : tab.id === "more" ? (
+            <MorePage />
+          ) : (
+            <PlaceholderPage key={tab.id} tab={tab} />
+          )}
         </div>
       </main>
     </div>

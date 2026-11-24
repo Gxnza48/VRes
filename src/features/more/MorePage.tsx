@@ -1,5 +1,13 @@
-import { Download, ExternalLink, Languages, RefreshCw, ShieldCheck } from "lucide-react";
-import { useState } from "react";
+import {
+  ClipboardCopy,
+  Download,
+  ExternalLink,
+  Languages,
+  Power,
+  RefreshCw,
+  ShieldCheck,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { PageHeader } from "@/components/common/PageHeader";
@@ -12,6 +20,7 @@ import { events } from "@/lib/events";
 import { inTauri, ipc, isIpcError } from "@/lib/ipc";
 import { ISSUES_URL, REPOSITORY_URL } from "@/lib/links";
 import { useAppStore } from "@/state/app";
+import { useEngineStore } from "@/state/engine";
 
 type UpdateState =
   | { kind: "idle" }
@@ -34,6 +43,7 @@ export function MorePage() {
       <PageHeader title={t("more.title")} subtitle={t("more.subtitle")} />
       <div className="grid gap-4 lg:grid-cols-2">
         <LanguageCard />
+        <StartupCard />
         <UpdatesCard />
         <Card>
           <CardHeader>
@@ -76,6 +86,53 @@ function LanguageCard() {
             </option>
           ))}
         </select>
+      </CardContent>
+    </Card>
+  );
+}
+
+function StartupCard() {
+  const { t } = useTranslation();
+  const tauri = inTauri();
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!tauri) return;
+    ipc
+      .settingsGetAutostart()
+      .then(setEnabled)
+      .catch(() => setEnabled(false));
+  }, [tauri]);
+
+  const toggle = () => {
+    const next = !enabled;
+    setEnabled(next);
+    ipc
+      .settingsSetAutostart(next)
+      .then(setEnabled)
+      .catch(() => setEnabled(!next));
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Power aria-hidden className="size-4 text-accent" />
+          {t("more.startup.title")}
+        </CardTitle>
+        <CardDescription>{t("more.startup.description")}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <label className="flex cursor-pointer items-center gap-3 text-sm text-fg">
+          <input
+            type="checkbox"
+            checked={enabled ?? false}
+            disabled={!tauri || enabled === null}
+            onChange={toggle}
+            className="size-4 cursor-pointer accent-accent disabled:cursor-not-allowed"
+          />
+          {t("more.startup.label")}
+        </label>
       </CardContent>
     </Card>
   );
@@ -159,6 +216,26 @@ function AboutCard() {
   const { t } = useTranslation();
   const version = useAppStore((state) => state.bootstrap?.appVersion);
   const tauri = inTauri();
+  const [copied, setCopied] = useState(false);
+
+  /** Copia un resumen técnico (sin datos personales) para los reportes. */
+  const copyDiagnostics = () => {
+    const engine = useEngineStore.getState();
+    const report = {
+      version,
+      userAgent: navigator.userAgent,
+      displays: engine.displays,
+      status: engine.status,
+      requested: engine.requested,
+    };
+    navigator.clipboard
+      .writeText(JSON.stringify(report, null, 2))
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch((error: unknown) => console.error("diagnóstico", error));
+  };
 
   return (
     <Card>
@@ -178,6 +255,10 @@ function AboutCard() {
           <Button variant="ghost" size="sm" onClick={() => void ipc.openExternal(ISSUES_URL)}>
             <ExternalLink aria-hidden />
             {t("more.about.report")}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={copyDiagnostics}>
+            <ClipboardCopy aria-hidden />
+            {copied ? t("more.about.copied") : t("more.about.copyDiagnostics")}
           </Button>
         </CardContent>
       )}

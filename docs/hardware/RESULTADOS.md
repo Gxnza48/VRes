@@ -82,8 +82,20 @@ Los números `\\.\DISPLAYn` **no son predecibles** (acá 5 y 1): confirma que VR
 **Decisiones:**
 
 - La regla documentada de Windows (`|byte alto − índice| ≤ 128`) se confirma **exacta** en las dos GPU. VRes mantiene su margen de 120 hasta probar más hardware (por ejemplo Intel).
-- En la AMD, escribir una rampa tarda casi un cuadro (parece esperar el refresco del panel de 120 Hz). Supera el umbral de 8 ms del plan, así que **las escrituras de rampas van a un hilo auxiliar** y, mientras se arrastra un deslizador, se limitan a ~30 por segundo.
+- En la AMD, escribir una rampa tarda casi un cuadro (parece esperar el refresco del panel de 120 Hz) y supera el umbral de 8 ms del plan. Por ahora el motor las escribe en su propio hilo, **agrupando los cambios**: mientras se arrastra un deslizador solo aplica el último valor pendiente, así que nunca se acumulan. Cuando lleguen las teclas de "mantener" (F7), que necesitan que ese hilo responda en pocos milisegundos, las rampas pasan a un hilo auxiliar.
 - La relectura se sigue haciendo siempre: otros drivers o Windows futuros podrían no comportarse igual.
+
+## F1b — Red de seguridad de punta a punta
+
+`scripts/e2e-engine.ps1` con la compilación de depuración (24/11/2026): arranca VRes sin ventana con un look guardado (saturación 140 %, gamma 1,10), lo mata a la fuerza, lo vuelve a abrir y prueba `--reset` y `--shutdown`. **18 de 18 verificaciones correctas.**
+
+| Paso | Resultado |
+|---|---|
+| Arranque con el look guardado | ✅ responde al ping; matriz y rampas aplicadas en las dos pantallas; `restore.json` marcado antes de modificar |
+| Cierre forzado (`Stop-Process -Force`) | ✅ Windows quita la matriz; las rampas quedan modificadas (esperado); `restore.json` sigue marcado |
+| Reapertura | ✅ restaura las rampas originales, arranca en modo seguro (color apagado) y limpia la marca |
+| `vres.exe --reset` con la app abierta | ✅ todo vuelve a la normalidad y la app sigue corriendo |
+| `vres.exe --shutdown` | ✅ cierra en 0,05 s; sesión marcada como limpia; pantalla intacta al final |
 
 ### Pendientes de F1
 

@@ -10,6 +10,12 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 - Enumeración de pantallas con nombre real, frecuencia exacta, GPU que maneja cada una y estado de HDR, con un identificador estable por monitor.
 - `vres-cli monitors`, `diag`, `mag get|set|reset`, `ramp get|set|reset`, `probe ramp-limits|timing` y `selftest`: prueban cada capa en hardware real, la verifican (por lectura y en pantalla) y la restauran, incluso ante `Ctrl + C`.
 - Resultados de las primeras pruebas en hardware real en [docs/hardware/RESULTADOS.md](docs/hardware/RESULTADOS.md).
+- **Motor de color** (`vres-engine`): un hilo propio que aplica solo lo que cambió, lo relee para confirmarlo, lo repara si Windows u otra app lo pisa (sin pelear indefinidamente) y lo reaplica tras cambios de pantalla, desbloqueo de sesión y reanudación.
+- **Red de seguridad**: los valores originales se guardan antes de modificar nada (`restore.json`); se restauran al salir, ante un error interno y, tras un cierre inesperado, al volver a abrir VRes, que arranca en modo seguro. Atajo de emergencia `Ctrl + Alt + Shift + R`, `vres.exe --reset` y `vres-cli reset` (también sin la app abierta).
+- **Pestaña Pantalla**: elegir monitores (y avisar si quedan sin tildar), identificar pantallas, estado en vivo con el motivo de cada limitación, Comparar (mantener presionado), Restablecer, encender o apagar el color, saturación de 0 a 300 % y ajuste fino (brillo, contraste, gamma, temperatura, altas luces, sombras, negros, blancos y tintes).
+- Bandeja con **Pausar todo** y **Restablecer pantalla**.
+- Más: **iniciar con Windows** (directo a la bandeja) y **copiar diagnóstico**.
+- `scripts/e2e-engine.ps1`: prueba de punta a punta de la red de seguridad.
 
 ## [0.0.1] - 2026-11-24
 

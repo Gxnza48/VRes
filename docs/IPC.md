@@ -17,9 +17,9 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 | App | `app_bootstrap` · `app_ui_ready` · `app_quit` | F0 ✅ |
 | Actualizaciones | `update_check` · `update_install` | F0 ✅ |
 | App | `app_get_snapshot` | F1 |
-| Look | `look_preview` · `look_commit` · `look_reset` · `look_set_enabled` · `look_compare` | F1 |
-| Motor | `engine_status` · `engine_set_paused` · `engine_emergency_reset` | F1 |
-| Pantallas | `displays_list` · `displays_set_targets` · `displays_identify` | F1 |
+| Look | `look_preview` · `look_commit` · `look_reset` · `look_set_enabled` · `look_compare` | F1 ✅ |
+| Motor | `engine_status` · `engine_set_paused` · `engine_emergency_reset` | F1 ✅ |
+| Pantallas | `displays_list` · `displays_set_targets` · `displays_identify` | F1 ✅ |
 | Pantallas | `displays_set_trim` | F8 |
 | Resolución | `resolution_get_state` · `resolution_apply` (devuelve `{ token, expiresInMs }`) · `resolution_confirm` · `resolution_revert` · `resolution_toggle` · `hdr_set` | F2 |
 | Biblioteca | `library_list` · `library_get` · `library_save` · `library_delete` · `library_duplicate` · `library_apply` | F2 |
@@ -29,6 +29,7 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 | Juegos y perfiles | `games_list` · `games_add_custom` · `games_remove_custom` · `games_running_candidates` · `profiles_activate` · `profiles_set_auto_switch` | F6 |
 | Dark Boost y zoom | `darkboost_preview` · `darkboost_commit` · `zoom_commit` · `enhancers_set_armed` | F7 |
 | Monitor | `ddc_get` · `ddc_set` · `ddc_restore_initial` | F8 |
+| Ajustes | `settings_get_autostart` · `settings_set_autostart` | F1 ✅ |
 | Ajustes | `settings_get` · `settings_update` · `hotkeys_check` | F1 |
 | Ajustes | `customize_set_background` | F8 |
 | Diagnóstico | `diag_report` · `diag_export` · `diag_selftest` | F1 |
@@ -41,9 +42,10 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 |---|---|---|
 | `update:progress` | Progreso de descarga de una actualización | F0 ✅ |
 | `state:snapshot` | Tras cada cambio confirmado (commit, atajo, cambio automático, celular) | F1 |
-| `engine:status` | Cambia el estado de alguna capa | F1 |
-| `displays:changed` | Cambio de monitores, modo o HDR (tras el asentamiento) | F1 |
-| `app:notice` | Recuperación tras un cierre inesperado, atajo ocupado, archivo corrupto | F1 |
+| `engine:status` | Cambia el estado de alguna capa | F1 ✅ |
+| `displays:changed` | Cambio de monitores, modo o HDR (tras el asentamiento) | F1 ✅ |
+| `app:notice` | Recuperación tras un cierre inesperado, modo seguro, atajo ocupado, restablecimiento | F1 ✅ |
+| `state:requested` | Lo pedido cambió fuera de la interfaz (bandeja, atajo de emergencia) | F1 ✅ |
 | `foreground:changed` | Cambio de ventana en primer plano | F6 |
 | `resolution:pending` · `resolution:resolved` | Cuenta regresiva y su resultado (`kept`, `reverted`, `failed`) | F2 |
 | `profile:activated` · `library:changed` | Cambio de perfil activo · cambios en la biblioteca | F5/F6 |
