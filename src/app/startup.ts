@@ -3,6 +3,7 @@ import { inTauri, ipc } from "@/lib/ipc";
 import { useAppStore } from "@/state/app";
 import { useEngineStore } from "@/state/engine";
 import { useResolutionStore } from "@/state/resolution";
+import { useSettingsStore } from "@/state/settings";
 
 let subscribed = false;
 
@@ -18,7 +19,7 @@ function subscribe(): void {
   const resolution = useResolutionStore.getState();
   void events.onResolutionChanged((state) => resolution.setState(state));
   void events.onResolutionResolved((resolved) => resolution.setResolved(resolved));
-  void events.onSettingsChanged((settings) => resolution.setSettings(settings));
+  void events.onSettingsChanged((settings) => useSettingsStore.getState().setSettings(settings));
 }
 
 /** Modos de pantalla y ajustes: no frenan el arranque si fallan. */
@@ -30,7 +31,7 @@ async function loadResolution(): Promise<void> {
   ]);
   if (state.status === "fulfilled") store.setState(state.value);
   else console.error("resolution_get_state", state.reason);
-  if (settings.status === "fulfilled") store.setSettings(settings.value);
+  if (settings.status === "fulfilled") useSettingsStore.getState().setSettings(settings.value);
   else console.error("settings_get", settings.reason);
 }
 

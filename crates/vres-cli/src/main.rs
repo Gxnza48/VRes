@@ -19,6 +19,8 @@ use serde_json::Value;
 #[cfg(windows)]
 mod app;
 #[cfg(windows)]
+mod crosshair;
+#[cfg(windows)]
 mod guard;
 #[cfg(windows)]
 mod hw;
@@ -101,6 +103,9 @@ enum Command {
     /// Vibrance del driver (NVIDIA y AMD), por pantalla.
     #[command(subcommand)]
     Vibrance(VibranceCommand),
+    /// Ventana del crosshair.
+    #[command(subcommand)]
+    Overlay(OverlayCommand),
     /// Mediciones en hardware real.
     #[command(subcommand)]
     Probe(ProbeCommand),
@@ -155,6 +160,19 @@ enum ModeCommand {
         /// Confirma que la pantalla puede parpadear y cambiar unos segundos.
         #[arg(long)]
         allow_mode_switch: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum OverlayCommand {
+    /// Dibuja un píxel de prueba en el centro de cada pantalla y verifica el centrado.
+    Test {
+        /// Pantalla. Por defecto, todas.
+        #[arg(long)]
+        display: Option<String>,
+        /// Cuánto tiempo mantenerlo, en milisegundos.
+        #[arg(long, default_value_t = 500)]
+        hold_ms: u64,
     },
 }
 
@@ -412,6 +430,9 @@ fn run(command: Command) -> Report {
             Duration::from_millis(hold_ms.min(resolution::MAX_MODE_HOLD_MS)),
             allow_mode_switch,
         ),
+        Command::Overlay(OverlayCommand::Test { display, hold_ms }) => {
+            crosshair::overlay_test(display.as_deref(), hold(hold_ms))
+        }
         Command::Vibrance(VibranceCommand::Get { display }) => vibrance::get(display.as_deref()),
         Command::Vibrance(VibranceCommand::Set {
             display,

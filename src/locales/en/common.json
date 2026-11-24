@@ -54,17 +54,6 @@
         "Window opacity"
       ]
     },
-    "crosshair": {
-      "title": "Crosshair",
-      "subtitle": "An overlay crosshair, drawn on the screen and not inside the game.",
-      "items": [
-        "Transparent window that doesn't intercept clicks",
-        "Shape by parts, size, thickness, gap, outline, color and opacity",
-        "Crosshair from your own image",
-        "Presets, saved designs, history and share code",
-        "Option to hide it from recordings and streams"
-      ]
-    },
     "profiles": {
       "title": "Profiles",
       "subtitle": "Each game with its own setup, applied automatically when it opens.",
@@ -359,6 +348,100 @@
     "displayGone": "That display is no longer connected.",
     "hotkeyInvalid": "That hotkey isn't valid.",
     "hotkeyTaken": "Another program already uses that hotkey. Choose another one.",
-    "settingsFailed": "The settings couldn't be saved."
+    "settingsFailed": "The settings couldn't be saved.",
+    "crosshairInvalid": "That crosshair could not be drawn."
+  },
+  "crosshair": {
+    "title": "Crosshair",
+    "subtitle": "Your own crosshair over any game: a transparent window on top, without touching the game.",
+    "enabled": "Crosshair",
+    "on": "On",
+    "off": "Off",
+    "warning": "Some games and tournaments consider an external crosshair an advantage: check their rules before using it in competitive play.",
+    "preview": {
+      "title": "Preview",
+      "description": "How it looks over the game: real size and zoomed ×4.",
+      "zoom": "Zoomed ×4 preview"
+    },
+    "presets": {
+      "title": "Presets",
+      "classic": "Classic",
+      "dot": "Dot",
+      "thin": "Thin",
+      "tshape": "T",
+      "circle": "Circle",
+      "plus": "Solid cross",
+      "cross": "X",
+      "large": "Large"
+    },
+    "color": {
+      "title": "Color",
+      "fill": "Color",
+      "opacity": "Opacity"
+    },
+    "arms": {
+      "title": "Arms",
+      "enabled": "Show",
+      "length": "Length",
+      "thickness": "Thickness",
+      "gap": "Gap",
+      "top": "Top",
+      "right": "Right",
+      "bottom": "Bottom",
+      "left": "Left"
+    },
+    "dot": {
+      "title": "Center dot",
+      "enabled": "Show",
+      "size": "Size",
+      "round": "Round"
+    },
+    "ring": {
+      "title": "Ring",
+      "enabled": "Show",
+      "radius": "Radius",
+      "thickness": "Thickness"
+    },
+    "outline": {
+      "title": "Outline",
+      "enabled": "Show",
+      "color": "Color",
+      "thickness": "Thickness",
+      "opacity": "Opacity"
+    },
+    "transform": {
+      "title": "Position and size",
+      "rotation": "Rotation",
+      "scale": "Scale",
+      "offsetX": "Horizontal offset",
+      "offsetY": "Vertical offset"
+    },
+    "image": {
+      "title": "Custom image",
+      "hint": "Use an image with transparency (up to 256 × 256 px).",
+      "choose": "Choose image",
+      "useShapes": "Back to shapes",
+      "invalid": "That image could not be read."
+    },
+    "placement": {
+      "title": "Where it shows",
+      "display": "Monitor",
+      "primary": "The primary one",
+      "hideFromCapture": "Hide from captures and streams",
+      "hideHint": "OBS, Discord and Windows captures don't see it; you do."
+    },
+    "saved": {
+      "title": "Saved",
+      "name": "Name",
+      "save": "Save current",
+      "empty": "You haven't saved any yet.",
+      "apply": "Use",
+      "remove": "Delete"
+    },
+    "units": {
+      "px": "{{value}} px",
+      "deg": "{{value}}°",
+      "percent": "{{value}}%"
+    }
   }
 }

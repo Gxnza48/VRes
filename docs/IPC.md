@@ -25,7 +25,7 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 | Biblioteca | `library_list` · `library_get` · `library_save` · `library_delete` · `library_duplicate` · `library_apply` | F5 |
 | Biblioteca | `library_set_favorite` | F5 |
 | Compartir | `share_export` · `share_decode` · `share_import` | F5 |
-| Crosshair | `crosshair_preview` · `crosshair_commit` · `crosshair_set_enabled` · `crosshair_set_target` · `crosshair_render` (RGBA binario) · `crosshair_import_image` | F4 |
+| Crosshair | `crosshair_render` (bytes: lado, centro y RGBA) · `crosshair_presets` · `crosshair_preview`; prender, elegir monitor, guardar e imagen propia van por `settings_update` | F4 ✅ |
 | Juegos y perfiles | `games_list` · `games_add_custom` · `games_remove_custom` · `games_running_candidates` · `profiles_activate` · `profiles_set_auto_switch` | F6 |
 | Dark Boost y zoom | `darkboost_preview` · `darkboost_commit` · `zoom_commit` · `enhancers_set_armed` | F7 |
 | Monitor | `ddc_get` · `ddc_set` · `ddc_restore_initial` | F8 |

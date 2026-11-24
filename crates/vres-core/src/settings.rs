@@ -8,6 +8,7 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+use crate::crosshair::Crosshair;
 use crate::keys::{Hotkey, check_hotkey};
 use crate::model::resolution::ModeRequest;
 
@@ -19,6 +20,10 @@ pub const DEFAULT_CONFIRM_SECONDS: u32 = 15;
 pub const CONFIRM_SECONDS_RANGE: (u32, u32) = (5, 60);
 /// Modos confirmados que se recuerdan.
 pub const MAX_CONFIRMED: usize = 24;
+/// Crosshairs guardados como máximo.
+pub const MAX_SAVED_CROSSHAIRS: usize = 50;
+/// Largo máximo del nombre de un crosshair guardado.
+pub const MAX_NAME_CHARS: usize = 40;
 
 /// Un modo de una pantalla.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, TS)]
@@ -64,14 +69,40 @@ impl Default for ResolutionSettings {
     }
 }
 
+/// Un crosshair guardado por el usuario.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct SavedCrosshair {
+    pub name: String,
+    pub crosshair: Crosshair,
+}
+
+/// Ajustes del crosshair.
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase", default)]
+#[ts(export)]
+pub struct CrosshairSettings {
+    pub enabled: bool,
+    /// Pantalla donde se dibuja (`None`: la principal).
+    pub display_id: Option<String>,
+    /// Que no aparezca en capturas ni transmisiones (Windows 10 2004+).
+    pub hide_from_capture: bool,
+    /// El crosshair en uso.
+    pub current: Crosshair,
+    /// Tus crosshairs guardados.
+    pub saved: Vec<SavedCrosshair>,
+}
+
 /// `settings.json`.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase", default)]
 #[ts(export)]
 pub struct Settings {
     pub schema_version: u32,
     pub hotkeys: HotkeySettings,
     pub resolution: ResolutionSettings,
+    pub crosshair: CrosshairSettings,
 }
 
 impl Default for Settings {
@@ -80,6 +111,7 @@ impl Default for Settings {
             schema_version: SETTINGS_SCHEMA,
             hotkeys: HotkeySettings::default(),
             resolution: ResolutionSettings::default(),
+            crosshair: CrosshairSettings::default(),
         }
     }
 }
@@ -111,6 +143,15 @@ impl Settings {
         {
             self.hotkeys.resolution_toggle = None;
         }
+
+        self.crosshair.current = self.crosshair.current.clamped();
+        self.crosshair.saved.truncate(MAX_SAVED_CROSSHAIRS);
+        for saved in &mut self.crosshair.saved {
+            saved.crosshair = saved.crosshair.clamped();
+            let name: String = saved.name.trim().chars().take(MAX_NAME_CHARS).collect();
+            saved.name = name;
+        }
+        self.crosshair.saved.retain(|saved| !saved.name.is_empty());
         self
     }
 

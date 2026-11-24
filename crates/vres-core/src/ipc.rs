@@ -117,6 +117,8 @@ pub enum ErrorCode {
     HotkeyTaken,
     /// No se pudieron guardar los ajustes.
     SettingsFailed,
+    /// No se pudo dibujar ese crosshair (imagen inválida o sin partes).
+    CrosshairInvalid,
 }
 
 /// Error que devuelven todos los comandos de Tauri.

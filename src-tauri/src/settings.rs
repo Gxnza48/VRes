@@ -31,6 +31,7 @@ pub fn engine_settings(settings: &Settings) -> EngineSettings {
         toggle_target: settings.resolution.toggle.clone(),
         tones: settings.resolution.tones,
         confirm_seconds: settings.resolution.confirm_seconds,
+        crosshair: settings.crosshair.clone(),
     }
 }
 

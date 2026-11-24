@@ -11,6 +11,72 @@
     "min": 50.0,
     "step": 1.0
   },
+  "crosshairDot": {
+    "default": 2.0,
+    "max": 20.0,
+    "min": 1.0,
+    "step": 1.0
+  },
+  "crosshairGap": {
+    "default": 3.0,
+    "max": 40.0,
+    "min": 0.0,
+    "step": 1.0
+  },
+  "crosshairLength": {
+    "default": 6.0,
+    "max": 80.0,
+    "min": 0.0,
+    "step": 1.0
+  },
+  "crosshairOffset": {
+    "default": 0.0,
+    "max": 200.0,
+    "min": -200.0,
+    "step": 1.0
+  },
+  "crosshairOpacity": {
+    "default": 100.0,
+    "max": 100.0,
+    "min": 0.0,
+    "step": 1.0
+  },
+  "crosshairOutline": {
+    "default": 1.0,
+    "max": 6.0,
+    "min": 1.0,
+    "step": 1.0
+  },
+  "crosshairRadius": {
+    "default": 10.0,
+    "max": 80.0,
+    "min": 2.0,
+    "step": 1.0
+  },
+  "crosshairRing": {
+    "default": 1.0,
+    "max": 10.0,
+    "min": 1.0,
+    "step": 1.0
+  },
+  "crosshairRotation": {
+    "default": 0.0,
+    "max": 180.0,
+    "min": -180.0,
+    "step": 1.0
+  },
+  "crosshairScale": {
+    "default": 100.0,
+    "max": 400.0,
+    "min": 25.0,
+    "step": 5.0
+  },
+  "crosshairThickness": {
+    "default": 2.0,
+    "max": 20.0,
+    "min": 1.0,
+    "step": 1.0
+  },
   "dim": {
     "default": 0.0,
     "max": 80.0,

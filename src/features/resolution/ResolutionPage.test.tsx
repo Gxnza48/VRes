@@ -8,6 +8,8 @@ import type { Settings } from "@/lib/bindings/Settings";
 import { ipc } from "@/lib/ipc";
 import { useEngineStore } from "@/state/engine";
 import { useResolutionStore } from "@/state/resolution";
+import { useSettingsStore } from "@/state/settings";
+import { defaultSettings } from "@/test/fixtures";
 
 import { aspectLabel, stretchLabel } from "./format";
 import { ResolutionPage } from "./ResolutionPage";
@@ -80,19 +82,15 @@ function state(pending: ResolutionState["pending"] = null): ResolutionState {
   };
 }
 
-const settings: Settings = {
-  schemaVersion: 1,
-  hotkeys: { resolutionToggle: null },
-  resolution: { confirmSeconds: 15, tones: true, toggle: null, confirmed: [] },
-};
+const settings: Settings = defaultSettings();
 
 describe("ResolutionPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useEngineStore.setState({ displays: [display] });
+    useSettingsStore.setState({ settings });
     useResolutionStore.setState({
       state: state(),
-      settings,
       selectedId: null,
       busy: false,
       error: null,

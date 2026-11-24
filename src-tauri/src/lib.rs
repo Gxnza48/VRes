@@ -95,6 +95,9 @@ pub fn run() {
             commands::resolution::resolution_restore,
             commands::resolution::resolution_toggle,
             commands::resolution::hdr_set,
+            commands::crosshair::crosshair_render,
+            commands::crosshair::crosshair_presets,
+            commands::crosshair::crosshair_preview,
         ])
         .build(tauri::generate_context!())
         .expect("VRes no pudo iniciar");

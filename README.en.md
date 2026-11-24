@@ -18,7 +18,7 @@ Saturation up to 300%, digital vibrance, stretched resolution, crosshair, per-ga
 </div>
 
 > [!IMPORTANT]
-> **VRes is in alpha.** The **Display** tab (saturation up to 300%, NVIDIA and AMD driver vibrance, and per-monitor fine tuning) and the **Resolution** tab (stretched, HDR and a native ↔ stretched hotkey) are here, with their safety net, and features land phase by phase. See the [feature table](#features) and the [roadmap](docs/ROADMAP.md) (in Spanish).
+> **VRes is in alpha.** The **Display** tab (saturation up to 300%, NVIDIA and AMD driver vibrance, and per-monitor fine tuning) the **Resolution** tab (stretched, HDR and a native ↔ stretched hotkey) and the **Crosshair** tab (shapes, your own image, hidden from captures) are here, with their safety net, and features land phase by phase. See the [feature table](#features) and the [roadmap](docs/ROADMAP.md) (in Spanish).
 
 ---
 
@@ -36,7 +36,7 @@ It is built for the Latin-American gaming community: **truly free** (no paid pla
 | **Display:** 0–300% saturation and per-monitor fine tuning (brightness, contrast, gamma, temperature, shadows, highlights, blacks, whites and tints) | ✅ Available | v0.1 |
 | **Resolution:** stretched 4:3, 5:4 and 16:10, refresh rate and HDR, with automatic rollback and a native ↔ stretched hotkey | ✅ Available | v0.2 |
 | **Digital vibrance** through the driver, per monitor: NVIDIA and AMD (emulated on Intel) | ✅ Available | v0.3 |
-| **Crosshair** overlay: shapes, colors, your own image and share codes | 🗓 Planned | v0.4 |
+| **Crosshair** overlay: shapes by parts, colors, your own image, any monitor, hidden from captures and saved crosshairs | ✅ Available | v0.4 |
 | **Looks & Library:** per-game presets, share codes, hue, color-blindness aids, eye care | 🗓 Planned | v0.5 |
 | **Per-game profiles:** Fortnite, VALORANT, CS2, Apex Legends, Rust, Rainbow Six Siege and any other game | 🗓 Planned | v0.6 |
 | **Dark Boost & Zoom** while holding a key or a mouse button | 🗓 Planned | v0.7 |

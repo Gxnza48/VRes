@@ -4,6 +4,7 @@
 //! y siempre devuelven `Result<T, IpcError>` con un código estable.
 
 pub mod app;
+pub mod crosshair;
 pub mod engine;
 pub mod resolution;
 pub mod settings;

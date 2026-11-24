@@ -158,3 +158,19 @@ Medido el 2026-11-24 con `vres-cli` (cada prueba vuelve sola al valor original).
 ### Pendiente de F3
 
 - A ojo: que el realce se note en cada monitor por separado y en un juego en pantalla completa exclusiva.
+
+## F4 — Crosshair
+
+Medido el 2026-11-24 con `vres-cli overlay test` (un píxel magenta en el centro de cada pantalla, leído de la pantalla con `BitBlt`).
+
+| Pantalla | Centro | Píxel central | Vecino | Oculto en capturas |
+|---|---|---|---|---|
+| ATNA40CU05-0 (interno, 200 %) | (1440, 900) | magenta ✅ | otro color ✅ | ✅ |
+| MAG 255F E20 (a la izquierda, coordenadas negativas) | (−960, 540) | magenta ✅ | otro color ✅ | ✅ |
+
+- El centro es exacto al píxel en las dos pantallas, también con DPI distinto y con el monitor externo en coordenadas negativas.
+- `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)` saca la ventana de la captura en las dos.
+
+### Pendiente de F4
+
+- A ojo: que no robe el foco ni los clics sobre un juego en ventana sin bordes, y que no aparezca en OBS con "ocultar en capturas".

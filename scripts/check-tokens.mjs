@@ -12,7 +12,8 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const srcDir = join(root, "src");
-const ALLOWED = ["src/styles/", "src/components/ui/", "src/lib/bindings/"];
+// `src/test/` tiene datos de prueba (por ejemplo, el color de un crosshair), no estilos.
+const ALLOWED = ["src/styles/", "src/components/ui/", "src/lib/bindings/", "src/test/"];
 const EXTENSIONS = [".ts", ".tsx", ".css"];
 
 const PALETTE =

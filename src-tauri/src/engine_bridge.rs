@@ -197,7 +197,7 @@ impl EngineState {
     pub fn configure(&self, settings: &Settings) -> bool {
         let (tx, rx) = mpsc::channel();
         if !self.send(Command::Configure {
-            settings: engine_settings(settings),
+            settings: Box::new(engine_settings(settings)),
             reply: tx,
         }) {
             return true;

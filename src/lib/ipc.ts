@@ -8,6 +8,8 @@ import { invoke, isTauri } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
 
 import type { Bootstrap } from "./bindings/Bootstrap";
+import type { Crosshair } from "./bindings/Crosshair";
+import type { CrosshairPreset } from "./bindings/CrosshairPreset";
 import type { DisplayInfo } from "./bindings/DisplayInfo";
 import type { EngineStatus } from "./bindings/EngineStatus";
 import type { Hotkey } from "./bindings/Hotkey";
@@ -97,6 +99,14 @@ export const ipc = {
   resolutionToggle: () => call<void>("resolution_toggle"),
   /** Prende o apaga HDR (vuelve como estaba al salir de VRes). */
   hdrSet: (displayId: string, enabled: boolean) => call<void>("hdr_set", { displayId, enabled }),
+
+  /** Dibuja un crosshair: lado, centro y RGBA (el mismo dibujo que en pantalla). */
+  crosshairRender: (crosshair: Crosshair) => call<ArrayBuffer>("crosshair_render", { crosshair }),
+  /** Presets propios de VRes. */
+  crosshairPresets: () => call<CrosshairPreset[]>("crosshair_presets"),
+  /** Muestra este crosshair en pantalla mientras se edita (`null` vuelve al guardado). */
+  crosshairPreview: (crosshair: Crosshair | null) =>
+    call<void>("crosshair_preview", { crosshair }),
 
   /** Consulta si hay una versión nueva en GitHub Releases. */
   updateCheck: () => call<UpdateInfo | null>("update_check"),

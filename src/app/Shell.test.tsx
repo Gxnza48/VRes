@@ -36,9 +36,9 @@ describe("Shell", () => {
 
   it("cambia de sección al hacer clic y dice en qué fase llega", async () => {
     render(<App />);
-    await userEvent.click(screen.getByRole("button", { name: "Crosshair" }));
-    expect(screen.getByRole("heading", { level: 1, name: "Crosshair" })).toBeInTheDocument();
-    expect(screen.getByText("Llega en la fase F4")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Perfiles" }));
+    expect(screen.getByRole("heading", { level: 1, name: "Perfiles" })).toBeInTheDocument();
+    expect(screen.getByText("Llega en la fase F6")).toBeInTheDocument();
   });
 
   it("la sección Más permite elegir el idioma", async () => {

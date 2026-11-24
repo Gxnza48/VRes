@@ -8,7 +8,7 @@ VRes se construye por **fases**. Cada fase termina en una versión instalable: c
 | **F1** | Motor de color + pestaña Pantalla | v0.1 | ✅ |
 | **F2** | Resolución estirada, Hz y HDR | v0.2 | ✅ |
 | **F3** | Vibrance por driver | v0.3 | ✅ |
-| **F4** | Crosshair | v0.4 | 🗓 |
+| **F4** | Crosshair | v0.4 | ✅ |
 | **F5** | Looks, Biblioteca, códigos y color avanzado | v0.5 | 🗓 |
 | **F6** | Perfiles por juego | v0.6 | 🗓 |
 | **F7** | Dark Boost y Zoom | v0.7 | 🗓 |
@@ -68,9 +68,12 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 
 ## F4 — Crosshair
 
-- Ventana transparente que no intercepta clics, dibujada por un renderer único (el mismo de la vista previa)
-- Formas por partes, contorno, opacidad, rotación, desplazamiento, imagen propia, monitor destino, ocultar en capturas
-- Presets propios, guardados, historial y código para compartir
+- [x] Ventana transparente que no intercepta clics ni foco, siempre encima (se vuelve a subir al cambiar de ventana), dibujada por un renderer único en `vres-core` (el mismo de la vista previa)
+- [x] Formas por partes (brazos, punto, anillo), contorno, opacidad, rotación, escala, desplazamiento, imagen propia, monitor destino y "ocultar en capturas"
+- [x] Presets propios y crosshairs guardados
+- [x] `vres-cli overlay test`: centrado exacto al píxel y oculto en capturas, en las dos pantallas ([resultados](hardware/RESULTADOS.md))
+- [ ] Código para compartir e historial: llegan con la Biblioteca (F5)
+- [ ] A ojo: centrado sobre un juego en ventana sin bordes en cada monitor
 
 ## F5 — Looks, Biblioteca, códigos y color avanzado
 

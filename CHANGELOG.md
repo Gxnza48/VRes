@@ -4,6 +4,18 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.4.0] - 2026-11-24
+
+**Crosshair** (fase F4 de la [hoja de ruta](docs/ROADMAP.md)).
+
+### Agregado
+
+- Pestaña **Crosshair**: una mira propia sobre cualquier juego, en una ventana transparente que no recibe clics ni foco y queda siempre encima.
+- Formas por partes (brazos que se pueden ocultar uno por uno, punto redondo o cuadrado, anillo), color, opacidad, contorno, rotación, escala y desplazamiento; o una imagen propia con transparencia.
+- Ocho presets propios, crosshairs guardados con nombre, monitor a elección y "ocultar en capturas y transmisiones" (OBS y Discord no la ven).
+- La vista previa usa el mismo dibujo que la pantalla, al píxel; sin rotación las líneas quedan nítidas.
+- `vres-cli overlay test`: verifica el centrado exacto y que quede fuera de las capturas.
+
 ## [0.3.0] - 2026-11-24
 
 **Vibrance por driver** (fase F3 de la [hoja de ruta](docs/ROADMAP.md)).
@@ -54,7 +66,8 @@ Primera versión pública: la base de la app y la pestaña **Pantalla** (fases F
 - Matemática de color con más de 70 pruebas (incluidas pruebas de propiedades) y resultados de las pruebas en hardware real en [docs/hardware/RESULTADOS.md](docs/hardware/RESULTADOS.md).
 - Documentación: arquitectura, motor de color, anti-cheat, contrato interno, códigos para compartir, desarrollo y hoja de ruta.
 
-[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.3.0...HEAD
+[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/Gxnza48/VRes/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Gxnza48/VRes/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Gxnza48/VRes/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Gxnza48/VRes/releases/tag/v0.1.0

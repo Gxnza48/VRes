@@ -1,3 +1,4 @@
+import { CrosshairPage } from "@/features/crosshair/CrosshairPage";
 import { DisplayPage } from "@/features/display/DisplayPage";
 import { MorePage } from "@/features/more/MorePage";
 import { ResolutionPage } from "@/features/resolution/ResolutionPage";
@@ -20,6 +21,8 @@ export function Shell() {
           <Notices />
           {tab.id === "display" ? (
             <DisplayPage />
+          ) : tab.id === "crosshair" ? (
+            <CrosshairPage />
           ) : tab.id === "resolution" ? (
             <ResolutionPage />
           ) : tab.id === "more" ? (

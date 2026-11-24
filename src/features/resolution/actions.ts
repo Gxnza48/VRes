@@ -4,7 +4,6 @@
  */
 import type { ErrorCode } from "@/lib/bindings/ErrorCode";
 import type { ModeRequest } from "@/lib/bindings/ModeRequest";
-import type { Settings } from "@/lib/bindings/Settings";
 import { ipc, isIpcError } from "@/lib/ipc";
 import { useResolutionStore } from "@/state/resolution";
 
@@ -52,18 +51,4 @@ export function restoreDisplay(displayId: string): Promise<boolean> {
 /** Prende o apaga HDR. */
 export function setHdr(displayId: string, enabled: boolean): Promise<boolean> {
   return run(() => ipc.hdrSet(displayId, enabled));
-}
-
-/** Guarda los ajustes (atajo, tonos, segundos). */
-export async function saveSettings(settings: Settings): Promise<boolean> {
-  const store = useResolutionStore.getState();
-  store.setError(null);
-  try {
-    store.setSettings(await ipc.settingsUpdate(settings));
-    return true;
-  } catch (error) {
-    console.error("settings_update", error);
-    store.setError(errorCode(error));
-    return false;
-  }
 }

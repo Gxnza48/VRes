@@ -22,6 +22,7 @@ pub mod identify;
 pub mod keyboard;
 pub mod mag;
 pub mod modes;
+pub mod overlay;
 pub mod probe;
 pub mod sound;
 pub mod vibrance;

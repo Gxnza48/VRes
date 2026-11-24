@@ -60,8 +60,42 @@ pub const HUE: Range = Range::new(0.0, 360.0, 0.0, 1.0);
 /// Gamma propia de cada monitor (multiplica la del look).
 pub const TRIM_GAMMA: Range = Range::new(0.7, 1.3, 1.0, 0.01);
 
+/// Crosshair: largo de cada brazo (px).
+pub const CROSSHAIR_LENGTH: Range = Range::new(0.0, 80.0, 6.0, 1.0);
+/// Crosshair: grosor de los brazos (px).
+pub const CROSSHAIR_THICKNESS: Range = Range::new(1.0, 20.0, 2.0, 1.0);
+/// Crosshair: separación desde el centro (px).
+pub const CROSSHAIR_GAP: Range = Range::new(0.0, 40.0, 3.0, 1.0);
+/// Crosshair: tamaño del punto (px).
+pub const CROSSHAIR_DOT: Range = Range::new(1.0, 20.0, 2.0, 1.0);
+/// Crosshair: radio del anillo (px).
+pub const CROSSHAIR_RADIUS: Range = Range::new(2.0, 80.0, 10.0, 1.0);
+/// Crosshair: grosor del anillo (px).
+pub const CROSSHAIR_RING: Range = Range::new(1.0, 10.0, 1.0, 1.0);
+/// Crosshair: grosor del contorno (px).
+pub const CROSSHAIR_OUTLINE: Range = Range::new(1.0, 6.0, 1.0, 1.0);
+/// Crosshair: opacidad (%).
+pub const CROSSHAIR_OPACITY: Range = Range::new(0.0, 100.0, 100.0, 1.0);
+/// Crosshair: rotación (grados).
+pub const CROSSHAIR_ROTATION: Range = Range::new(-180.0, 180.0, 0.0, 1.0);
+/// Crosshair: escala (%).
+pub const CROSSHAIR_SCALE: Range = Range::new(25.0, 400.0, 100.0, 5.0);
+/// Crosshair: desplazamiento desde el centro (px).
+pub const CROSSHAIR_OFFSET: Range = Range::new(-200.0, 200.0, 0.0, 1.0);
+
 /// Todos los rangos, con el nombre con el que los usa la interfaz.
 pub const ALL: &[(&str, Range)] = &[
+    ("crosshairLength", CROSSHAIR_LENGTH),
+    ("crosshairThickness", CROSSHAIR_THICKNESS),
+    ("crosshairGap", CROSSHAIR_GAP),
+    ("crosshairDot", CROSSHAIR_DOT),
+    ("crosshairRadius", CROSSHAIR_RADIUS),
+    ("crosshairRing", CROSSHAIR_RING),
+    ("crosshairOutline", CROSSHAIR_OUTLINE),
+    ("crosshairOpacity", CROSSHAIR_OPACITY),
+    ("crosshairRotation", CROSSHAIR_ROTATION),
+    ("crosshairScale", CROSSHAIR_SCALE),
+    ("crosshairOffset", CROSSHAIR_OFFSET),
     ("saturation", SATURATION),
     ("vibrance", VIBRANCE),
     ("brightness", BRIGHTNESS),

@@ -54,17 +54,6 @@
         "Opacidade da janela"
       ]
     },
-    "crosshair": {
-      "title": "Mira",
-      "subtitle": "Uma mira sobreposta, desenhada na tela e não dentro do jogo.",
-      "items": [
-        "Janela transparente que não intercepta cliques",
-        "Forma por partes, tamanho, espessura, espaçamento, contorno, cor e opacidade",
-        "Mira com a sua própria imagem",
-        "Presets, salvos, histórico e código para compartilhar",
-        "Opção para escondê-la de gravações e streams"
-      ]
-    },
     "profiles": {
       "title": "Perfis",
       "subtitle": "Cada jogo com sua configuração, aplicada sozinha ao abrir.",
@@ -359,6 +348,100 @@
     "displayGone": "Essa tela não está mais conectada.",
     "hotkeyInvalid": "Esse atalho não é válido.",
     "hotkeyTaken": "Outro programa já usa esse atalho. Escolha outro.",
-    "settingsFailed": "Não foi possível salvar os ajustes."
+    "settingsFailed": "Não foi possível salvar os ajustes.",
+    "crosshairInvalid": "Não foi possível desenhar esse crosshair."
+  },
+  "crosshair": {
+    "title": "Crosshair",
+    "subtitle": "Sua própria mira sobre qualquer jogo: uma janela transparente por cima, sem mexer no jogo.",
+    "enabled": "Crosshair",
+    "on": "Ativado",
+    "off": "Desligado",
+    "warning": "Alguns jogos e torneios consideram vantagem uma mira externa: confira as regras antes de usá-la no competitivo.",
+    "preview": {
+      "title": "Prévia",
+      "description": "Como fica sobre o jogo: tamanho real e ampliado ×4.",
+      "zoom": "Prévia ampliada ×4"
+    },
+    "presets": {
+      "title": "Presets",
+      "classic": "Clássico",
+      "dot": "Ponto",
+      "thin": "Fino",
+      "tshape": "T",
+      "circle": "Círculo",
+      "plus": "Cruz sólida",
+      "cross": "Xis",
+      "large": "Grande"
+    },
+    "color": {
+      "title": "Cor",
+      "fill": "Cor",
+      "opacity": "Opacidade"
+    },
+    "arms": {
+      "title": "Braços",
+      "enabled": "Mostrar",
+      "length": "Comprimento",
+      "thickness": "Espessura",
+      "gap": "Espaço",
+      "top": "Cima",
+      "right": "Direita",
+      "bottom": "Baixo",
+      "left": "Esquerda"
+    },
+    "dot": {
+      "title": "Ponto central",
+      "enabled": "Mostrar",
+      "size": "Tamanho",
+      "round": "Redondo"
+    },
+    "ring": {
+      "title": "Anel",
+      "enabled": "Mostrar",
+      "radius": "Raio",
+      "thickness": "Espessura"
+    },
+    "outline": {
+      "title": "Contorno",
+      "enabled": "Mostrar",
+      "color": "Cor",
+      "thickness": "Espessura",
+      "opacity": "Opacidade"
+    },
+    "transform": {
+      "title": "Posição e tamanho",
+      "rotation": "Rotação",
+      "scale": "Escala",
+      "offsetX": "Deslocamento horizontal",
+      "offsetY": "Deslocamento vertical"
+    },
+    "image": {
+      "title": "Imagem própria",
+      "hint": "Use uma imagem com transparência (até 256 × 256 px).",
+      "choose": "Escolher imagem",
+      "useShapes": "Voltar às formas",
+      "invalid": "Não foi possível ler essa imagem."
+    },
+    "placement": {
+      "title": "Onde aparece",
+      "display": "Monitor",
+      "primary": "O principal",
+      "hideFromCapture": "Ocultar em capturas e transmissões",
+      "hideHint": "OBS, Discord e as capturas do Windows não a veem; você sim."
+    },
+    "saved": {
+      "title": "Salvos",
+      "name": "Nome",
+      "save": "Salvar o atual",
+      "empty": "Você ainda não salvou nenhum.",
+      "apply": "Usar",
+      "remove": "Apagar"
+    },
+    "units": {
+      "px": "{{value}} px",
+      "deg": "{{value}}°",
+      "percent": "{{value}}%"
+    }
   }
 }

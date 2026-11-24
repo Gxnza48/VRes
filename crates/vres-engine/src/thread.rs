@@ -18,6 +18,7 @@ use std::time::{Duration, Instant};
 
 use vres_core::color::matrix::ColorMatrix;
 use vres_core::color::ramp::GammaRamp;
+use vres_core::crosshair::{self, Crosshair};
 use vres_core::ipc::ErrorCode;
 use vres_core::keys::Hotkey;
 use vres_core::model::display::DisplayInfo;
@@ -27,11 +28,12 @@ use vres_core::model::resolution::{
 };
 use vres_core::model::vibrance::VibranceInfo;
 use vres_core::planner::Requested;
-use vres_core::settings::{DEFAULT_CONFIRM_SECONDS, SavedMode};
+use vres_core::settings::{CrosshairSettings, DEFAULT_CONFIRM_SECONDS, SavedMode};
 use vres_core::status::{EngineStatus, ReasonCode};
 use vres_win::control::{self, ACK, RemoteCommand};
 use vres_win::identify::IdentifyOverlay;
 use vres_win::mag::Magnifier;
+use vres_win::overlay::CrosshairOverlay;
 use vres_win::sound::{self, Tone};
 use vres_win::vibrance::DriverVibrance;
 use vres_win::window::{self, ForegroundHook, HiddenWindow};
@@ -90,6 +92,8 @@ pub struct EngineSettings {
     pub tones: bool,
     /// Segundos para conservar un modo nuevo antes de que vuelva solo.
     pub confirm_seconds: u32,
+    /// El crosshair: si está prendido, dónde y cuál.
+    pub crosshair: CrosshairSettings,
 }
 
 impl Default for EngineSettings {
@@ -99,6 +103,7 @@ impl Default for EngineSettings {
             toggle_target: None,
             tones: true,
             confirm_seconds: DEFAULT_CONFIRM_SECONDS,
+            crosshair: CrosshairSettings::default(),
         }
     }
 }
@@ -162,11 +167,14 @@ pub enum Command {
     },
     /// Nuevos ajustes. Responde si el atajo de resolución se pudo registrar.
     Configure {
-        settings: EngineSettings,
+        settings: Box<EngineSettings>,
         reply: Sender<bool>,
     },
     /// Suspender el atajo de resolución (mientras se graba uno nuevo).
     SuspendHotkeys(bool),
+    /// Mostrar este crosshair mientras se edita (sin guardar). `None` vuelve
+    /// al guardado.
+    CrosshairPreview(Option<Box<Crosshair>>),
     /// Restaurar todo y terminar el hilo.
     Shutdown(Sender<()>),
 }
@@ -452,6 +460,8 @@ struct Shell {
     job_rx: Receiver<JobResult>,
     job_reply: Option<JobReply>,
     resolution_rev: u64,
+    overlay: Option<CrosshairOverlay>,
+    crosshair_preview: Option<Crosshair>,
     shutdown_reply: Option<Sender<()>>,
 }
 
@@ -497,6 +507,10 @@ impl Shell {
                 None
             }
             WM_FOREGROUND => {
+                // El juego que pasa al frente puede taparlo: se vuelve a subir.
+                if let Some(overlay) = &self.overlay {
+                    overlay.raise();
+                }
                 // Un juego a pantalla completa puede pisar la rampa: se verifica.
                 if self.core.is_active() {
                     window::set_timer(self.hwnd, TIMER_FOREGROUND, 150);
@@ -535,6 +549,7 @@ impl Shell {
                 if std::mem::take(&mut self.displays_dirty) {
                     self.refresh_displays();
                     self.emit_resolution();
+                    self.apply_crosshair();
                 }
                 // Windows resetea las rampas en los cambios de pantalla: se reescribe todo.
                 let changed = self.core.reconcile(true);
@@ -703,9 +718,15 @@ impl Shell {
                 }
             }
             Command::Configure { settings, reply } => {
-                self.settings = settings;
+                self.settings = *settings;
+                self.crosshair_preview = None;
                 let registered = self.register_toggle_hotkey();
+                self.apply_crosshair();
                 let _ = reply.send(registered);
+            }
+            Command::CrosshairPreview(crosshair) => {
+                self.crosshair_preview = crosshair.map(|crosshair| *crosshair);
+                self.apply_crosshair();
             }
             Command::SuspendHotkeys(suspended) => {
                 self.hotkeys_suspended = suspended;
@@ -716,6 +737,58 @@ impl Shell {
             | Command::EmergencyReset
             | Command::Refresh
             | Command::Shutdown(_) => {}
+        }
+    }
+
+    /// Dibuja (o esconde) el crosshair según los ajustes y la vista previa.
+    fn apply_crosshair(&mut self) {
+        let config = self.settings.crosshair.clone();
+        if !config.enabled {
+            if let Some(overlay) = &mut self.overlay {
+                overlay.hide();
+            }
+            return;
+        }
+        let crosshair = self
+            .crosshair_preview
+            .clone()
+            .unwrap_or(config.current)
+            .clamped();
+        let display = config
+            .display_id
+            .as_deref()
+            .and_then(|id| self.display(id))
+            .or_else(|| self.core.displays().iter().find(|d| d.primary).cloned())
+            .or_else(|| self.core.displays().first().cloned());
+        let Some(display) = display else {
+            return;
+        };
+        let rendered = match crosshair::render(&crosshair) {
+            Ok(rendered) => rendered,
+            Err(error) => {
+                (self.sink)(EngineEvent::Log(format!("crosshair not drawn: {error}")));
+                if let Some(overlay) = &mut self.overlay {
+                    overlay.hide();
+                }
+                return;
+            }
+        };
+        if self.overlay.is_none() {
+            self.overlay = CrosshairOverlay::create().ok();
+        }
+        let Some(overlay) = &mut self.overlay else {
+            return;
+        };
+        let bounds = display.bounds;
+        let center_x = bounds.x + (bounds.width / 2) as i32;
+        let center_y = bounds.y + (bounds.height / 2) as i32;
+        let x = center_x + crosshair.offset_x - rendered.center as i32;
+        let y = center_y + crosshair.offset_y - rendered.center as i32;
+        overlay.set_hidden_from_capture(config.hide_from_capture);
+        if let Err(error) = overlay.show(&rendered.to_bgra_premultiplied(), rendered.size, x, y) {
+            (self.sink)(EngineEvent::Log(format!(
+                "crosshair overlay failed: {error}"
+            )));
         }
     }
 
@@ -1033,6 +1106,8 @@ fn run(
         job_rx,
         job_reply: None,
         resolution_rev: 0,
+        overlay: None,
+        crosshair_preview: None,
         shutdown_reply: None,
     }));
 
@@ -1067,6 +1142,7 @@ fn run(
         shell.hwnd = window.handle();
         shell.after_change(false);
         let toggle_ok = shell.register_toggle_hotkey();
+        shell.apply_crosshair();
         let resolution = shell.resolution_state();
         let snapshot = EngineSnapshot {
             displays: shell.core.displays().to_vec(),

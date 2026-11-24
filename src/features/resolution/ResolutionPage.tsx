@@ -11,6 +11,7 @@ import type { Scaling } from "@/lib/bindings/Scaling";
 import { cn } from "@/lib/utils";
 import { useEngineStore } from "@/state/engine";
 import { useResolutionStore } from "@/state/resolution";
+import { useSettingsStore } from "@/state/settings";
 
 import { applyMode, restoreDisplay, setHdr } from "./actions";
 import { CountdownDialog } from "./CountdownDialog";
@@ -41,7 +42,7 @@ export function ResolutionPage() {
   const { t, i18n } = useTranslation();
   const displays = useEngineStore((state) => state.displays);
   const state = useResolutionStore((store) => store.state);
-  const settings = useResolutionStore((store) => store.settings);
+  const settings = useSettingsStore((store) => store.settings);
   const selectedId = useResolutionStore((store) => store.selectedId);
   const select = useResolutionStore((store) => store.select);
   const busy = useResolutionStore((store) => store.busy);

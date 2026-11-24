@@ -9,11 +9,20 @@ import type { DisplayInfo } from "@/lib/bindings/DisplayInfo";
 import type { Hotkey } from "@/lib/bindings/Hotkey";
 import type { Settings } from "@/lib/bindings/Settings";
 import { ipc } from "@/lib/ipc";
+import { useResolutionStore } from "@/state/resolution";
+import { saveSettings as persist } from "@/state/settings";
 
-import { saveSettings } from "./actions";
 import { sizeLabel } from "./format";
 
 const CONFIRM_CHOICES = [10, 15, 30] as const;
+
+/** Guarda y muestra el error (por ejemplo, un atajo ocupado) en la pestaña. */
+async function saveSettings(settings: Settings): Promise<void> {
+  const store = useResolutionStore.getState();
+  store.setError(null);
+  const error = await persist(settings);
+  if (error) store.setError(error);
+}
 
 interface HotkeyCardProps {
   settings: Settings;

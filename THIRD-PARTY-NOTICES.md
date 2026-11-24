@@ -14,6 +14,7 @@ VRes se distribuye bajo [GPL-3.0-or-later](LICENSE) e incluye o usa software de 
 | [i18next](https://www.i18next.com) y react-i18next | Traducciones | MIT |
 | [Zustand](https://github.com/pmndrs/zustand) | Estado de la interfaz | MIT |
 | [Lucide](https://lucide.dev) | Íconos | ISC |
+| [tiny-skia](https://github.com/linebender/tiny-skia) | Dibujo del crosshair | BSD-3-Clause |
 | [Orbitron](https://github.com/theleagueof/orbitron) (vía Fontsource) | Tipografía de los títulos | SIL Open Font License 1.1 |
 | [clsx](https://github.com/lukeed/clsx), [tailwind-merge](https://github.com/dcastil/tailwind-merge), [class-variance-authority](https://github.com/joe-bell/cva) | Utilidades de estilos | MIT / Apache-2.0 |
 | Microsoft Edge WebView2 | Motor de la interfaz (se instala aparte, parte de Windows) | Licencia de Microsoft |

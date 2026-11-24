@@ -10,6 +10,7 @@
 #![forbid(unsafe_code)]
 
 pub mod color;
+pub mod crosshair;
 pub mod ipc;
 pub mod keys;
 pub mod model;
