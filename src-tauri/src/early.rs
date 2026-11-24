@@ -32,7 +32,7 @@ pub fn handle_early_flags() -> Option<i32> {
         if has("--shutdown") {
             // Si no había instancia, o no terminó a tiempo, el instalador
             // igual verifica después si la app sigue abierta.
-            let _ = control::shutdown_running(Duration::from_secs(3));
+            let _ = control::shutdown_running(Duration::from_secs(6));
             return Some(0);
         }
 

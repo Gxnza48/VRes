@@ -75,6 +75,12 @@ pub enum ReasonCode {
     NotInGame,
     /// El monitor no admite ese modo.
     ModeNotSupported,
+    /// Windows no pudo aplicar el modo.
+    ModeChangeFailed,
+    /// El driver o el monitor no respetaron el escalado pedido.
+    ScalingIgnored,
+    /// No se pudo cambiar el HDR.
+    HdrChangeFailed,
     /// Otro programa ya usa ese atajo.
     HotkeyTaken,
     /// VRes arrancó en modo seguro tras un cierre inesperado.

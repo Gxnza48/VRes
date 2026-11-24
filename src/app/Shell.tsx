@@ -1,5 +1,6 @@
 import { DisplayPage } from "@/features/display/DisplayPage";
 import { MorePage } from "@/features/more/MorePage";
+import { ResolutionPage } from "@/features/resolution/ResolutionPage";
 import { useAppStore } from "@/state/app";
 
 import { tabById } from "./nav";
@@ -19,6 +20,8 @@ export function Shell() {
           <Notices />
           {tab.id === "display" ? (
             <DisplayPage />
+          ) : tab.id === "resolution" ? (
+            <ResolutionPage />
           ) : tab.id === "more" ? (
             <MorePage />
           ) : (

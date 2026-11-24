@@ -36,17 +36,6 @@
         "Tudo fica no seu PC: sem conta e sem servidores"
       ]
     },
-    "resolution": {
-      "title": "Resolução",
-      "subtitle": "Resolução esticada, taxa de atualização e HDR, com volta automática.",
-      "items": [
-        "Modo atual de cada monitor: resolução, Hz, escala e HDR",
-        "Presets esticados 4:3, 5:4 e 16:10 calculados para o seu monitor",
-        "Criador de resolução personalizada",
-        "Contagem regressiva: se você não confirmar, volta sozinha para a anterior",
-        "Atalho para alternar entre a resolução nativa e a esticada"
-      ]
-    },
     "monitor": {
       "title": "Monitor",
       "subtitle": "O que o seu monitor permite ajustar por hardware.",
@@ -220,7 +209,10 @@
     "notInGame": "Só funciona com o jogo em primeiro plano.",
     "modeNotSupported": "O monitor não aceita esse modo.",
     "hotkeyTaken": "Outro programa usa esse atalho.",
-    "safeModeAfterCrash": "Modo seguro após um fechamento inesperado."
+    "safeModeAfterCrash": "Modo seguro após um fechamento inesperado.",
+    "modeChangeFailed": "O Windows não conseguiu aplicar esse modo.",
+    "scalingIgnored": "A placa de vídeo ou o monitor ignoraram a escala pedida: podem aparecer barras pretas.",
+    "hdrChangeFailed": "Não foi possível mudar o HDR."
   },
   "notices": {
     "recovered": "O VRes não fechou direito da última vez: já restaurou as cores originais.",
@@ -228,6 +220,138 @@
     "emergencyReset": "Tela restaurada: a cor ficou desligada.",
     "hotkeyTaken": "Outro programa usa Ctrl + Alt + Shift + R, então o atalho de emergência não está disponível. Você pode restaurar a tela pela bandeja.",
     "engineUnavailable": "O motor do VRes não conseguiu iniciar. Reinicie o app; se continuar, reporte.",
-    "dismiss": "Fechar aviso"
+    "dismiss": "Fechar aviso",
+    "modeExpired": "A nova resolução voltou sozinha porque você não confirmou.",
+    "toggleHotkeyTaken": "Outro programa usa o atalho de resolução que você escolheu. Escolha outro na aba Resolução."
+  },
+  "resolution": {
+    "title": "Resolução",
+    "subtitle": "Resolução esticada, frequência e HDR, com volta automática.",
+    "loading": "Lendo os modos das suas telas…",
+    "picker": "Tela",
+    "apply": "Testar",
+    "busy": "Aplicando…",
+    "current": {
+      "title": "Modo atual",
+      "temporary": "Temporário (VRes)",
+      "aspect": "Proporção",
+      "scaling": "Escala",
+      "saved": "No Windows",
+      "native": "Nativa",
+      "restore": "Voltar à do Windows",
+      "hdr": "HDR",
+      "hdrUnsupported": "Esta tela não suporta HDR.",
+      "hdrHint": "Com HDR ativo, a saturação e o ajuste fino não são confiáveis. Ao fechar o VRes, o HDR volta como estava."
+    },
+    "scaling": {
+      "title": "Escala",
+      "preferred": "O monitor decide",
+      "identity": "Sem escala",
+      "centered": "Centralizada",
+      "stretched": "Esticada",
+      "aspectRatio": "Manter proporção",
+      "custom": "Do driver"
+    },
+    "presets": {
+      "title": "Esticadas",
+      "description": "Preenchem a tela com uma imagem mais larga. Ao testar uma, o VRes pede que você confirme: se não responder, ela volta sozinha.",
+      "groups": {
+        "aspect4x3": "4:3",
+        "aspect5x4": "5:4",
+        "aspect16x10": "16:10",
+        "popular": "Intermediária"
+      },
+      "stretch": "estica {{factor}}",
+      "unavailable": "Requer resolução personalizada (chega na v1.0)",
+      "none": "Não há resoluções esticadas para esta tela."
+    },
+    "modes": {
+      "title": "Todos os modos",
+      "description": "Os que o seu monitor lista.",
+      "aspectFilter": "Proporção",
+      "rateFilter": "Frequência",
+      "all": "Todas",
+      "allRates": "Todas",
+      "current": "Atual",
+      "empty": "Nenhum modo com esses filtros.",
+      "showAll": "Ver os {{count}} modos",
+      "showLess": "Ver menos"
+    },
+    "custom": {
+      "title": "Personalizada",
+      "description": "Escolha largura, altura e frequência.",
+      "width": "Largura",
+      "height": "Altura",
+      "rate": "Frequência",
+      "summary": "Proporção {{aspect}} · estica {{factor}}",
+      "tooSmall": "O mínimo é 640 × 480.",
+      "tooLarge": "Não pode passar da resolução nativa ({{size}}).",
+      "notListed": "O seu monitor não lista essa resolução: é preciso uma resolução personalizada do driver (chega na v1.0)."
+    },
+    "pending": {
+      "title": "Manter esta resolução?",
+      "body": "Se você não responder, ela volta sozinha à anterior.",
+      "keep": "Manter",
+      "revert": "Reverter"
+    },
+    "resolved": {
+      "kept": "Pronto: {{mode}} ficou aplicada. O atalho agora alterna para esta resolução.",
+      "reverted": "Você voltou à resolução anterior.",
+      "expired": "Sem resposta: a resolução voltou sozinha.",
+      "failed": "Não foi possível mudar a resolução."
+    },
+    "hotkey": {
+      "title": "Atalho nativa ↔ esticada",
+      "description": "Alterna entre a resolução do Windows e a última esticada que você manteve, sem abrir o VRes.",
+      "none": "Sem atalho",
+      "set": "Escolher atalho",
+      "change": "Mudar",
+      "cancel": "Cancelar",
+      "clear": "Remover",
+      "recording": "Pressione a combinação… (Esc cancela)",
+      "target": "Alterna para {{mode}} em {{display}}.",
+      "noTarget": "Mantenha uma resolução esticada para poder usar o atalho.",
+      "toggleNow": "Alternar agora",
+      "tones": "Sons ao alternar",
+      "issues": {
+        "unknownKey": "Essa tecla não pode ser usada como atalho.",
+        "needsModifier": "Letras, números e símbolos precisam de Ctrl, Alt ou Win.",
+        "reserved": "Está reservada (atalho de emergência, F12 ou Escape).",
+        "altGrClash": "Ctrl + Alt equivale a AltGr no teclado ABNT2: pode impedir que você digite caracteres como a arroba.",
+        "overlayClash": "O overlay da sua placa de vídeo usa esse atalho.",
+        "taken": "Outro programa já usa esse atalho."
+      }
+    },
+    "confirm": {
+      "title": "Tempo para confirmar",
+      "seconds": "{{count}} segundos"
+    },
+    "keys": {
+      "space": "Espaço",
+      "pageUp": "PgUp",
+      "pageDown": "PgDn",
+      "insert": "Insert",
+      "delete": "Delete",
+      "home": "Home",
+      "end": "End"
+    }
+  },
+  "errors": {
+    "internal": "Algo deu errado. Tente de novo.",
+    "windowFailed": "Não foi possível abrir a janela.",
+    "updateCheckFailed": "Não foi possível procurar atualizações.",
+    "updateUnavailable": "Não há nenhuma atualização.",
+    "updateInstallFailed": "Não foi possível instalar a atualização.",
+    "engineUnavailable": "O motor do VRes não está disponível.",
+    "modeNotSupported": "O seu monitor não lista essa resolução.",
+    "modeBusy": "Há outra mudança de resolução em andamento: responda primeiro a que está pendente.",
+    "modeFailed": "O Windows não conseguiu mudar a resolução.",
+    "modeExpired": "Essa mudança já foi mantida, revertida ou expirou.",
+    "modeNotConfirmed": "O atalho só alterna para resoluções que você já manteve uma vez.",
+    "hdrFailed": "Não foi possível mudar o HDR.",
+    "displayGone": "Essa tela não está mais conectada.",
+    "hotkeyInvalid": "Esse atalho não é válido.",
+    "hotkeyTaken": "Outro programa já usa esse atalho. Escolha outro.",
+    "settingsFailed": "Não foi possível salvar os ajustes."
   }
 }

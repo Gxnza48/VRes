@@ -36,17 +36,6 @@
         "Everything stays on your PC: no account and no servers"
       ]
     },
-    "resolution": {
-      "title": "Resolution",
-      "subtitle": "Stretched resolution, refresh rate and HDR, with automatic rollback.",
-      "items": [
-        "Current mode of each monitor: resolution, Hz, scaling and HDR",
-        "4:3, 5:4 and 16:10 stretched presets computed for your monitor",
-        "Custom resolution builder",
-        "Countdown: if you don't confirm, it goes back on its own",
-        "Hotkey to switch between native and stretched resolution"
-      ]
-    },
     "monitor": {
       "title": "Monitor",
       "subtitle": "What your monitor lets you adjust in hardware.",
@@ -220,7 +209,10 @@
     "notInGame": "Only works with the game in the foreground.",
     "modeNotSupported": "The monitor doesn't support that mode.",
     "hotkeyTaken": "Another program uses that shortcut.",
-    "safeModeAfterCrash": "Safe mode after an unexpected shutdown."
+    "safeModeAfterCrash": "Safe mode after an unexpected shutdown.",
+    "modeChangeFailed": "Windows couldn't apply that mode.",
+    "scalingIgnored": "The graphics card or the monitor ignored the requested scaling: you may see black bars.",
+    "hdrChangeFailed": "HDR couldn't be changed."
   },
   "notices": {
     "recovered": "VRes didn't close properly last time: it already restored the original colors.",
@@ -228,6 +220,138 @@
     "emergencyReset": "Display reset: color is now off.",
     "hotkeyTaken": "Another program uses Ctrl + Alt + Shift + R, so the emergency shortcut isn't available. You can reset the display from the tray.",
     "engineUnavailable": "The VRes engine couldn't start. Restart the app; if it keeps happening, please report it.",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "modeExpired": "The new resolution reverted by itself because you didn't confirm it.",
+    "toggleHotkeyTaken": "Another program uses the resolution hotkey you chose. Pick another one in the Resolution tab."
+  },
+  "resolution": {
+    "title": "Resolution",
+    "subtitle": "Stretched resolution, refresh rate and HDR, with automatic rollback.",
+    "loading": "Reading your displays' modes…",
+    "picker": "Display",
+    "apply": "Try",
+    "busy": "Applying…",
+    "current": {
+      "title": "Current mode",
+      "temporary": "Temporary (VRes)",
+      "aspect": "Aspect ratio",
+      "scaling": "Scaling",
+      "saved": "In Windows",
+      "native": "Native",
+      "restore": "Back to Windows' resolution",
+      "hdr": "HDR",
+      "hdrUnsupported": "This display doesn't support HDR.",
+      "hdrHint": "With HDR on, saturation and fine tuning aren't reliable. When you close VRes, HDR goes back to how it was."
+    },
+    "scaling": {
+      "title": "Scaling",
+      "preferred": "Monitor decides",
+      "identity": "No scaling",
+      "centered": "Centered",
+      "stretched": "Stretched",
+      "aspectRatio": "Keep aspect ratio",
+      "custom": "Driver-defined"
+    },
+    "presets": {
+      "title": "Stretched",
+      "description": "Fill the screen with a wider image. When you try one, VRes asks you to confirm it: if you don't answer, it reverts by itself.",
+      "groups": {
+        "aspect4x3": "4:3",
+        "aspect5x4": "5:4",
+        "aspect16x10": "16:10",
+        "popular": "In-between"
+      },
+      "stretch": "stretches {{factor}}",
+      "unavailable": "Needs a custom resolution (coming in v1.0)",
+      "none": "No stretched resolutions for this display."
+    },
+    "modes": {
+      "title": "All modes",
+      "description": "The ones your monitor lists.",
+      "aspectFilter": "Aspect ratio",
+      "rateFilter": "Refresh rate",
+      "all": "All",
+      "allRates": "All",
+      "current": "Current",
+      "empty": "No modes match those filters.",
+      "showAll": "Show all {{count}} modes",
+      "showLess": "Show less"
+    },
+    "custom": {
+      "title": "Custom",
+      "description": "Choose width, height and refresh rate.",
+      "width": "Width",
+      "height": "Height",
+      "rate": "Refresh rate",
+      "summary": "Aspect {{aspect}} · stretches {{factor}}",
+      "tooSmall": "The minimum is 640 × 480.",
+      "tooLarge": "It can't exceed the native resolution ({{size}}).",
+      "notListed": "Your monitor doesn't list that resolution: it needs a driver custom resolution (coming in v1.0)."
+    },
+    "pending": {
+      "title": "Keep this resolution?",
+      "body": "If you don't answer, it goes back to the previous one by itself.",
+      "keep": "Keep",
+      "revert": "Revert"
+    },
+    "resolved": {
+      "kept": "Done: {{mode}} is applied. The hotkey now toggles to this resolution.",
+      "reverted": "You went back to the previous resolution.",
+      "expired": "No answer: the resolution reverted by itself.",
+      "failed": "The resolution couldn't be changed."
+    },
+    "hotkey": {
+      "title": "Native ↔ stretched hotkey",
+      "description": "Toggles between Windows' resolution and the last stretched one you kept, without opening VRes.",
+      "none": "No hotkey",
+      "set": "Choose hotkey",
+      "change": "Change",
+      "cancel": "Cancel",
+      "clear": "Remove",
+      "recording": "Press the combination… (Esc cancels)",
+      "target": "Toggles to {{mode}} on {{display}}.",
+      "noTarget": "Keep a stretched resolution to be able to use the hotkey.",
+      "toggleNow": "Toggle now",
+      "tones": "Tones when toggling",
+      "issues": {
+        "unknownKey": "That key can't be used as a hotkey.",
+        "needsModifier": "Letters, numbers and symbols need Ctrl, Alt or Win.",
+        "reserved": "It's reserved (emergency hotkey, F12 or Escape).",
+        "altGrClash": "Ctrl + Alt equals AltGr on Latin American keyboards: it could stop you from typing characters like @.",
+        "overlayClash": "Your graphics card's overlay uses it.",
+        "taken": "Another program already uses that hotkey."
+      }
+    },
+    "confirm": {
+      "title": "Time to confirm",
+      "seconds": "{{count}} seconds"
+    },
+    "keys": {
+      "space": "Space",
+      "pageUp": "PgUp",
+      "pageDown": "PgDn",
+      "insert": "Insert",
+      "delete": "Del",
+      "home": "Home",
+      "end": "End"
+    }
+  },
+  "errors": {
+    "internal": "Something went wrong. Try again.",
+    "windowFailed": "The window couldn't be opened.",
+    "updateCheckFailed": "Couldn't check for updates.",
+    "updateUnavailable": "There's no update.",
+    "updateInstallFailed": "The update couldn't be installed.",
+    "engineUnavailable": "The VRes engine isn't available.",
+    "modeNotSupported": "Your monitor doesn't list that resolution.",
+    "modeBusy": "Another resolution change is in progress: answer the pending one first.",
+    "modeFailed": "Windows couldn't change the resolution.",
+    "modeExpired": "That change was already kept, reverted or expired.",
+    "modeNotConfirmed": "The hotkey only toggles to resolutions you've kept once.",
+    "hdrFailed": "HDR couldn't be changed.",
+    "displayGone": "That display is no longer connected.",
+    "hotkeyInvalid": "That hotkey isn't valid.",
+    "hotkeyTaken": "Another program already uses that hotkey. Choose another one.",
+    "settingsFailed": "The settings couldn't be saved."
   }
 }

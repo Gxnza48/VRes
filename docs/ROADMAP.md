@@ -6,7 +6,7 @@ VRes se construye por **fases**. Cada fase termina en una versión instalable: c
 |---|---|---|---|
 | **F0** | Repo, base de la app, documentación, CI y actualizaciones automáticas | v0.1 | ✅ |
 | **F1** | Motor de color + pestaña Pantalla | v0.1 | ✅ |
-| **F2** | Resolución estirada, Hz y HDR | v0.2 | 🗓 |
+| **F2** | Resolución estirada, Hz y HDR | v0.2 | ✅ |
 | **F3** | Vibrance por driver | v0.3 | 🗓 |
 | **F4** | Crosshair | v0.4 | 🗓 |
 | **F5** | Looks, Biblioteca, códigos y color avanzado | v0.5 | 🗓 |
@@ -43,13 +43,18 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 - [x] Pestaña **Pantalla**: monitores con tilde, Identificar, estado en vivo, Comparar, Restablecer, saturación 0–300 % y ajuste fino
 - [x] Bandeja con Pausar y Restablecer; Más: iniciar con Windows y copiar diagnóstico
 - [x] Publicación de la v0.1.0, con el logo y la identidad visual nuevos
-- [ ] Prueba a ojo de la interfaz por parte de la comunidad (lista manual de la fase)
+- [x] Prueba a ojo de la interfaz (lista manual de la fase)
 
 ## F2 — Resolución
 
-- Modos de cada monitor; cambio **temporal** (Windows lo deshace solo si algo falla)
-- Estirado 4:3, 5:4 y 16:10 (escalado por GPU), constructor personalizado, HDR on/off
-- Cuenta regresiva "Conservar / Revertir"; atajo nativa ↔ estirada con tonos
+- [x] Modos de cada monitor (actual, de Windows y nativa) y cambio **temporal**: nunca se escribe en el registro y, si VRes muere, Windows lo deshace solo
+- [x] Presets estirados propios (4:3, 5:4, 16:10 e intermedios) que indican si el monitor ya los admite; lista completa con filtros; constructor personalizado
+- [x] Escalado estirado, mantener aspecto o centrado, releído después de aplicar (se avisa si la placa o el monitor lo ignoran)
+- [x] Cuenta regresiva "Conservar / Revertir" (10, 15 o 30 s) que vuelve sola aunque la ventana esté cerrada
+- [x] HDR on/off por monitor, restaurado al salir
+- [x] Atajo nativa ↔ estirada (solo a modos ya conservados) con tonos; grabador de atajos que avisa los choques conocidos
+- [x] `vres-cli mode list | test | set`, `hdr get | set`, `probe mode-kill-revert` y `probe engine-modes`, verificados en hardware real ([resultados](hardware/RESULTADOS.md))
+- [ ] Prueba a ojo: la estirada llena la pantalla sin barras en cada monitor
 
 ## F3 — Vibrance por driver
 
@@ -64,6 +69,7 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 
 ## F5 — Looks, Biblioteca, códigos y color avanzado
 
+- Almacén genérico de la biblioteca (looks, crosshairs, resoluciones y perfiles)
 - Looks por juego (presets propios) y biblioteca local con búsqueda y filtros
 - Códigos para compartir (`VRL1-…`, `VRC1-…`, `VRR1-…`, `VRP1-…`), tolerantes a errores de copiado
 - Fórmula de luminancia, giro de tono, oscurecer un color, ayudas para daltonismo, cuidado visual

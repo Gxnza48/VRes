@@ -11,8 +11,10 @@
 
 pub mod color;
 pub mod ipc;
+pub mod keys;
 pub mod model;
 pub mod planner;
+pub mod settings;
 pub mod status;
 pub mod store;
 

@@ -24,6 +24,15 @@ pub enum WinError {
     /// Un hilo auxiliar terminó antes de responder.
     #[error("worker thread stopped: {0}")]
     ThreadStopped(&'static str),
+    /// Un cambio de pantalla devolvió un código de error (`DISP_CHANGE_*` o
+    /// `ERROR_*`).
+    #[error("{api} returned {code}")]
+    DisplayChange {
+        /// Nombre de la función.
+        api: &'static str,
+        /// Código devuelto.
+        code: i32,
+    },
 }
 
 /// Resultado de las funciones de este crate.

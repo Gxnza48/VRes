@@ -1,8 +1,11 @@
 //! El hilo del motor: una ventana oculta y su bucle de mensajes.
 //!
-//! Solo este hilo toca la Magnification API, registra el atajo de emergencia
-//! y recibe los avisos del sistema. Los demás hilos le hablan por un canal
+//! Solo este hilo toca la Magnification API, registra los atajos y recibe los
+//! avisos del sistema. Los demás hilos le hablan por un canal
 //! ([`EngineHandle::send`]) y él les responde con eventos ([`EngineEvent`]).
+//! Los cambios de resolución y de HDR, que pueden tardar segundos, corren en
+//! un hilo auxiliar: mientras tanto, el motor sigue atendiendo el atajo de
+//! emergencia y la cuenta regresiva.
 
 use std::cell::RefCell;
 use std::path::PathBuf;
@@ -11,20 +14,29 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use vres_core::color::matrix::ColorMatrix;
 use vres_core::color::ramp::GammaRamp;
+use vres_core::ipc::ErrorCode;
+use vres_core::keys::Hotkey;
 use vres_core::model::display::DisplayInfo;
+use vres_core::model::resolution::{
+    DisplayMode, DisplayModes, ModeRequest, ModeResolved, PendingMode, ResolutionState, is_listed,
+    presets,
+};
 use vres_core::planner::Requested;
+use vres_core::settings::{DEFAULT_CONFIRM_SECONDS, SavedMode};
 use vres_core::status::{EngineStatus, ReasonCode};
 use vres_win::control::{self, ACK, RemoteCommand};
 use vres_win::identify::IdentifyOverlay;
 use vres_win::mag::Magnifier;
+use vres_win::sound::{self, Tone};
 use vres_win::window::{self, ForegroundHook, HiddenWindow};
-use vres_win::{displays, gamma};
+use vres_win::{displays, gamma, keyboard, modes};
 
 use crate::core::{Core, Hardware};
+use crate::resolution::{Feedback, JobResult, ModeJob, Outcome, ResolutionManager};
 
 // Mensajes y constantes públicas de la API de Windows.
 const WM_CLOSE: u32 = 0x0010;
@@ -48,23 +60,58 @@ const VK_R: u32 = 0x52;
 const WM_WAKE: u32 = WM_APP + 1;
 /// Cambió la ventana en primer plano.
 const WM_FOREGROUND: u32 = WM_APP + 2;
+/// Terminó un trabajo de resolución o HDR.
+const WM_JOB_DONE: u32 = WM_APP + 3;
 
 const TIMER_SETTLE: usize = 1;
 const TIMER_HEALTH: usize = 2;
 const TIMER_IDENTIFY: usize = 3;
 const TIMER_FOREGROUND: usize = 4;
+const TIMER_MODE: usize = 5;
 const HOTKEY_EMERGENCY: i32 = 1;
+const HOTKEY_TOGGLE: i32 = 2;
 
 const HEALTH_INTERVAL_MS: u32 = 1000;
 const IDENTIFY_MS: u32 = 2500;
+const MODE_TICK_MS: u32 = 250;
+/// Tope para esperar un cambio de modo en curso antes de restaurar.
+const JOB_WAIT: Duration = Duration::from_secs(2);
+
+/// Ajustes del motor que vienen de `settings.json`.
+#[derive(Debug, Clone)]
+pub struct EngineSettings {
+    /// Atajo que alterna entre la resolución de Windows y la estirada.
+    pub toggle_hotkey: Option<Hotkey>,
+    /// Destino del atajo: siempre un modo que el usuario ya conservó.
+    pub toggle_target: Option<SavedMode>,
+    /// Tonos al alternar con el atajo.
+    pub tones: bool,
+    /// Segundos para conservar un modo nuevo antes de que vuelva solo.
+    pub confirm_seconds: u32,
+}
+
+impl Default for EngineSettings {
+    fn default() -> Self {
+        Self {
+            toggle_hotkey: None,
+            toggle_target: None,
+            tones: true,
+            confirm_seconds: DEFAULT_CONFIRM_SECONDS,
+        }
+    }
+}
 
 /// Configuración del motor.
 #[derive(Debug, Clone)]
 pub struct EngineConfig {
     /// `restore.json`. `None` desactiva la recuperación tras un cierre inesperado.
     pub restore_path: Option<PathBuf>,
+    /// `restore-modes.json` (resolución y HDR).
+    pub modes_restore_path: Option<PathBuf>,
     /// Lo que se aplica al arrancar.
     pub requested: Requested,
+    /// Atajos y preferencias.
+    pub settings: EngineSettings,
 }
 
 /// Vista previa (mientras se arrastra un control) o cambio confirmado.
@@ -73,6 +120,9 @@ pub enum ApplyMode {
     Preview,
     Commit,
 }
+
+/// Respuesta a un pedido.
+pub type Reply<T> = Sender<Result<T, ErrorCode>>;
 
 /// Pedidos al motor.
 #[derive(Debug)]
@@ -85,6 +135,36 @@ pub enum Command {
     EmergencyReset,
     /// Volver a leer las pantallas y reaplicar.
     Refresh,
+    /// Probar un modo: queda pendiente de confirmación.
+    ModeApply {
+        display_id: String,
+        request: ModeRequest,
+        reply: Reply<PendingMode>,
+    },
+    /// Conservar el modo pendiente.
+    ModeConfirm { token: String, reply: Reply<()> },
+    /// Volver atrás el modo pendiente.
+    ModeRevert { token: String, reply: Reply<()> },
+    /// Volver a la resolución de Windows en una pantalla.
+    ModeRestore {
+        display_id: String,
+        reply: Reply<()>,
+    },
+    /// Lo mismo que el atajo: alternar entre la de Windows y la estirada.
+    ModeToggle,
+    /// Prender o apagar HDR.
+    HdrSet {
+        display_id: String,
+        enabled: bool,
+        reply: Reply<()>,
+    },
+    /// Nuevos ajustes. Responde si el atajo de resolución se pudo registrar.
+    Configure {
+        settings: EngineSettings,
+        reply: Sender<bool>,
+    },
+    /// Suspender el atajo de resolución (mientras se graba uno nuevo).
+    SuspendHotkeys(bool),
     /// Restaurar todo y terminar el hilo.
     Shutdown(Sender<()>),
 }
@@ -96,12 +176,18 @@ pub enum EngineEvent {
     Status(EngineStatus),
     /// Cambiaron las pantallas.
     Displays(Vec<DisplayInfo>),
+    /// Cambiaron los modos, o hay un cambio pendiente.
+    Resolution(ResolutionState),
+    /// Terminó un cambio de resolución.
+    ModeResolved(ModeResolved),
     /// Se restableció todo (atajo de emergencia u otro proceso): el color quedó apagado.
     EmergencyReset,
     /// Otro proceso pidió cerrar VRes (`vres.exe --shutdown`, el instalador).
     QuitRequested,
     /// Aviso para el usuario.
     Notice(ReasonCode),
+    /// Detalle técnico para el log (en inglés).
+    Log(String),
 }
 
 /// Estado inicial, al terminar de arrancar.
@@ -109,10 +195,13 @@ pub enum EngineEvent {
 pub struct EngineSnapshot {
     pub displays: Vec<DisplayInfo>,
     pub status: EngineStatus,
+    pub resolution: ResolutionState,
     /// Se restauraron cambios de una sesión que no cerró bien.
     pub recovered: bool,
     /// Se pudo registrar el atajo de emergencia (`Ctrl + Alt + Shift + R`).
     pub hotkey_registered: bool,
+    /// Se pudo registrar el atajo de resolución (o no hay ninguno configurado).
+    pub toggle_hotkey_registered: bool,
 }
 
 /// Carpeta de estado de la máquina: `%LOCALAPPDATA%\io.github.gxnza48.vres\state`.
@@ -129,16 +218,27 @@ pub fn restore_path() -> Option<PathBuf> {
     state_dir().map(|dir| dir.join("restore.json"))
 }
 
+/// `restore-modes.json`: lo que hay que deshacer de resolución y HDR.
+pub fn modes_restore_path() -> Option<PathBuf> {
+    state_dir().map(|dir| dir.join("restore-modes.json"))
+}
+
 /// Si quedaron cambios de una sesión que no cerró bien, los deshace sin
 /// arrancar la app (lo usan `vres.exe --reset` y `vres-cli reset`).
 /// Devuelve `true` si había algo que restaurar.
 pub fn recover_from_disk() -> bool {
-    let Some(path) = restore_path() else {
-        return false;
-    };
     let found = displays::enumerate().unwrap_or_default();
-    let mut core = Core::new(WinHardware { magnifier: None }, Some(path));
-    core.recover(&found)
+    let mut recovered = false;
+    if let Some(path) = restore_path() {
+        let mut core = Core::new(WinHardware { magnifier: None }, Some(path));
+        recovered |= core.recover(&found);
+    }
+    let mut manager = ResolutionManager::new(modes_restore_path());
+    for job in manager.recovery_jobs(&found) {
+        let _ = execute_job(&job);
+        recovered = true;
+    }
+    recovered
 }
 
 /// Función que recibe los eventos. Corre en el hilo del motor: no debe bloquear.
@@ -183,6 +283,8 @@ impl EngineHandle {
 /// Rampas originales de las pantallas modificadas, para restaurar desde
 /// cualquier hilo (por ejemplo, el hook de pánico).
 static EMERGENCY_ORIGINALS: Mutex<Vec<(String, GammaRamp)>> = Mutex::new(Vec::new());
+/// Trabajos que deshacen los cambios de resolución y HDR vigentes.
+static EMERGENCY_MODE_JOBS: Mutex<Vec<ModeJob>> = Mutex::new(Vec::new());
 
 /// Restauración de emergencia. Se puede llamar desde cualquier hilo. La matriz
 /// de color no hace falta: Windows la quita sola al terminar el proceso.
@@ -191,6 +293,15 @@ pub fn emergency_restore() {
         if let Ok(originals) = EMERGENCY_ORIGINALS.try_lock() {
             for (gdi_name, ramp) in originals.iter() {
                 let _ = gamma::write_ramp(gdi_name, ramp);
+            }
+            break;
+        }
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    for _ in 0..20 {
+        if let Ok(jobs) = EMERGENCY_MODE_JOBS.try_lock() {
+            for job in jobs.iter() {
+                let _ = execute_job(job);
             }
             return;
         }
@@ -230,8 +341,70 @@ impl Hardware for WinHardware {
     }
 }
 
+/// Ejecuta un trabajo de resolución o HDR. Corre en un hilo auxiliar (o en el
+/// del motor al restaurar).
+fn execute_job(job: &ModeJob) -> JobResult {
+    let result = match job {
+        ModeJob::Apply { gdi_name, request } => modes::apply_scaled(gdi_name, request).map(|got| {
+            modes::scaling_ignored(request.scaling, got).then_some(ReasonCode::ScalingIgnored)
+        }),
+        ModeJob::Revert { gdi_name } => {
+            let unchanged = matches!(
+                (modes::current_mode(gdi_name), modes::saved_mode(gdi_name)),
+                (Ok(current), Ok(saved)) if current == saved
+            );
+            if unchanged {
+                Ok(None)
+            } else {
+                modes::revert_to_saved(gdi_name).map(|()| None)
+            }
+        }
+        ModeJob::SetHdr { gdi_name, enabled } => modes::set_hdr(gdi_name, *enabled).map(|()| None),
+    };
+    match result {
+        Ok(reason) => JobResult::Done { reason },
+        Err(error) => JobResult::Failed {
+            detail: error.to_string(),
+        },
+    }
+}
+
+/// Modos y estado de una pantalla, leídos de Windows.
+fn display_modes(display: &DisplayInfo, changed: bool) -> DisplayModes {
+    let gdi_name = &display.gdi_name;
+    let list = modes::list_modes(gdi_name);
+    let current = modes::current_mode(gdi_name).unwrap_or(DisplayMode::new(
+        display.bounds.width,
+        display.bounds.height,
+        display.refresh_hz.round() as u32,
+    ));
+    let saved = modes::saved_mode(gdi_name).unwrap_or(current);
+    let native = modes::native_mode(gdi_name).or_else(|| list.first().copied());
+    let base = native.unwrap_or(saved);
+    // Los presets prefieren la frecuencia de siempre del usuario.
+    let preset_base = DisplayMode::new(base.width, base.height, saved.refresh_hz);
+    DisplayModes {
+        display_id: display.id.clone(),
+        current,
+        saved,
+        native,
+        scaling: modes::scaling(gdi_name).unwrap_or_default(),
+        presets: presets(&preset_base, &list),
+        modes: list,
+        changed,
+    }
+}
+
+/// A quién responderle cuando termine el trabajo en curso.
+enum JobReply {
+    Pending(Reply<PendingMode>),
+    Unit(Reply<()>),
+}
+
 struct Shell {
     core: Core<WinHardware>,
+    modes: ResolutionManager,
+    settings: EngineSettings,
     sink: EventSink,
     rx: Receiver<Command>,
     wake_pending: Arc<AtomicBool>,
@@ -240,6 +413,12 @@ struct Shell {
     identify: Option<IdentifyOverlay>,
     displays_dirty: bool,
     health_armed: bool,
+    mode_timer_armed: bool,
+    hotkeys_suspended: bool,
+    job_tx: Sender<JobResult>,
+    job_rx: Receiver<JobResult>,
+    job_reply: Option<JobReply>,
+    resolution_rev: u64,
     shutdown_reply: Option<Sender<()>>,
 }
 
@@ -250,9 +429,15 @@ impl Shell {
                 self.drain();
                 Some(0)
             }
+            WM_JOB_DONE => {
+                self.on_job_done();
+                Some(0)
+            }
             WM_HOTKEY => {
                 if wparam == HOTKEY_EMERGENCY as usize {
                     self.emergency_reset();
+                } else if wparam == HOTKEY_TOGGLE as usize {
+                    self.toggle();
                 }
                 Some(0)
             }
@@ -288,6 +473,7 @@ impl Shell {
             WM_QUERYENDSESSION => Some(1),
             WM_ENDSESSION => {
                 if wparam != 0 {
+                    self.restore_modes();
                     self.core.restore_all();
                     self.after_change(true);
                 }
@@ -315,6 +501,7 @@ impl Shell {
                 window::kill_timer(self.hwnd, TIMER_SETTLE);
                 if std::mem::take(&mut self.displays_dirty) {
                     self.refresh_displays();
+                    self.emit_resolution();
                 }
                 // Windows resetea las rampas en los cambios de pantalla: se reescribe todo.
                 let changed = self.core.reconcile(true);
@@ -333,6 +520,14 @@ impl Shell {
                 window::kill_timer(self.hwnd, TIMER_IDENTIFY);
                 self.identify = None;
             }
+            TIMER_MODE => {
+                if let Some(job) = self.modes.tick(Instant::now()) {
+                    self.run_job(job);
+                }
+                if self.modes.pending(Instant::now()).is_none() {
+                    self.stop_mode_timer();
+                }
+            }
             _ => {}
         }
     }
@@ -342,6 +537,7 @@ impl Shell {
         let mut latest: Option<Requested> = None;
         let (mut identify, mut emergency, mut refresh) = (false, false, false);
         let mut shutdown = None;
+        let mut ordered = Vec::new();
         while let Ok(command) = self.rx.try_recv() {
             match command {
                 Command::Set(requested, _) => latest = Some(*requested),
@@ -349,6 +545,7 @@ impl Shell {
                 Command::EmergencyReset => emergency = true,
                 Command::Refresh => refresh = true,
                 Command::Shutdown(reply) => shutdown = Some(reply),
+                other => ordered.push(other),
             }
         }
 
@@ -364,10 +561,14 @@ impl Shell {
         if identify {
             self.identify();
         }
+        for command in ordered {
+            self.on_command(command);
+        }
         if emergency {
             self.emergency_reset();
         }
         if let Some(reply) = shutdown {
+            self.restore_modes();
             self.core.restore_all();
             self.after_change(true);
             self.identify = None;
@@ -376,12 +577,287 @@ impl Shell {
         }
     }
 
+    fn display(&self, display_id: &str) -> Option<DisplayInfo> {
+        self.core
+            .displays()
+            .iter()
+            .find(|display| display.id == display_id)
+            .cloned()
+    }
+
+    fn on_command(&mut self, command: Command) {
+        match command {
+            Command::ModeApply {
+                display_id,
+                request,
+                reply,
+            } => {
+                let Some(display) = self.display(&display_id) else {
+                    let _ = reply.send(Err(ErrorCode::DisplayGone));
+                    return;
+                };
+                let listed = is_listed(&modes::list_modes(&display.gdi_name), &request);
+                let seconds = self.settings.confirm_seconds;
+                match self.modes.start_try(&display, request, listed, seconds) {
+                    Ok(job) => {
+                        self.job_reply = Some(JobReply::Pending(reply));
+                        self.run_job(job);
+                    }
+                    Err(code) => {
+                        let _ = reply.send(Err(code));
+                    }
+                }
+            }
+            Command::ModeConfirm { token, reply } => match self.modes.confirm(&token) {
+                Ok(resolved) => {
+                    let _ = reply.send(Ok(()));
+                    self.stop_mode_timer();
+                    (self.sink)(EngineEvent::ModeResolved(resolved));
+                    self.emit_resolution();
+                }
+                Err(code) => {
+                    let _ = reply.send(Err(code));
+                }
+            },
+            Command::ModeRevert { token, reply } => match self.modes.start_revert(&token) {
+                Ok(job) => {
+                    self.job_reply = Some(JobReply::Unit(reply));
+                    self.run_job(job);
+                }
+                Err(code) => {
+                    let _ = reply.send(Err(code));
+                }
+            },
+            Command::ModeRestore { display_id, reply } => {
+                let Some(display) = self.display(&display_id) else {
+                    let _ = reply.send(Err(ErrorCode::DisplayGone));
+                    return;
+                };
+                match self.modes.start_restore_display(&display, false) {
+                    Ok(Some(job)) => {
+                        self.job_reply = Some(JobReply::Unit(reply));
+                        self.run_job(job);
+                    }
+                    Ok(None) => {
+                        let _ = reply.send(Ok(()));
+                    }
+                    Err(code) => {
+                        let _ = reply.send(Err(code));
+                    }
+                }
+            }
+            Command::ModeToggle => self.toggle(),
+            Command::HdrSet {
+                display_id,
+                enabled,
+                reply,
+            } => {
+                let Some(display) = self.display(&display_id) else {
+                    let _ = reply.send(Err(ErrorCode::DisplayGone));
+                    return;
+                };
+                match self.modes.start_hdr(&display, enabled) {
+                    Ok(Some(job)) => {
+                        self.job_reply = Some(JobReply::Unit(reply));
+                        self.run_job(job);
+                    }
+                    Ok(None) => {
+                        let _ = reply.send(Ok(()));
+                    }
+                    Err(code) => {
+                        let _ = reply.send(Err(code));
+                    }
+                }
+            }
+            Command::Configure { settings, reply } => {
+                self.settings = settings;
+                let registered = self.register_toggle_hotkey();
+                let _ = reply.send(registered);
+            }
+            Command::SuspendHotkeys(suspended) => {
+                self.hotkeys_suspended = suspended;
+                self.register_toggle_hotkey();
+            }
+            Command::Set(..)
+            | Command::Identify
+            | Command::EmergencyReset
+            | Command::Refresh
+            | Command::Shutdown(_) => {}
+        }
+    }
+
+    /// (Re)registra el atajo de resolución. Devuelve `false` si otro programa
+    /// ya lo usa o la tecla no se puede registrar.
+    fn register_toggle_hotkey(&mut self) -> bool {
+        window::unregister_hotkey(self.hwnd, HOTKEY_TOGGLE);
+        if self.hotkeys_suspended {
+            return true;
+        }
+        let Some(hotkey) = &self.settings.toggle_hotkey else {
+            return true;
+        };
+        match keyboard::hotkey_registration(hotkey) {
+            Some((modifiers, vk)) => {
+                window::register_hotkey(self.hwnd, HOTKEY_TOGGLE, modifiers, vk).is_ok()
+            }
+            None => false,
+        }
+    }
+
+    fn toggle(&mut self) {
+        let Some(target) = self.settings.toggle_target.clone() else {
+            return;
+        };
+        let Some(display) = self.display(&target.display_id) else {
+            return;
+        };
+        let listed = is_listed(&modes::list_modes(&display.gdi_name), &target.mode);
+        match self.modes.start_toggle(&target, true, &display, listed) {
+            Ok(job) => self.run_job(job),
+            Err(code) => (self.sink)(EngineEvent::Log(format!("toggle refused: {code:?}"))),
+        }
+    }
+
+    fn run_job(&mut self, job: ModeJob) {
+        self.update_emergency_jobs();
+        let tx = self.job_tx.clone();
+        let hwnd = self.hwnd;
+        let worker_job = job.clone();
+        let spawned = std::thread::Builder::new()
+            .name("vres-modes".into())
+            .spawn(move || {
+                let result = execute_job(&worker_job);
+                let _ = tx.send(result);
+                window::post_message(hwnd, WM_JOB_DONE, 0, 0);
+            });
+        if spawned.is_err() {
+            // Sin hilo auxiliar, se hace acá mismo.
+            let result = execute_job(&job);
+            let outcome = self.modes.finish(result, Instant::now());
+            self.apply_outcome(outcome);
+        }
+    }
+
+    fn on_job_done(&mut self) {
+        while let Ok(result) = self.job_rx.try_recv() {
+            if let JobResult::Failed { detail } = &result {
+                (self.sink)(EngineEvent::Log(format!(
+                    "display mode job failed: {detail}"
+                )));
+            }
+            let outcome = self.modes.finish(result, Instant::now());
+            self.apply_outcome(outcome);
+        }
+    }
+
+    fn apply_outcome(&mut self, outcome: Outcome) {
+        if let Some(reply) = outcome.reply {
+            match self.job_reply.take() {
+                Some(JobReply::Pending(tx)) => {
+                    let _ = tx.send(reply.and_then(|pending| pending.ok_or(ErrorCode::ModeFailed)));
+                }
+                Some(JobReply::Unit(tx)) => {
+                    let _ = tx.send(reply.map(|_| ()));
+                }
+                None => {}
+            }
+        }
+        if outcome.pending.is_some() {
+            self.start_mode_timer();
+        }
+        if let Some(resolved) = outcome.resolved {
+            if self.modes.pending(Instant::now()).is_none() {
+                self.stop_mode_timer();
+            }
+            (self.sink)(EngineEvent::ModeResolved(resolved));
+        }
+        if self.settings.tones {
+            match outcome.feedback {
+                Some(Feedback::ToneUp) => sound::play(Tone::Up),
+                Some(Feedback::ToneDown) => sound::play(Tone::Down),
+                Some(Feedback::None) | None => {}
+            }
+        }
+        self.update_emergency_jobs();
+        if outcome.changed {
+            // El HDR cambia la información de la pantalla; el modo, sus medidas.
+            self.refresh_displays();
+            self.emit_resolution();
+        }
+    }
+
+    fn start_mode_timer(&mut self) {
+        if !self.mode_timer_armed {
+            window::set_timer(self.hwnd, TIMER_MODE, MODE_TICK_MS);
+            self.mode_timer_armed = true;
+        }
+    }
+
+    fn stop_mode_timer(&mut self) {
+        if self.mode_timer_armed {
+            window::kill_timer(self.hwnd, TIMER_MODE);
+            self.mode_timer_armed = false;
+        }
+    }
+
+    /// Deshace los cambios de resolución y HDR, en este mismo hilo.
+    fn restore_modes(&mut self) {
+        if self.modes.busy()
+            && let Ok(result) = self.job_rx.recv_timeout(JOB_WAIT)
+        {
+            let _ = self.modes.finish(result, Instant::now());
+        }
+        let had_changes = self.modes.has_changes();
+        let jobs = self.modes.restore_jobs(self.core.displays());
+        for job in &jobs {
+            if let JobResult::Failed { detail } = execute_job(job) {
+                (self.sink)(EngineEvent::Log(format!("restore job failed: {detail}")));
+            }
+        }
+        if had_changes || !jobs.is_empty() {
+            self.modes.restored();
+        }
+        self.job_reply = None;
+        self.stop_mode_timer();
+        self.update_emergency_jobs();
+    }
+
+    fn update_emergency_jobs(&self) {
+        if let Ok(mut jobs) = EMERGENCY_MODE_JOBS.lock() {
+            *jobs = self.modes.emergency_jobs(self.core.displays());
+        }
+    }
+
+    fn resolution_state(&mut self) -> ResolutionState {
+        self.resolution_rev += 1;
+        let displays = self
+            .core
+            .displays()
+            .iter()
+            .map(|display| display_modes(display, self.modes.changed(&display.id).is_some()))
+            .collect();
+        ResolutionState {
+            rev: self.resolution_rev,
+            displays,
+            pending: self.modes.pending(Instant::now()),
+        }
+    }
+
+    fn emit_resolution(&mut self) {
+        let state = self.resolution_state();
+        (self.sink)(EngineEvent::Resolution(state));
+    }
+
     fn refresh_displays(&mut self) {
         let Ok(found) = displays::enumerate() else {
             return;
         };
         if found.as_slice() != self.core.displays() {
             self.core.set_displays(found.clone());
+            if let Some(resolved) = self.modes.displays_changed(&found) {
+                self.stop_mode_timer();
+                (self.sink)(EngineEvent::ModeResolved(resolved));
+            }
             (self.sink)(EngineEvent::Displays(found));
         }
     }
@@ -391,7 +867,13 @@ impl Shell {
         requested.color_enabled = false;
         self.core.set_requested(requested);
         self.core.restore_all();
+        let had_modes = self.modes.has_changes();
+        self.restore_modes();
         self.after_change(true);
+        if had_modes {
+            self.refresh_displays();
+            self.emit_resolution();
+        }
         (self.sink)(EngineEvent::EmergencyReset);
     }
 
@@ -442,7 +924,7 @@ pub fn spawn(
         .spawn(move || run(config, sink, rx, thread_wake, ready_tx))
         .map_err(|error| error.to_string())?;
 
-    match ready_rx.recv_timeout(Duration::from_secs(10)) {
+    match ready_rx.recv_timeout(Duration::from_secs(15)) {
         Ok(Ok((hwnd, snapshot))) => Ok((
             EngineHandle {
                 tx,
@@ -473,14 +955,28 @@ fn run(
     // Primero se deshace lo que haya quedado de una sesión anterior; recién
     // después se capturan los originales.
     let found = displays::enumerate().unwrap_or_default();
-    let recovered = core.recover(&found);
+    let mut recovered = core.recover(&found);
+    let mut modes = ResolutionManager::new(config.modes_restore_path);
+    for job in modes.recovery_jobs(&found) {
+        let _ = execute_job(&job);
+        recovered = true;
+    }
+    // Los modos o el HDR pudieron cambiar: se vuelve a leer.
+    let found = if recovered {
+        displays::enumerate().unwrap_or(found)
+    } else {
+        found
+    };
     core.set_displays(found);
     core.set_requested(config.requested);
     core.reconcile(false);
 
     let remote_message = window::register_message(control::REMOTE_MESSAGE_NAME);
+    let (job_tx, job_rx) = mpsc::channel();
     let shell = Rc::new(RefCell::new(Shell {
         core,
+        modes,
+        settings: config.settings,
         sink,
         rx,
         wake_pending,
@@ -489,6 +985,12 @@ fn run(
         identify: None,
         displays_dirty: false,
         health_armed: false,
+        mode_timer_armed: false,
+        hotkeys_suspended: false,
+        job_tx,
+        job_rx,
+        job_reply: None,
+        resolution_rev: 0,
         shutdown_reply: None,
     }));
 
@@ -522,11 +1024,15 @@ fn run(
     if let Ok(mut shell) = shell.try_borrow_mut() {
         shell.hwnd = window.handle();
         shell.after_change(false);
+        let toggle_ok = shell.register_toggle_hotkey();
+        let resolution = shell.resolution_state();
         let snapshot = EngineSnapshot {
             displays: shell.core.displays().to_vec(),
             status: shell.core.status().clone(),
+            resolution,
             recovered,
             hotkey_registered: hotkey_ok,
+            toggle_hotkey_registered: toggle_ok,
         };
         let _ = ready.send(Ok((window.handle(), snapshot)));
     }
@@ -535,6 +1041,7 @@ fn run(
 
     drop(foreground);
     window.unregister_hotkey(HOTKEY_EMERGENCY);
+    window.unregister_hotkey(HOTKEY_TOGGLE);
     drop(window);
     if let Ok(mut shell) = shell.try_borrow_mut()
         && let Some(reply) = shell.shutdown_reply.take()

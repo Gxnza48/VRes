@@ -13,12 +13,14 @@
 #![deny(clippy::unwrap_used)]
 
 pub mod core;
+pub mod resolution;
 
 #[cfg(windows)]
 mod thread;
 
 #[cfg(windows)]
 pub use thread::{
-    ApplyMode, Command, EngineConfig, EngineEvent, EngineHandle, EngineSnapshot, EventSink,
-    emergency_restore, recover_from_disk, restore_path, spawn, state_dir,
+    ApplyMode, Command, EngineConfig, EngineEvent, EngineHandle, EngineSettings, EngineSnapshot,
+    EventSink, Reply, emergency_restore, modes_restore_path, recover_from_disk, restore_path,
+    spawn, state_dir,
 };

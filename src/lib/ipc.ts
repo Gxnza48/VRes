@@ -10,9 +10,15 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import type { Bootstrap } from "./bindings/Bootstrap";
 import type { DisplayInfo } from "./bindings/DisplayInfo";
 import type { EngineStatus } from "./bindings/EngineStatus";
+import type { Hotkey } from "./bindings/Hotkey";
+import type { HotkeyCheck } from "./bindings/HotkeyCheck";
 import type { IpcError } from "./bindings/IpcError";
 import type { Look } from "./bindings/Look";
+import type { ModeRequest } from "./bindings/ModeRequest";
+import type { PendingMode } from "./bindings/PendingMode";
 import type { Requested } from "./bindings/Requested";
+import type { ResolutionState } from "./bindings/ResolutionState";
+import type { Settings } from "./bindings/Settings";
 import type { UpdateInfo } from "./bindings/UpdateInfo";
 
 /** `true` dentro de la app; `false` en un navegador común o en los tests. */
@@ -67,6 +73,30 @@ export const ipc = {
   settingsGetAutostart: () => call<boolean>("settings_get_autostart"),
   /** Activa o desactiva el arranque con Windows; devuelve el estado final. */
   settingsSetAutostart: (enabled: boolean) => call<boolean>("settings_set_autostart", { enabled }),
+  /** Ajustes (atajos y preferencias). */
+  settingsGet: () => call<Settings>("settings_get"),
+  /** Guarda los ajustes; falla con `hotkeyTaken` si otro programa usa el atajo. */
+  settingsUpdate: (settings: Settings) => call<Settings>("settings_update", { settings }),
+  /** Revisa un atajo (teclas reservadas y choques conocidos). */
+  hotkeysCheck: (hotkey: Hotkey) => call<HotkeyCheck>("hotkeys_check", { hotkey }),
+  /** Suspende el atajo de resolución mientras se graba uno nuevo. */
+  hotkeysSuspend: (suspended: boolean) => call<void>("hotkeys_suspend", { suspended }),
+
+  /** Modos de cada pantalla, presets y el cambio pendiente. */
+  resolutionGetState: () => call<ResolutionState>("resolution_get_state"),
+  /** Prueba un modo: si no se confirma a tiempo, vuelve solo. */
+  resolutionApply: (displayId: string, request: ModeRequest) =>
+    call<PendingMode>("resolution_apply", { displayId, request }),
+  /** Conserva el modo pendiente. */
+  resolutionConfirm: (token: string) => call<void>("resolution_confirm", { token }),
+  /** Vuelve atrás el modo pendiente. */
+  resolutionRevert: (token: string) => call<void>("resolution_revert", { token }),
+  /** Vuelve a la resolución de Windows en una pantalla. */
+  resolutionRestore: (displayId: string) => call<void>("resolution_restore", { displayId }),
+  /** Alterna entre la de Windows y la estirada (lo mismo que el atajo). */
+  resolutionToggle: () => call<void>("resolution_toggle"),
+  /** Prende o apaga HDR (vuelve como estaba al salir de VRes). */
+  hdrSet: (displayId: string, enabled: boolean) => call<void>("hdr_set", { displayId, enabled }),
 
   /** Consulta si hay una versión nueva en GitHub Releases. */
   updateCheck: () => call<UpdateInfo | null>("update_check"),

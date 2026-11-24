@@ -4,17 +4,22 @@
 //! la interfaz los eventos del motor.
 
 use std::path::PathBuf;
+use std::sync::mpsc;
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Duration;
 
 use tauri::{AppHandle, Emitter, Manager};
-use vres_core::ipc::Notice;
+use vres_core::ipc::{ErrorCode, IpcError, Notice};
 use vres_core::model::display::DisplayInfo;
+use vres_core::model::resolution::{ModeOutcome, ResolutionState};
 use vres_core::model::state::{SESSION_SCHEMA, SessionState};
 use vres_core::planner::Requested;
+use vres_core::settings::Settings;
 use vres_core::status::EngineStatus;
 use vres_core::store::{self, Loaded};
-use vres_engine::{ApplyMode, Command, EngineConfig, EngineEvent, EngineHandle, EventSink};
+use vres_engine::{ApplyMode, Command, EngineConfig, EngineEvent, EngineHandle, EventSink, Reply};
+
+use crate::settings::{SettingsState, engine_settings};
 
 /// Evento: cambió el estado de alguna capa.
 pub const EVENT_STATUS: &str = "engine:status";
@@ -24,11 +29,24 @@ pub const EVENT_DISPLAYS: &str = "displays:changed";
 pub const EVENT_REQUESTED: &str = "state:requested";
 /// Evento: aviso para el usuario.
 pub const EVENT_NOTICE: &str = "app:notice";
+/// Evento: cambiaron los modos de pantalla o hay un cambio pendiente.
+pub const EVENT_RESOLUTION: &str = "resolution:changed";
+/// Evento: terminó un cambio de resolución (conservado, revertido, vencido…).
+pub const EVENT_RESOLVED: &str = "resolution:resolved";
+/// Evento: cambiaron los ajustes (por ejemplo, un modo nuevo confirmado).
+pub const EVENT_SETTINGS: &str = "settings:changed";
 
 fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
     mutex
         .lock()
         .unwrap_or_else(|poisoned| poisoned.into_inner())
+}
+
+fn unavailable() -> IpcError {
+    IpcError::new(
+        ErrorCode::EngineUnavailable,
+        "the display engine is not running",
+    )
 }
 
 /// Estado del motor, administrado por Tauri.
@@ -37,6 +55,7 @@ pub struct EngineState {
     requested: Mutex<Requested>,
     displays: Mutex<Vec<DisplayInfo>>,
     status: Mutex<EngineStatus>,
+    resolution: Mutex<ResolutionState>,
     notices: Mutex<Vec<Notice>>,
     session_path: Option<PathBuf>,
 }
@@ -44,7 +63,7 @@ pub struct EngineState {
 impl EngineState {
     /// Arranca el motor con la sesión guardada. Si el motor no puede
     /// arrancar, VRes sigue abierto y la interfaz lo informa.
-    pub fn start(app: &AppHandle) -> Self {
+    pub fn start(app: &AppHandle, settings: &Settings) -> Self {
         let state_dir = vres_engine::state_dir();
         let session_path = state_dir.as_ref().map(|dir| dir.join("session.json"));
         let mut notices = Vec::new();
@@ -70,7 +89,9 @@ impl EngineState {
         let sink: EventSink = Arc::new(move |event| on_engine_event(&sink_app, event));
         let config = EngineConfig {
             restore_path: vres_engine::restore_path(),
+            modes_restore_path: vres_engine::modes_restore_path(),
             requested: requested.clone(),
+            settings: engine_settings(settings),
         };
 
         let state = match vres_engine::spawn(config, sink) {
@@ -81,11 +102,15 @@ impl EngineState {
                 if !snapshot.hotkey_registered {
                     notices.push(Notice::HotkeyTaken);
                 }
+                if !snapshot.toggle_hotkey_registered {
+                    notices.push(Notice::ToggleHotkeyTaken);
+                }
                 Self {
                     handle: Mutex::new(Some(handle)),
                     requested: Mutex::new(requested),
                     displays: Mutex::new(snapshot.displays),
                     status: Mutex::new(snapshot.status),
+                    resolution: Mutex::new(snapshot.resolution),
                     notices: Mutex::new(notices),
                     session_path,
                 }
@@ -98,6 +123,7 @@ impl EngineState {
                     requested: Mutex::new(requested),
                     displays: Mutex::new(Vec::new()),
                     status: Mutex::new(EngineStatus::default()),
+                    resolution: Mutex::new(ResolutionState::default()),
                     notices: Mutex::new(notices),
                     session_path,
                 }
@@ -128,6 +154,11 @@ impl EngineState {
         lock(&self.status).clone()
     }
 
+    /// Modos de cada pantalla y el cambio pendiente, si hay.
+    pub fn resolution(&self) -> ResolutionState {
+        lock(&self.resolution).clone()
+    }
+
     /// Avisos pendientes para la interfaz (se vacían al leerlos).
     pub fn take_notices(&self) -> Vec<Notice> {
         std::mem::take(&mut *lock(&self.notices))
@@ -138,6 +169,40 @@ impl EngineState {
         lock(&self.handle)
             .as_ref()
             .is_some_and(|handle| handle.send(command))
+    }
+
+    /// Envía un pedido y espera la respuesta (con tope). **Bloquea**: no se
+    /// llama desde el hilo del motor ni desde el runtime async.
+    pub fn request<T>(
+        &self,
+        make: impl FnOnce(Reply<T>) -> Command,
+        timeout: Duration,
+    ) -> Result<T, IpcError> {
+        let (tx, rx) = mpsc::channel();
+        if !self.send(make(tx)) {
+            return Err(unavailable());
+        }
+        match rx.recv_timeout(timeout) {
+            Ok(Ok(value)) => Ok(value),
+            Ok(Err(code)) => Err(IpcError::new(code, format!("{code:?}"))),
+            Err(_) => Err(IpcError::new(
+                ErrorCode::ModeFailed,
+                "the display engine did not answer in time",
+            )),
+        }
+    }
+
+    /// Le pasa los ajustes al motor. Devuelve `false` si el atajo de
+    /// resolución no se pudo registrar. **Bloquea** (como `request`).
+    pub fn configure(&self, settings: &Settings) -> bool {
+        let (tx, rx) = mpsc::channel();
+        if !self.send(Command::Configure {
+            settings: engine_settings(settings),
+            reply: tx,
+        }) {
+            return true;
+        }
+        rx.recv_timeout(Duration::from_secs(3)).unwrap_or(false)
     }
 
     /// Modifica lo pedido, se lo envía al motor y, si es un cambio
@@ -175,7 +240,7 @@ impl EngineState {
     /// Restaura todo, apaga el motor y marca la salida como limpia.
     pub fn shutdown(&self) {
         if let Some(mut handle) = lock(&self.handle).take()
-            && !handle.shutdown(Duration::from_secs(3))
+            && !handle.shutdown(Duration::from_secs(4))
         {
             tracing::warn!("el motor no terminó a tiempo; restauración de emergencia");
             vres_engine::emergency_restore();
@@ -198,6 +263,45 @@ fn on_engine_event(app: &AppHandle, event: EngineEvent) {
             *lock(&state.displays) = displays.clone();
             let _ = app.emit(EVENT_DISPLAYS, displays);
         }
+        EngineEvent::Resolution(resolution) => {
+            *lock(&state.resolution) = resolution.clone();
+            let _ = app.emit(EVENT_RESOLUTION, resolution);
+        }
+        EngineEvent::ModeResolved(resolved) => {
+            tracing::info!(
+                outcome = ?resolved.outcome,
+                width = resolved.mode.width,
+                height = resolved.mode.height,
+                "cambio de resolución terminado"
+            );
+            if resolved.outcome == ModeOutcome::Expired {
+                let _ = app.emit(EVENT_NOTICE, Notice::ModeExpired);
+            }
+            if resolved.outcome == ModeOutcome::Kept {
+                // Esto corre en el hilo del motor: guardar y reconfigurar el
+                // atajo (que espera al motor) va en otra tarea.
+                let app = app.clone();
+                let kept = resolved.clone();
+                tauri::async_runtime::spawn_blocking(move || {
+                    let (Some(settings), Some(engine)) = (
+                        app.try_state::<SettingsState>(),
+                        app.try_state::<EngineState>(),
+                    ) else {
+                        return;
+                    };
+                    match settings.remember_kept(&kept.display_id, kept.mode) {
+                        Ok(updated) => {
+                            engine.configure(&updated);
+                            let _ = app.emit(EVENT_SETTINGS, updated);
+                        }
+                        Err(error) => {
+                            tracing::warn!(%error, "no se pudo guardar el modo confirmado")
+                        }
+                    }
+                });
+            }
+            let _ = app.emit(EVENT_RESOLVED, resolved);
+        }
         EngineEvent::EmergencyReset => {
             tracing::info!("restablecimiento de emergencia");
             let requested = {
@@ -218,6 +322,9 @@ fn on_engine_event(app: &AppHandle, event: EngineEvent) {
         }
         EngineEvent::Notice(reason) => {
             tracing::info!(?reason, "aviso del motor");
+        }
+        EngineEvent::Log(detail) => {
+            tracing::warn!(%detail, "motor");
         }
     }
 }

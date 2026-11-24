@@ -21,8 +21,8 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 | Motor | `engine_status` · `engine_set_paused` · `engine_emergency_reset` | F1 ✅ |
 | Pantallas | `displays_list` · `displays_set_targets` · `displays_identify` | F1 ✅ |
 | Pantallas | `displays_set_trim` | F8 |
-| Resolución | `resolution_get_state` · `resolution_apply` (devuelve `{ token, expiresInMs }`) · `resolution_confirm` · `resolution_revert` · `resolution_toggle` · `hdr_set` | F2 |
-| Biblioteca | `library_list` · `library_get` · `library_save` · `library_delete` · `library_duplicate` · `library_apply` | F2 |
+| Resolución | `resolution_get_state` · `resolution_apply` (devuelve `PendingMode`: `token`, `expiresInMs`, `seconds`) · `resolution_confirm` · `resolution_revert` · `resolution_restore` · `resolution_toggle` · `hdr_set` | F2 ✅ |
+| Biblioteca | `library_list` · `library_get` · `library_save` · `library_delete` · `library_duplicate` · `library_apply` | F5 |
 | Biblioteca | `library_set_favorite` | F5 |
 | Compartir | `share_export` · `share_decode` · `share_import` | F5 |
 | Crosshair | `crosshair_preview` · `crosshair_commit` · `crosshair_set_enabled` · `crosshair_set_target` · `crosshair_render` (RGBA binario) · `crosshair_import_image` | F4 |
@@ -30,7 +30,7 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 | Dark Boost y zoom | `darkboost_preview` · `darkboost_commit` · `zoom_commit` · `enhancers_set_armed` | F7 |
 | Monitor | `ddc_get` · `ddc_set` · `ddc_restore_initial` | F8 |
 | Ajustes | `settings_get_autostart` · `settings_set_autostart` | F1 ✅ |
-| Ajustes | `settings_get` · `settings_update` · `hotkeys_check` | F1 |
+| Ajustes | `settings_get` · `settings_update` (falla con `hotkeyTaken` si otro programa usa el atajo) · `hotkeys_check` · `hotkeys_suspend` | F2 ✅ |
 | Ajustes | `customize_set_background` | F8 |
 | Diagnóstico | `diag_report` · `diag_export` · `diag_selftest` | F1 |
 | Celular | `remote_start` · `remote_stop` · `remote_status` · `remote_regenerate_token` | F9 |
@@ -47,7 +47,9 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 | `app:notice` | Recuperación tras un cierre inesperado, modo seguro, atajo ocupado, restablecimiento | F1 ✅ |
 | `state:requested` | Lo pedido cambió fuera de la interfaz (bandeja, atajo de emergencia) | F1 ✅ |
 | `foreground:changed` | Cambio de ventana en primer plano | F6 |
-| `resolution:pending` · `resolution:resolved` | Cuenta regresiva y su resultado (`kept`, `reverted`, `failed`) | F2 |
+| `resolution:changed` | Cambiaron los modos o hay un cambio pendiente (incluye `pending`) | F2 ✅ |
+| `resolution:resolved` | Terminó un cambio: `kept`, `reverted`, `expired` o `failed` | F2 ✅ |
+| `settings:changed` | Cambiaron los ajustes (por ejemplo, se conservó un modo nuevo) | F2 ✅ |
 | `profile:activated` · `library:changed` | Cambio de perfil activo · cambios en la biblioteca | F5/F6 |
 | `remote:clients` | Teléfonos conectados | F9 |
 

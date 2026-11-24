@@ -22,6 +22,8 @@ mod app;
 mod guard;
 #[cfg(windows)]
 mod hw;
+#[cfg(windows)]
+mod resolution;
 
 /// Resultado de un comando: JSON para scripts y texto para personas.
 pub struct Report {
@@ -88,6 +90,12 @@ enum Command {
     /// Rampas de gamma (por pantalla).
     #[command(subcommand)]
     Ramp(RampCommand),
+    /// Resolución: modos de cada pantalla, prueba y cambio temporal.
+    #[command(subcommand)]
+    Mode(ModeCommand),
+    /// HDR de cada pantalla.
+    #[command(subcommand)]
+    Hdr(HdrCommand),
     /// Mediciones en hardware real.
     #[command(subcommand)]
     Probe(ProbeCommand),
@@ -96,6 +104,71 @@ enum Command {
         /// Capas a probar, separadas por coma (mag, ramp). Por defecto, todas.
         #[arg(long, value_delimiter = ',')]
         layers: Vec<String>,
+    },
+    /// Uso interno de `probe mode-kill-revert`.
+    #[command(hide = true)]
+    InternalModeHold {
+        #[arg(long)]
+        display: String,
+        #[arg(long)]
+        mode: String,
+        #[arg(long, default_value = "stretch")]
+        scaling: String,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum ModeCommand {
+    /// Lista los modos de cada pantalla, el actual, el de Windows y la nativa.
+    List {
+        /// Pantalla: número, `\\.\DISPLAYn` o identificador `d-…`.
+        #[arg(long)]
+        display: Option<String>,
+    },
+    /// Pregunta si un modo se puede aplicar, sin cambiar nada.
+    Test {
+        #[arg(long)]
+        display: String,
+        /// `1440x1080` o `1440x1080@200`.
+        mode: String,
+        /// stretch, aspect, center o preferred.
+        #[arg(long, default_value = "stretch")]
+        scaling: String,
+    },
+    /// Aplica un modo temporal, relee el escalado, lo mantiene y vuelve.
+    Set {
+        #[arg(long)]
+        display: String,
+        /// `1440x1080` o `1440x1080@200`.
+        mode: String,
+        /// stretch, aspect, center o preferred.
+        #[arg(long, default_value = "stretch")]
+        scaling: String,
+        /// Cuánto tiempo mantenerlo, en milisegundos (máximo 10 000).
+        #[arg(long, default_value_t = 3000)]
+        hold_ms: u64,
+        /// Confirma que la pantalla puede parpadear y cambiar unos segundos.
+        #[arg(long)]
+        allow_mode_switch: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum HdrCommand {
+    /// Estado de HDR de cada pantalla.
+    Get,
+    /// Cambia el HDR, lo verifica, lo mantiene y lo deja como estaba.
+    Set {
+        #[arg(long)]
+        display: String,
+        /// on u off.
+        state: String,
+        /// Cuánto tiempo mantenerlo, en milisegundos (máximo 10 000).
+        #[arg(long, default_value_t = 3000)]
+        hold_ms: u64,
+        /// Confirma que la pantalla puede parpadear unos segundos.
+        #[arg(long)]
+        allow_mode_switch: bool,
     },
 }
 
@@ -182,6 +255,28 @@ enum ProbeCommand {
         #[arg(long, default_value_t = 30)]
         samples: usize,
     },
+    /// El motor real aplica, deja vencer, conserva y restaura un modo.
+    EngineModes {
+        #[arg(long)]
+        display: String,
+        /// `1440x1080` o `1440x1080@200`.
+        mode: String,
+        /// Confirma que la pantalla puede parpadear y cambiar varias veces.
+        #[arg(long)]
+        allow_mode_switch: bool,
+    },
+    /// ¿Windows revierte solo un modo temporal si el proceso que lo aplicó muere?
+    ModeKillRevert {
+        #[arg(long)]
+        display: String,
+        /// `1440x1080` o `1440x1080@200`.
+        mode: String,
+        #[arg(long, default_value = "stretch")]
+        scaling: String,
+        /// Confirma que la pantalla puede parpadear y cambiar unos segundos.
+        #[arg(long)]
+        allow_mode_switch: bool,
+    },
 }
 
 fn main() -> ExitCode {
@@ -249,6 +344,59 @@ fn run(command: Command) -> Report {
         Command::Probe(ProbeCommand::Timing { display, samples }) => {
             hw::probe_timing(display.as_deref(), samples.clamp(2, 500))
         }
+        Command::Probe(ProbeCommand::EngineModes {
+            display,
+            mode,
+            allow_mode_switch,
+        }) => resolution::probe_engine_modes(&display, &mode, allow_mode_switch),
+        Command::Probe(ProbeCommand::ModeKillRevert {
+            display,
+            mode,
+            scaling,
+            allow_mode_switch,
+        }) => resolution::probe_mode_kill_revert(&display, &mode, &scaling, allow_mode_switch),
+        Command::Mode(ModeCommand::List { display }) => resolution::mode_list(display.as_deref()),
+        Command::Mode(ModeCommand::Test {
+            display,
+            mode,
+            scaling,
+        }) => resolution::mode_test(&display, &mode, &scaling),
+        Command::Mode(ModeCommand::Set {
+            display,
+            mode,
+            scaling,
+            hold_ms,
+            allow_mode_switch,
+        }) => resolution::mode_set(
+            &display,
+            &mode,
+            &scaling,
+            Duration::from_millis(hold_ms.min(resolution::MAX_MODE_HOLD_MS)),
+            allow_mode_switch,
+        ),
+        Command::Hdr(HdrCommand::Get) => resolution::hdr_get(),
+        Command::Hdr(HdrCommand::Set {
+            display,
+            state,
+            hold_ms,
+            allow_mode_switch,
+        }) => match state.as_str() {
+            "on" | "off" => resolution::hdr_set(
+                &display,
+                state == "on",
+                Duration::from_millis(hold_ms.min(resolution::MAX_MODE_HOLD_MS)),
+                allow_mode_switch,
+            ),
+            _ => Report::fail(
+                serde_json::json!({ "ok": false, "error": "state must be on or off" }),
+                "El estado tiene que ser on u off.",
+            ),
+        },
+        Command::InternalModeHold {
+            display,
+            mode,
+            scaling,
+        } => resolution::mode_hold(&display, &mode, &scaling),
         Command::Selftest { layers } => hw::selftest(&layers),
     }
 }

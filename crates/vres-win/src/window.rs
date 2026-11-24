@@ -311,3 +311,25 @@ pub fn kill_timer(hwnd: isize, id: usize) {
     // SAFETY: cancelar un temporizador inexistente no tiene efectos.
     let _ = unsafe { KillTimer(Some(HWND(hwnd as *mut c_void)), id) };
 }
+
+/// Registra un atajo global para la ventana `hwnd`. Solo desde el hilo de la
+/// ventana (Windows no admite asociarlo a una ventana de otro hilo).
+pub fn register_hotkey(hwnd: isize, id: i32, modifiers: u32, virtual_key: u32) -> WinResult<()> {
+    // SAFETY: si la ventana no es de este hilo o no existe, la llamada falla
+    // sin efectos.
+    unsafe {
+        RegisterHotKey(
+            Some(HWND(hwnd as *mut c_void)),
+            id,
+            HOT_KEY_MODIFIERS(modifiers),
+            virtual_key,
+        )
+    }
+    .map_err(|e| WinError::api("RegisterHotKey", e))
+}
+
+/// Libera un atajo global de la ventana `hwnd`.
+pub fn unregister_hotkey(hwnd: isize, id: i32) {
+    // SAFETY: liberar un atajo inexistente no tiene efectos.
+    let _ = unsafe { UnregisterHotKey(Some(HWND(hwnd as *mut c_void)), id) };
+}

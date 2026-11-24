@@ -2,6 +2,7 @@ import { events } from "@/lib/events";
 import { inTauri, ipc } from "@/lib/ipc";
 import { useAppStore } from "@/state/app";
 import { useEngineStore } from "@/state/engine";
+import { useResolutionStore } from "@/state/resolution";
 
 let subscribed = false;
 
@@ -14,6 +15,23 @@ function subscribe(): void {
   void events.onDisplaysChanged((displays) => engine.setDisplays(displays));
   void events.onRequestedChanged((requested) => engine.setRequested(requested));
   void events.onNotice((notice) => engine.pushNotice(notice));
+  const resolution = useResolutionStore.getState();
+  void events.onResolutionChanged((state) => resolution.setState(state));
+  void events.onResolutionResolved((resolved) => resolution.setResolved(resolved));
+  void events.onSettingsChanged((settings) => resolution.setSettings(settings));
+}
+
+/** Modos de pantalla y ajustes: no frenan el arranque si fallan. */
+async function loadResolution(): Promise<void> {
+  const store = useResolutionStore.getState();
+  const [state, settings] = await Promise.allSettled([
+    ipc.resolutionGetState(),
+    ipc.settingsGet(),
+  ]);
+  if (state.status === "fulfilled") store.setState(state.value);
+  else console.error("resolution_get_state", state.reason);
+  if (settings.status === "fulfilled") store.setSettings(settings.value);
+  else console.error("settings_get", settings.reason);
 }
 
 /**
@@ -27,6 +45,7 @@ export async function startApp(): Promise<void> {
     const bootstrap = await ipc.appBootstrap();
     useAppStore.getState().setBootstrap(bootstrap);
     useEngineStore.getState().hydrate(bootstrap);
+    await loadResolution();
   } catch (error) {
     console.error("app_bootstrap", error);
   } finally {

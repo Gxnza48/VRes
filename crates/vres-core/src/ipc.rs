@@ -25,6 +25,10 @@ pub enum Notice {
     HotkeyTaken,
     /// El motor no pudo arrancar.
     EngineUnavailable,
+    /// Una resolución nueva volvió sola porque nadie la confirmó.
+    ModeExpired,
+    /// Otro programa usa el atajo de resolución.
+    ToggleHotkeyTaken,
 }
 
 /// Datos que la interfaz pide una sola vez, al arrancar.
@@ -93,6 +97,26 @@ pub enum ErrorCode {
     UpdateInstallFailed,
     /// El motor no está disponible.
     EngineUnavailable,
+    /// El monitor no lista ese modo.
+    ModeNotSupported,
+    /// Hay otro cambio de resolución en curso o esperando confirmación.
+    ModeBusy,
+    /// Windows no pudo aplicar o revertir el modo.
+    ModeFailed,
+    /// El cambio ya se confirmó, se revirtió o venció.
+    ModeExpired,
+    /// El atajo solo alterna a modos que ya conservaste una vez.
+    ModeNotConfirmed,
+    /// No se pudo cambiar el HDR.
+    HdrFailed,
+    /// La pantalla ya no está conectada.
+    DisplayGone,
+    /// El atajo no es válido.
+    HotkeyInvalid,
+    /// Otro programa ya usa ese atajo.
+    HotkeyTaken,
+    /// No se pudieron guardar los ajustes.
+    SettingsFailed,
 }
 
 /// Error que devuelven todos los comandos de Tauri.

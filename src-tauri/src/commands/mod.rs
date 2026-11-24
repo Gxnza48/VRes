@@ -5,5 +5,6 @@
 
 pub mod app;
 pub mod engine;
+pub mod resolution;
 pub mod settings;
 pub mod update;

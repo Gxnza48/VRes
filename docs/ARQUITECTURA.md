@@ -49,7 +49,7 @@ Reglas del planificador:
 Un único **hilo del motor** con una ventana oculta de nivel superior y su bucle de mensajes de Win32 (las ventanas *message-only* no reciben `WM_DISPLAYCHANGE` ni `WM_POWERBROADCAST`). Solo ese hilo toca la Magnification API, registra los atajos (`RegisterHotKey`) y el aviso de cambio de primer plano, recibe los mensajes del sistema y es dueño de las ventanas superpuestas.
 
 - Los comandos de la interfaz y del celular le llegan por un canal más un mensaje de despertar; el motor conserva solo la **última** vista previa de cada slider.
-- Las operaciones lentas (cambio de resolución, HDR, DDC/CI) corren en un hilo auxiliar: el atajo de emergencia sigue respondiendo.
+- Las operaciones lentas (cambio de resolución, HDR, DDC/CI) corren en un hilo auxiliar (`vres-modes`), uno a la vez: el atajo de emergencia y la cuenta regresiva siguen respondiendo. La lógica de esos cambios (`vres-engine/src/resolution.rs`) no toca Windows: decide trabajos y recibe resultados, así se prueba con un reloj falso.
 - Temporizadores: 120 ms de asentamiento tras un cambio de foco, pantalla o sesión; chequeo de salud cada ~1 s **solo** si hay alguna capa activa; ningún temporizador más rápido salvo con una tecla de "mantener" armada.
 
 La **ventana de control** (`VRes.Engine`) ya existe desde la v0.0: recibe `--shutdown` y `--reset` desde otros procesos (el instalador, los accesos directos, `vres-cli`).
@@ -58,7 +58,7 @@ La **ventana de control** (`VRes.Engine`) ya existe desde la v0.0: recibe `--shu
 
 1. **Antes de la primera escritura** de cada capa y monitor se guarda el valor original en `restore.json` (con `fsync`) y se marca "sucio".
 2. Si al arrancar el archivo está sucio, **primero se restaura** y recién después se capturan originales; se arranca en **modo seguro** (efectos apagados y un aviso) para no entrar en un bucle de fallos.
-3. La **resolución** se cambia siempre de forma **temporal** (nunca en el registro de Windows) y pide confirmación.
+3. La **resolución** se cambia siempre de forma **temporal** (nunca en el registro de Windows) y pide confirmación; si nadie responde, vuelve sola. Si VRes muere, Windows deshace el modo por su cuenta (medido). El **HDR** sí es persistente: su estado original se guarda en `restore-modes.json` antes de cambiarlo y se restaura al salir o al próximo arranque.
 4. La **matriz** nunca lleva valores inválidos: los coeficientes se acotan acercando la matriz a la identidad (así el gris sigue gris). Las **rampas** respetan el rango que Windows acepta y se componen **sobre** la rampa original de cada monitor (se respeta la calibración del usuario).
 5. Se **reaplica** tras cambio de foco, de pantalla, desbloqueo y reanudación; el chequeo de salud lee y solo reescribe si hay diferencias.
 
@@ -78,8 +78,8 @@ Todos los caminos de salida restauran:
 
 JSON versionado (`schemaVersion`, camelCase), escritura atómica (temporal + `sync_all` + reemplazo), copia `.bak`, cuarentena de archivos corruptos y migraciones encadenadas.
 
-- Configuración y biblioteca: `%APPDATA%\io.github.gxnza48.vres\`.
-- Estado de la máquina y logs: `%LOCALAPPDATA%\io.github.gxnza48.vres\`.
+- Configuración y biblioteca: `%APPDATA%\io.github.gxnza48.vres\` (`settings.json`: atajos, tonos, segundos para confirmar y modos ya conservados).
+- Estado de la máquina y logs: `%LOCALAPPDATA%\io.github.gxnza48.vres\` (`state\session.json`, `state\restore.json` para el color y `state\restore-modes.json` para resolución y HDR).
 - Cada monitor se identifica por una clave estable (derivada de su ruta de dispositivo), no por `\\.\DISPLAYn`, que puede cambiar.
 
 ## Interfaz ⇄ motor

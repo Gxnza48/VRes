@@ -87,6 +87,54 @@ impl Default for RestoreState {
     }
 }
 
+/// Versión del esquema de `restore-modes.json`.
+pub const MODE_RESTORE_SCHEMA: u32 = 1;
+
+/// Lo que VRes cambió en una pantalla: resolución o HDR.
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct ModeRestoreDisplay {
+    /// Nombre GDI al momento del cambio (puede cambiar entre sesiones).
+    pub gdi_name: String,
+    /// Hay un modo temporal de VRes: se vuelve al guardado en Windows.
+    pub mode_changed: bool,
+    /// Estado de HDR antes de que VRes lo cambiara.
+    pub hdr_was_enabled: Option<bool>,
+}
+
+impl ModeRestoreDisplay {
+    /// No queda nada que restaurar en esta pantalla.
+    pub fn is_clean(&self) -> bool {
+        !self.mode_changed && self.hdr_was_enabled.is_none()
+    }
+}
+
+/// `restore-modes.json`: como `restore.json`, pero para resolución y HDR. Se
+/// escribe **antes** de cada cambio; si VRes arranca y lo encuentra sucio,
+/// restaura primero.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct ModeRestoreState {
+    pub schema_version: u32,
+    pub dirty: bool,
+    pub pid: u32,
+    pub app_version: String,
+    /// Por pantalla (identificador estable).
+    pub displays: BTreeMap<String, ModeRestoreDisplay>,
+}
+
+impl Default for ModeRestoreState {
+    fn default() -> Self {
+        Self {
+            schema_version: MODE_RESTORE_SCHEMA,
+            dirty: false,
+            pid: 0,
+            app_version: crate::APP_VERSION.to_owned(),
+            displays: BTreeMap::new(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

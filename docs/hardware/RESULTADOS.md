@@ -26,7 +26,7 @@ Para sumar tu PC, abre un [reporte de compatibilidad](https://github.com/Gxnza48
 | 7 | ¿La matriz o el crosshair sacan al juego de *independent flip*? (PresentMon) | Texto de compatibilidad | F1/F4 | — |
 | 8 | Pantalla completa exclusiva: ¿se detecta bien? | Estado `ExclusiveFullscreen` | F1 | — |
 | 9 | ¿Llegan los atajos con cada juego en primer plano? | Backend de atajos | F1/F7 | — |
-| 10 | Resolución temporal: ¿persiste al cambiar de foco? ¿GDI o CCD para estirar en cada GPU? | Red de seguridad y orden de F2 | F2 | — |
+| 10 | Resolución temporal: ¿persiste al cambiar de foco? ¿GDI o CCD para estirar en cada GPU? | Red de seguridad y orden de F2 | F2 | ✅ GDI estira en las dos GPU; Windows revierte solo si el proceso muere |
 | 11 | Crosshair: siempre encima, centrado con DPI mixto, oculto en capturas | F4 | F4 | — |
 | 12 | Zoom con el monitor externo a la izquierda y a la derecha | F7 | F7 | — |
 
@@ -102,3 +102,42 @@ Los números `\\.\DISPLAYn` **no son predecibles** (acá 5 y 1): confirma que VR
 - Repetir con **HDR activo** (pregunta 4) y con **Luz nocturna** encendida.
 - Ver a ojo la saturación al 300 % en las dos pantallas (posible dominante de color).
 - Medir con PresentMon si la matriz saca a un juego de *independent flip* (pregunta 7).
+
+## F2 — Resolución y HDR
+
+Medido el 2026-11-24 con `vres-cli` (cada prueba vuelve sola al modo de Windows).
+
+### Modos (`vres-cli mode list`)
+
+| Pantalla | Modos | Tamaños | Nativa (EDID) | En uso |
+|---|---|---|---|---|
+| ATNA40CU05-0 (AMD 780M, interno) | 28 | 14 (2880 × 1800 … 640 × 480; 4:3: 2048 × 1536, 1600 × 1200, 1024 × 768) | 2880 × 1800 @ 120 | 2880 × 1800 @ 120 |
+| MAG 255F E20 (RTX 5060, externo) | 132 | 18 (incluye 1440 × 1080 hasta 200 Hz) | 1920 × 1080 **@ 60** | 1920 × 1080 @ 200 |
+
+El EDID del monitor externo informa 60 Hz como modo preferido aunque se use a 200 Hz: los presets eligen la frecuencia **en uso**, no la del EDID.
+
+### Cambio temporal y escalado (`vres-cli mode set`)
+
+| Prueba | Aplicar | Escalado releído | Revertir |
+|---|---|---|---|
+| MAG 1440 × 1080 @ 200, estirada | 255 ms | estirada ✅ | 160 ms, vuelve a "sin escalar" |
+| Interno 2048 × 1536 @ 120, estirada | 73 ms | estirada ✅ | 177 ms |
+| MAG 1440 × 1080, mantener aspecto | 690 ms | **sin escalar** (NVIDIA lo ignora: escala el monitor) | 91 ms |
+| Interno 1280 × 1024 @ 120, mantener aspecto | 137 ms | mantener aspecto ✅ | 162 ms |
+
+- El campo `DM_DISPLAYFIXEDOUTPUT` de GDI alcanza para estirar en las dos GPU; CCD (`SetDisplayConfig`) queda de respaldo para "mantener aspecto".
+- Cuando la placa o el monitor ignoran el escalado pedido, la app lo informa (`scalingIgnored`).
+
+### Red de seguridad
+
+- `probe mode-kill-revert`: con un modo temporal aplicado, se mata el proceso → **Windows vuelve solo** al modo guardado (`revertedByWindows: true`).
+- El modo está atado al **proceso**, no al hilo: el motor lo aplica desde un hilo auxiliar que termina enseguida y el modo se mantiene (`probe engine-modes`: `heldAfterWorkerExit: true`).
+- `probe engine-modes` (motor real): aplicar → pendiente → vence a los 4 s y vuelve solo → aplicar y conservar → volver a la de Windows → apagar el motor: todo ✅.
+
+### HDR (`vres-cli hdr set`)
+
+- MAG 255F E20: prender y apagar con `DISPLAYCONFIG_DEVICE_INFO_SET_HDR_STATE` (Windows 11 24H2) en 183 ms; el estado se relee y se restaura ✅.
+
+### Pendiente de F2
+
+- A ojo: la estirada llena la pantalla sin barras en cada monitor.

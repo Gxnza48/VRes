@@ -4,6 +4,22 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.2.0] - 2026-11-24
+
+La pestaña **Resolución** (fase F2 de la [hoja de ruta](docs/ROADMAP.md)).
+
+### Agregado
+
+- **Resolución estirada** por monitor: presets propios 4:3, 5:4, 16:10 e intermedios (cada uno indica si tu monitor ya lo admite), lista completa de modos con filtros por proporción y frecuencia, y constructor personalizado.
+- **Escalado** estirado, mantener aspecto o centrado. VRes relee lo que quedó aplicado y avisa si la placa de video o el monitor lo ignoraron.
+- **Cuenta regresiva "Conservar / Revertir"** (10, 15 o 30 s): si no respondes, vuelve sola, aunque la ventana esté cerrada.
+- **HDR** on/off por monitor; al cerrar VRes vuelve como estaba.
+- **Atajo nativa ↔ estirada**, con tonos, que solo alterna a resoluciones que ya conservaste. El grabador de atajos avisa los choques conocidos (AltGr en teclados latinoamericanos y ABNT2, overlay de NVIDIA, teclas reservadas) y si otro programa ya lo usa.
+- Los cambios de resolución son siempre temporales: nunca se escriben en el registro de Windows. Si VRes se cierra de golpe, Windows vuelve solo a tu resolución (medido); el HDR se restaura al volver a abrir VRes.
+- `vres-cli mode list | test | set`, `hdr get | set`, `probe mode-kill-revert` y `probe engine-modes`, con guardianes que restauran todo aunque la prueba falle o se corte con `Ctrl + C`.
+- `settings.json` con los atajos y preferencias.
+- Resultados en hardware real en [docs/hardware/RESULTADOS.md](docs/hardware/RESULTADOS.md).
+
 ## [0.1.0] - 2026-11-24
 
 Primera versión pública: la base de la app y la pestaña **Pantalla** (fases F0 y F1 de la [hoja de ruta](docs/ROADMAP.md)).
@@ -25,5 +41,6 @@ Primera versión pública: la base de la app y la pestaña **Pantalla** (fases F
 - Matemática de color con más de 70 pruebas (incluidas pruebas de propiedades) y resultados de las pruebas en hardware real en [docs/hardware/RESULTADOS.md](docs/hardware/RESULTADOS.md).
 - Documentación: arquitectura, motor de color, anti-cheat, contrato interno, códigos para compartir, desarrollo y hoja de ruta.
 
-[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.1.0...HEAD
+[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Gxnza48/VRes/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Gxnza48/VRes/releases/tag/v0.1.0

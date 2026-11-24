@@ -49,7 +49,7 @@ struct AdvancedColorInfo2 {
     active_color_mode: i32,
 }
 
-fn utf16_to_string(buffer: &[u16]) -> String {
+pub(crate) fn utf16_to_string(buffer: &[u16]) -> String {
     let end = buffer.iter().position(|&c| c == 0).unwrap_or(buffer.len());
     String::from_utf16_lossy(&buffer[..end])
 }
@@ -59,7 +59,7 @@ fn luid_key(luid: LUID) -> (u32, i32) {
 }
 
 /// Pide información de un dispositivo; `T` empieza con el encabezado.
-fn device_info<T>(
+pub(crate) fn device_info<T>(
     packet: &mut T,
     kind: DISPLAYCONFIG_DEVICE_INFO_TYPE,
     adapter: LUID,
@@ -104,7 +104,8 @@ fn adapters_by_luid() -> HashMap<(u32, i32), AdapterInfo> {
     adapters
 }
 
-fn query_active_paths() -> WinResult<(Vec<DISPLAYCONFIG_PATH_INFO>, Vec<DISPLAYCONFIG_MODE_INFO>)> {
+pub(crate) fn query_active_paths()
+-> WinResult<(Vec<DISPLAYCONFIG_PATH_INFO>, Vec<DISPLAYCONFIG_MODE_INFO>)> {
     // La configuración puede cambiar entre las dos llamadas: se reintenta.
     for _ in 0..5 {
         let (mut path_count, mut mode_count) = (0u32, 0u32);

@@ -20,6 +20,7 @@ mod engine_bridge;
 mod i18n;
 mod lifecycle;
 mod logging;
+mod settings;
 mod tray;
 
 use tauri::DeviceEventFilter;
@@ -83,6 +84,17 @@ pub fn run() {
             commands::engine::engine_status,
             commands::settings::settings_get_autostart,
             commands::settings::settings_set_autostart,
+            commands::settings::settings_get,
+            commands::settings::settings_update,
+            commands::settings::hotkeys_check,
+            commands::settings::hotkeys_suspend,
+            commands::resolution::resolution_get_state,
+            commands::resolution::resolution_apply,
+            commands::resolution::resolution_confirm,
+            commands::resolution::resolution_revert,
+            commands::resolution::resolution_restore,
+            commands::resolution::resolution_toggle,
+            commands::resolution::hdr_set,
         ])
         .build(tauri::generate_context!())
         .expect("VRes no pudo iniciar");

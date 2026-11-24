@@ -6,6 +6,7 @@ use tauri::{App, AppHandle, Manager, RunEvent};
 use vres_engine::Command;
 
 use crate::engine_bridge::EngineState;
+use crate::settings::SettingsState;
 use crate::{AUTOSTART_FLAG, LaunchInfo, app_windows, logging, tray};
 
 /// Inicialización, antes de que corra el bucle de eventos.
@@ -19,7 +20,10 @@ pub fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
 
     // El motor arranca antes que la bandeja y la ventana: restaura lo que haya
     // quedado de una sesión anterior y aplica la sesión guardada.
-    let engine = EngineState::start(&handle);
+    // Los ajustes primero: el motor arranca con el atajo y sus preferencias.
+    let settings = SettingsState::load();
+    let engine = EngineState::start(&handle, &settings.get());
+    app.manage(settings);
     let paused = engine.requested().paused;
     app.manage(engine);
 
