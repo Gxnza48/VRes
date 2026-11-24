@@ -177,6 +177,12 @@ pub enum ErrorCode {
     SettingsFailed,
     /// No se pudo dibujar ese crosshair (imagen inválida o sin partes).
     CrosshairInvalid,
+    /// El monitor no permite ese ajuste por hardware.
+    HardwareUnsupported,
+    /// Falló un ajuste por hardware (DDC/CI o brillo del panel).
+    HardwareFailed,
+    /// La imagen de fondo no es PNG, JPEG, GIF o WebP, o es muy grande.
+    BackgroundInvalid,
 }
 
 /// Error que devuelven todos los comandos de Tauri.

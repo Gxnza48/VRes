@@ -10,6 +10,7 @@ import type { Requested } from "@/lib/bindings/Requested";
 import { events } from "@/lib/events";
 import { inTauri, ipc } from "@/lib/ipc";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/app/theme";
 import { useCatalogStore } from "@/state/catalog";
 import { useSettingsStore } from "@/state/settings";
 
@@ -23,6 +24,7 @@ export function QuickApp() {
   const settings = useSettingsStore((store) => store.settings);
   const { lookPresets, load } = useCatalogStore();
   const hadFocus = useRef(false);
+  useTheme();
 
   useEffect(() => {
     if (!inTauri()) return;

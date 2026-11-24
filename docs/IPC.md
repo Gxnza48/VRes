@@ -27,11 +27,11 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 | Crosshair | `crosshair_render` (bytes: lado, centro y RGBA) · `crosshair_presets` · `crosshair_preview`; prender, elegir monitor, guardar e imagen propia van por `settings_update` | F4 ✅ |
 | Juegos y perfiles | `games_list` (con ejecutables y anti-cheat) · `games_running_candidates` · `profile_active`; los perfiles, el cambio automático y los juegos propios van por `settings_update` | F6 ✅ |
 | Dark Boost y zoom | `enhancers_state` · `enhancers_key_supported`; armar, teclas y efectos van por `settings_update` | F7 ✅ |
-| Monitor | `ddc_get` · `ddc_set` · `ddc_restore_initial` | F8 |
+| Monitor | `monitor_details` · `ddc_set` · `panel_brightness_set` · `hardware_restore_initial` · `displays_set_trim` | F8 ✅ |
 | Ajustes | `settings_get_autostart` · `settings_set_autostart` | F1 ✅ |
 | Ajustes | `settings_get` · `settings_update` (falla con `hotkeyTaken` si otro programa usa el atajo) · `hotkeys_check` · `hotkeys_suspend` | F2 ✅ |
-| Ajustes | `customize_set_background` | F8 |
-| Diagnóstico | `diag_report` · `diag_export` · `diag_selftest` | F1 |
+| Ajustes | `customize_background_set` (los bytes viajan tal cual, sin JSON) · `customize_background_get` · `customize_background_clear` · `settings_reset` | F8 ✅ |
+| Diagnóstico | `diag_report` (sin usuario, carpeta de usuario ni nombre del equipo) | F8 ✅ |
 | Celular | `remote_start` · `remote_stop` · `remote_status` · `remote_regenerate_token` | F9 |
 | Popup | `quick_toggle` · `quick_close` · `app_open_main` · `look_get` | F5 ✅ |
 

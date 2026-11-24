@@ -25,26 +25,6 @@
     "upcoming": "What it will bring",
     "roadmap": "See the roadmap"
   },
-  "pages": {
-    "monitor": {
-      "title": "Monitor",
-      "subtitle": "What your monitor lets you adjust in hardware.",
-      "items": [
-        "Details for each screen: model, GPU, HDR and scale",
-        "Hardware brightness and contrast (DDC/CI) on compatible monitors",
-        "Per-monitor gamma and warmth"
-      ]
-    },
-    "customize": {
-      "title": "Customize",
-      "subtitle": "Make VRes look the way you like.",
-      "items": [
-        "Interface themes",
-        "Background with your own image or GIF",
-        "Window opacity"
-      ]
-    }
-  },
   "more": {
     "title": "More",
     "subtitle": "Language, updates and information about VRes.",
@@ -78,14 +58,42 @@
       "version": "Version {{version}}",
       "license": "Free software under the GPL-3.0 license. No account and no telemetry.",
       "repository": "Source code",
-      "report": "Report a problem",
-      "copyDiagnostics": "Copy diagnostics",
-      "copied": "Copied"
+      "report": "Report a problem"
     },
     "startup": {
       "title": "Startup",
       "description": "VRes starts with Windows straight to the tray, without opening the window, and applies your last look.",
       "label": "Start with Windows"
+    },
+    "behavior": {
+      "title": "When closing the window",
+      "description": "VRes can stay in the tray or quit completely.",
+      "closeToTray": "Stay in the tray",
+      "closeQuits": "Closing the window will quit VRes and your display will go back to normal."
+    },
+    "diagnostics": {
+      "title": "Diagnostic report",
+      "description": "To attach to a bug report. It doesn't include your user name or your PC's name, and VRes doesn't send it: you copy it and paste it wherever you want.",
+      "show": "Show report",
+      "copy": "Copy report",
+      "copied": "Copied",
+      "failed": "The report couldn't be built."
+    },
+    "licenses": {
+      "title": "Licenses",
+      "description": "VRes is free software (GPL-3.0). These are the licenses of what it uses.",
+      "show": "Show third-party licenses",
+      "hide": "Hide licenses"
+    },
+    "reset": {
+      "title": "Reset everything",
+      "description": "Brings VRes back to how it was when installed.",
+      "button": "Reset everything…",
+      "confirm": "Your saved looks and crosshairs, profiles and added games, hotkeys, Dark Boost and Zoom, theme and background are deleted, and the look goes back to neutral. This can't be undone.",
+      "yes": "Yes, reset everything",
+      "cancel": "Cancel",
+      "done": "Done: VRes is like freshly installed.",
+      "failed": "It couldn't be reset."
     }
   },
   "display": {
@@ -351,7 +359,10 @@
     "hotkeyInvalid": "That hotkey isn't valid.",
     "hotkeyTaken": "Another program already uses that hotkey. Choose another one.",
     "settingsFailed": "The settings couldn't be saved.",
-    "crosshairInvalid": "That crosshair could not be drawn."
+    "crosshairInvalid": "That crosshair could not be drawn.",
+    "hardwareUnsupported": "The monitor doesn't allow that adjustment.",
+    "hardwareFailed": "The monitor didn't respond to the change. Try again.",
+    "backgroundInvalid": "That image won't work: it must be PNG, JPEG, GIF or WebP, up to 25 MB."
   },
   "crosshair": {
     "title": "Crosshair",
@@ -649,6 +660,77 @@
     "units": {
       "percent": "{{value}}%",
       "times": "{{value}}×"
+    }
+  },
+  "monitor": {
+    "title": "Monitor",
+    "subtitle": "What each display can adjust in hardware, and its own fine-tuning.",
+    "refresh": "Read again",
+    "reading": "Reading the monitors…",
+    "primary": "Main",
+    "internal": "Laptop screen",
+    "external": "External monitor",
+    "hdrOn": "HDR on",
+    "scale": "{{value}}% scale",
+    "unknownGpu": "Unknown graphics card",
+    "vibrance": {
+      "nvidia": "Driver vibrance: NVIDIA",
+      "amd": "Driver vibrance: AMD",
+      "none": "No driver vibrance"
+    },
+    "hardware": {
+      "title": "Hardware",
+      "brightness": "Brightness",
+      "contrast": "Contrast",
+      "redGain": "Red",
+      "greenGain": "Green",
+      "blueGain": "Blue",
+      "panelBrightness": "Panel brightness",
+      "restore": "Restore the values from before VRes",
+      "noDdc": "This monitor doesn't answer DDC/CI. Some ship with it off: look for it in the monitor's menu.",
+      "noPanel": "This screen's brightness can't be changed from Windows.",
+      "dragHint": "Applied when you let go"
+    },
+    "trim": {
+      "title": "This display's own adjustment",
+      "description": "Added on top of the Display tab's look, only on this monitor.",
+      "gamma": "Gamma",
+      "warmth": "Warmth",
+      "cool": "Cool",
+      "warm": "Warm",
+      "red": "Red",
+      "green": "Green",
+      "blue": "Blue",
+      "reset": "Remove adjustment",
+      "colorOff": "Applies while VRes color is on."
+    },
+    "units": {
+      "percent": "{{value}}%"
+    }
+  },
+  "customize": {
+    "title": "Customize",
+    "subtitle": "Make VRes look the way you like.",
+    "theme": {
+      "title": "Theme",
+      "description": "The interface colors. VRes's lime green stays.",
+      "black": "Black",
+      "blackHint": "Pure black, the classic",
+      "graphite": "Graphite",
+      "graphiteHint": "Dark grays, softer"
+    },
+    "background": {
+      "title": "Background",
+      "description": "An image or GIF of yours behind the tabs (PNG, JPEG, GIF or WebP, up to 25 MB).",
+      "choose": "Choose image or GIF",
+      "replace": "Change image",
+      "uploading": "Saving…",
+      "remove": "Remove background",
+      "opacity": "How visible",
+      "note": "The GIF stays still while VRes isn't in front, so it costs nothing while you play. The image never leaves your PC."
+    },
+    "units": {
+      "percent": "{{value}}%"
     }
   }
 }

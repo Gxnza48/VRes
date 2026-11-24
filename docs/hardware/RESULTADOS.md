@@ -202,3 +202,21 @@ Medido el 2026-11-24 con `vres-cli zoom test` (dos cuadrados de color: uno en el
 
 - A ojo: mantener el botón hace zoom al instante y soltarlo lo quita; el juego sigue recibiendo el botón; Dark Boost aclara las sombras sin lavar todo; el precalentamiento no se nota.
 - Zoom con el monitor externo a la derecha del principal.
+
+## F8 — Monitor (DDC/CI y brillo del panel)
+
+Medido el 2026-11-24 con `vres-cli ddc get` y `vres-cli ddc test` (brillo ±1 y vuelta).
+
+| Pantalla | Vía | Lectura | Valores del usuario | Escritura ±1 |
+|---|---|---|---|---|
+| ATNA40CU05-0 (interno, escala 200 %) | WMI `WmiMonitorBrightness` | 35 ms | brillo 100/100 | 30 ms, releída exacta ✅ |
+| MAG 255F E20 (escala 100 %) | DDC/CI (`dxva2`) | 340 ms los 5 controles | brillo 60, contraste 70, R/G/B 100 (de 100) | 190 ms con relectura ✅ |
+
+- WMI en `root\WMI` responde **acceso denegado** (`0x80041003`) si el proxy no pide suplantación: hace falta `CoSetProxyBlanket(RPC_C_IMP_LEVEL_IMPERSONATE)`.
+- Un error de windows-rs guarda un `IErrorInfo` de COM: si se suelta después de `CoUninitialize`, el proceso se cae. Los errores de COM se guardan solo como HRESULT.
+- El panel interno no habla DDC/CI (no se intenta: cada intento fallido tarda); el externo responde los cinco controles.
+- La versión de Windows del reporte sale del registro: "Windows 11 Home 26H2 (26300.9974)".
+
+### Pendiente de F8
+
+- A ojo: el brillo y el contraste del monitor cambian al soltar el control, y "Volver a los valores de antes de VRes" los devuelve.

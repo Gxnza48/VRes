@@ -11,6 +11,7 @@ const buttonVariants = cva(
         primary: "bg-accent text-accent-fg hover:bg-accent/90",
         secondary: "border border-border bg-surface-2 text-fg hover:bg-surface-2/70",
         ghost: "text-muted hover:bg-surface-2 hover:text-fg",
+        danger: "bg-danger text-accent-fg hover:bg-danger/90",
       },
       size: {
         sm: "h-8 px-3",

@@ -8,6 +8,7 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+use crate::appearance::{AppearanceSettings, BehaviorSettings};
 use crate::crosshair::Crosshair;
 use crate::enhancers::EnhancerSettings;
 use crate::keys::{Hotkey, check_hotkey};
@@ -133,6 +134,8 @@ pub struct Settings {
     pub library: LibrarySettings,
     pub profiles: ProfileSettings,
     pub enhancers: EnhancerSettings,
+    pub appearance: AppearanceSettings,
+    pub behavior: BehaviorSettings,
 }
 
 impl Default for Settings {
@@ -145,6 +148,8 @@ impl Default for Settings {
             library: LibrarySettings::default(),
             profiles: ProfileSettings::default(),
             enhancers: EnhancerSettings::default(),
+            appearance: AppearanceSettings::default(),
+            behavior: BehaviorSettings::default(),
         }
     }
 }
@@ -222,6 +227,7 @@ impl Settings {
         });
         self.profiles.custom_games.truncate(100);
         self.enhancers = self.enhancers.clamped();
+        self.appearance = self.appearance.sanitized();
         self
     }
 
@@ -254,6 +260,11 @@ impl Settings {
             .cloned()
             .collect();
         merged.resolution.confirmed = kept;
+        // La imagen de fondo solo la cambia su comando (que guarda el archivo).
+        merged
+            .appearance
+            .background
+            .clone_from(&self.appearance.background);
         merged.sanitized()
     }
 }

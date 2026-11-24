@@ -10,7 +10,9 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import type { Bootstrap } from "./bindings/Bootstrap";
 import type { Crosshair } from "./bindings/Crosshair";
 import type { CrosshairPreset } from "./bindings/CrosshairPreset";
+import type { DdcControl } from "./bindings/DdcControl";
 import type { DisplayInfo } from "./bindings/DisplayInfo";
+import type { DisplayTrim } from "./bindings/DisplayTrim";
 import type { EnhancerState } from "./bindings/EnhancerState";
 import type { EngineStatus } from "./bindings/EngineStatus";
 import type { GameInfo } from "./bindings/GameInfo";
@@ -20,6 +22,7 @@ import type { IpcError } from "./bindings/IpcError";
 import type { Look } from "./bindings/Look";
 import type { LookPreset } from "./bindings/LookPreset";
 import type { ModeRequest } from "./bindings/ModeRequest";
+import type { MonitorDetails } from "./bindings/MonitorDetails";
 import type { PendingMode } from "./bindings/PendingMode";
 import type { Requested } from "./bindings/Requested";
 import type { RunningApp } from "./bindings/RunningApp";
@@ -27,6 +30,7 @@ import type { ResolutionState } from "./bindings/ResolutionState";
 import type { Settings } from "./bindings/Settings";
 import type { ShareDecoded } from "./bindings/ShareDecoded";
 import type { UpdateInfo } from "./bindings/UpdateInfo";
+import type { VcpValue } from "./bindings/VcpValue";
 
 /** `true` dentro de la app; `false` en un navegador común o en los tests. */
 export function inTauri(): boolean {
@@ -136,6 +140,29 @@ export const ipc = {
   gamesList: () => call<GameInfo[]>("games_list"),
   /** Perfil de juego en uso (`null`: el escritorio). */
   profileActive: () => call<string | null>("profile_active"),
+  /** Ficha de hardware de cada pantalla (DDC/CI y brillo del panel). Puede tardar. */
+  monitorDetails: () => call<MonitorDetails[]>("monitor_details"),
+  /** Cambia un control DDC/CI; devuelve el valor que quedó. */
+  ddcSet: (displayId: string, control: DdcControl, value: number) =>
+    call<VcpValue>("ddc_set", { displayId, control, value }),
+  /** Cambia el brillo del panel de la notebook (0–100). */
+  panelBrightnessSet: (displayId: string, value: number) =>
+    call<number>("panel_brightness_set", { displayId, value }),
+  /** Vuelve el hardware de una pantalla a los valores de antes de VRes. */
+  hardwareRestoreInitial: (displayId: string) => call<void>("hardware_restore_initial", { displayId }),
+  /** Ajuste propio de una pantalla (`null` lo quita). Con `preview` no se guarda. */
+  displaysSetTrim: (displayId: string, trim: DisplayTrim | null, preview: boolean) =>
+    call<Requested>("displays_set_trim", { displayId, trim, preview }),
+  /** Usa una imagen o un GIF como fondo (los bytes viajan tal cual). */
+  customizeBackgroundSet: (bytes: Uint8Array) => invoke<Settings>("customize_background_set", bytes),
+  /** La imagen de fondo, en bytes. */
+  customizeBackgroundGet: () => call<ArrayBuffer>("customize_background_get"),
+  /** Quita el fondo. */
+  customizeBackgroundClear: () => call<Settings>("customize_background_clear"),
+  /** Reporte de diagnóstico, sin datos personales. */
+  diagReport: () => call<string>("diag_report"),
+  /** Vuelve todos los ajustes a como estaban al instalar. */
+  settingsReset: () => call<Settings>("settings_reset"),
   /** Dark Boost y Zoom: si escuchan su tecla o están activos. */
   enhancersState: () => call<EnhancerState>("enhancers_state"),
   /** Si una tecla física sirve para Dark Boost o Zoom. */

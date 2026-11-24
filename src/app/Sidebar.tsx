@@ -15,7 +15,7 @@ export function Sidebar() {
   return (
     <nav
       aria-label={t("nav.label")}
-      className="flex w-24 shrink-0 flex-col gap-1 overflow-y-auto border-r border-border bg-bg px-2 py-4"
+      className="relative z-10 flex w-24 shrink-0 flex-col gap-1 overflow-y-auto border-r border-border bg-bg px-2 py-4"
     >
       <div className="mb-4 flex justify-center px-1">
         <img src="/vres-logo.png" alt={t("app.name")} className="w-full max-w-20" />

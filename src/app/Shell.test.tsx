@@ -34,11 +34,10 @@ describe("Shell", () => {
     );
   });
 
-  it("cambia de sección al hacer clic y dice en qué fase llega", async () => {
+  it("cambia de sección al hacer clic", async () => {
     render(<App />);
-    await userEvent.click(screen.getByRole("button", { name: "Monitor" }));
-    expect(screen.getByRole("heading", { level: 1, name: "Monitor" })).toBeInTheDocument();
-    expect(screen.getByText("Llega en la fase F8")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Personalizar" }));
+    expect(screen.getByRole("heading", { level: 1, name: "Personalizar" })).toBeInTheDocument();
   });
 
   it("la sección Más permite elegir el idioma", async () => {

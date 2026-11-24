@@ -3,7 +3,7 @@ resolver = "3"
 members = ["src-tauri", "crates/*"]
 
 [workspace.package]
-version = "0.7.0"
+version = "0.8.0"
 edition = "2024"
 rust-version = "1.90"
 license = "GPL-3.0-or-later"
@@ -50,6 +50,11 @@ windows = { version = "0.62", features = [
   "Win32_System_SystemServices",
   "Win32_System_Shutdown",
   "Win32_System_Console",
+  "Win32_System_Com",
+  "Win32_System_Ole",
+  "Win32_System_Variant",
+  "Win32_System_Wmi",
+  "Win32_System_Registry",
 ] }
 
 [workspace.lints.rust]

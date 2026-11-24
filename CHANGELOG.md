@@ -4,6 +4,26 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.8.0] - 2026-11-24
+
+**Monitor, Personalizar y Más** (fase F8 de la [hoja de ruta](docs/ROADMAP.md)).
+
+### Agregado
+
+- Pestaña **Monitor**: ficha de cada pantalla (resolución, Hz, escala, placa de video, HDR y vibrance por driver).
+  - Brillo, contraste y ganancia RGB **por hardware** (DDC/CI) en los monitores externos que lo admiten, y brillo del panel de la notebook. VRes guarda los valores de antes de tocarlos y vuelve a ellos con un botón.
+  - Gamma, calidez y RGB **propios de cada pantalla**, sumados al look.
+- Pestaña **Personalizar**: temas Negro y Grafito, e imagen o GIF de fondo con su opacidad. El GIF se queda quieto mientras VRes no está al frente.
+- En **Más**:
+  - Elegir si cerrar la ventana deja VRes en la bandeja o lo cierra.
+  - **Reporte de diagnóstico** sin tu usuario ni el nombre de tu PC, que ves antes de copiarlo.
+  - Licencias de terceros y **restablecer todo** (con confirmación).
+- `vres-cli ddc get`, `vres-cli ddc test` y la versión de Windows en `vres-cli diag`.
+
+### Corregido
+
+- Ya no aparecen dos barras de desplazamiento en la ventana principal (la ventana en sí nunca se desplaza: solo el contenido).
+
 ## [0.7.0] - 2026-11-24
 
 **Dark Boost y Zoom** (fase F7 de la [hoja de ruta](docs/ROADMAP.md)).
@@ -103,7 +123,8 @@ Primera versión pública: la base de la app y la pestaña **Pantalla** (fases F
 - Matemática de color con más de 70 pruebas (incluidas pruebas de propiedades) y resultados de las pruebas en hardware real en [docs/hardware/RESULTADOS.md](docs/hardware/RESULTADOS.md).
 - Documentación: arquitectura, motor de color, anti-cheat, contrato interno, códigos para compartir, desarrollo y hoja de ruta.
 
-[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.7.0...HEAD
+[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/Gxnza48/VRes/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Gxnza48/VRes/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/Gxnza48/VRes/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/Gxnza48/VRes/compare/v0.4.0...v0.5.0

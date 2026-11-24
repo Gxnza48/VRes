@@ -13,6 +13,7 @@ VRes **sí** usa:
 - el cambio de resolución estándar de Windows;
 - el nombre del programa en primer plano, para cambiar de perfil (sin abrir su proceso);
 - la lupa de pantalla completa de Windows, para el zoom (solo visual: el mouse no cambia);
+- DDC/CI, el mismo canal que usa el menú del monitor, y el brillo de Windows (WMI) del panel de la notebook, para la pestaña Monitor;
 - la lectura del estado de **una** tecla o botón (`GetAsyncKeyState`) para Dark Boost y Zoom, solo mientras están armados y en su alcance. Solo lee: no la consume ni la intercepta, y el juego la recibe igual.
 
 VRes **no**:

@@ -112,6 +112,16 @@ pub fn run() {
             commands::profiles::games_running_candidates,
             commands::enhancers::enhancers_state,
             commands::enhancers::enhancers_key_supported,
+            commands::engine::displays_set_trim,
+            commands::monitor::monitor_details,
+            commands::monitor::ddc_set,
+            commands::monitor::panel_brightness_set,
+            commands::monitor::hardware_restore_initial,
+            commands::customize::customize_background_set,
+            commands::customize::customize_background_get,
+            commands::customize::customize_background_clear,
+            commands::diag::diag_report,
+            commands::diag::settings_reset,
         ])
         .build(tauri::generate_context!())
         .expect("VRes no pudo iniciar");

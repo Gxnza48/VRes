@@ -12,15 +12,20 @@ use serde::de::DeserializeOwned;
 /// (con `sync_all`) y después lo reemplaza. Si se corta la luz en el medio,
 /// queda el archivo viejo o el nuevo, nunca uno a medias.
 pub fn write_json_atomic<T: Serialize>(path: &Path, value: &T) -> io::Result<()> {
+    let mut json = serde_json::to_vec_pretty(value).map_err(io::Error::other)?;
+    json.push(b'\n');
+    write_bytes_atomic(path, &json)
+}
+
+/// Escribe bytes de forma atómica (temporal con `sync_all` y reemplazo).
+pub fn write_bytes_atomic(path: &Path, bytes: &[u8]) -> io::Result<()> {
     if let Some(dir) = path.parent() {
         fs::create_dir_all(dir)?;
     }
-    let json = serde_json::to_vec_pretty(value).map_err(io::Error::other)?;
     let temp = path.with_extension("tmp");
     {
         let mut file = fs::File::create(&temp)?;
-        file.write_all(&json)?;
-        file.write_all(b"\n")?;
+        file.write_all(bytes)?;
         file.sync_all()?;
     }
     // Windows puede tener el archivo abierto por un instante (antivirus,

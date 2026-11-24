@@ -24,6 +24,15 @@ pub enum WinError {
     /// Un hilo auxiliar terminó antes de responder.
     #[error("worker thread stopped: {0}")]
     ThreadStopped(&'static str),
+    /// Una llamada COM devolvió error (solo el código: el error de Windows
+    /// guarda objetos COM que no pueden sobrevivir al apartamento).
+    #[error("{api} failed: HRESULT 0x{code:08X}")]
+    Com {
+        /// Nombre de la llamada.
+        api: &'static str,
+        /// HRESULT.
+        code: u32,
+    },
     /// Un cambio de pantalla devolvió un código de error (`DISP_CHANGE_*` o
     /// `ERROR_*`).
     #[error("{api} returned {code}")]
@@ -44,6 +53,14 @@ impl WinError {
         Self::Api {
             api,
             source: windows::core::Error::from_thread(),
+        }
+    }
+
+    /// Error de una llamada COM, guardando solo su HRESULT.
+    pub(crate) fn com(api: &'static str, source: &windows::core::Error) -> Self {
+        Self::Com {
+            api,
+            code: source.code().0 as u32,
         }
     }
 

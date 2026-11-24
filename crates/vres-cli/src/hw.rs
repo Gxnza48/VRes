@@ -143,6 +143,7 @@ pub fn diag() -> Report {
     let value = json!({
         "ok": true,
         "version": vres_core::APP_VERSION,
+        "windows": vres_win::system::windows_version(),
         "displays": displays,
         "ramps": ramps,
         "magnification": magnification,

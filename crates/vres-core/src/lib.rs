@@ -9,6 +9,7 @@
 //! `cargo test`.
 #![forbid(unsafe_code)]
 
+pub mod appearance;
 pub mod color;
 pub mod crosshair;
 pub mod enhancers;
@@ -16,6 +17,7 @@ pub mod ipc;
 pub mod keys;
 pub mod looks;
 pub mod model;
+pub mod monitor;
 pub mod planner;
 pub mod profiles;
 pub mod settings;

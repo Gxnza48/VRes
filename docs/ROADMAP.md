@@ -12,7 +12,7 @@ VRes se construye por **fases**. Cada fase termina en una versión instalable: c
 | **F5** | Looks, Biblioteca, códigos y color avanzado | v0.5 | ✅ |
 | **F6** | Perfiles por juego | v0.6 | ✅ |
 | **F7** | Dark Boost y Zoom | v0.7 | ✅ |
-| **F8** | Monitor (DDC/CI), Personalizar y Más | v0.8 | 🗓 |
+| **F8** | Monitor (DDC/CI), Personalizar y Más | v0.8 | ✅ |
 | **F9** | Control desde el celular | v0.9 | 🗓 |
 | **F10** | Resoluciones personalizadas, asistentes por juego, firma | v1.0 | 🗓 |
 
@@ -109,8 +109,13 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 
 ## F8 — Monitor, Personalizar y Más
 
-- Brillo y contraste por hardware (DDC/CI); gamma y calidez por monitor
-- Temas, fondo propio, reporte de diagnóstico, acerca de y licencias
+- [x] Pestaña Monitor: ficha de cada pantalla (resolución, Hz, escala, GPU, HDR, vibrance por driver)
+- [x] Brillo, contraste y ganancia RGB por hardware (DDC/CI) en monitores externos; brillo del panel de la notebook por WMI. VRes guarda los valores de antes y vuelve a ellos con un botón
+- [x] Gamma, calidez y RGB propios de cada pantalla (por rampa, sobre el look)
+- [x] Pestaña Personalizar: temas Negro y Grafito, imagen o GIF de fondo (el GIF se queda quieto con la ventana sin foco)
+- [x] Más: cerrar a la bandeja o salir, reporte de diagnóstico sin datos personales (se ve antes de copiarlo), licencias y "restablecer todo"
+- [x] `vres-cli ddc get`, `vres-cli ddc test` (brillo ±1 y vuelta) y la versión de Windows en `vres-cli diag`
+- [ ] A ojo: el brillo y el contraste del monitor cambian al soltar el control; el tema Grafito y el fondo se ven bien
 
 ## F9 — Control desde el celular
 

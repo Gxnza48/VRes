@@ -75,6 +75,13 @@ pub fn on_run_event(app: &AppHandle, event: RunEvent) {
             if let Some(engine) = app.try_state::<EngineState>() {
                 engine.send(Command::SuspendHotkeys(false));
             }
+            // Si el usuario eligió que cerrar la ventana cierre VRes.
+            let close_to_tray = app
+                .try_state::<SettingsState>()
+                .is_none_or(|settings| settings.get().behavior.close_to_tray);
+            if !close_to_tray {
+                app.exit(0);
+            }
         }
         _ => {}
     }

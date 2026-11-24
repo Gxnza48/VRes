@@ -5,8 +5,11 @@
 
 pub mod app;
 pub mod crosshair;
+pub mod customize;
+pub mod diag;
 pub mod engine;
 pub mod enhancers;
+pub mod monitor;
 pub mod profiles;
 pub mod resolution;
 pub mod settings;

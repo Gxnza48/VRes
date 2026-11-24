@@ -14,6 +14,7 @@
 
 pub mod console;
 pub mod control;
+pub mod ddc;
 pub mod displays;
 pub mod dpi;
 pub mod error;
@@ -23,9 +24,11 @@ pub mod keyboard;
 pub mod mag;
 pub mod modes;
 pub mod overlay;
+pub mod panel;
 pub mod probe;
 pub mod process;
 pub mod sound;
+pub mod system;
 pub mod vibrance;
 pub mod window;
 

@@ -8,7 +8,8 @@
  * Identidad: fondo negro total, verde lima del logo (#9EFA12) y texto negro
  * sobre el verde.
  */
-:root {
+:root,
+[data-theme="black"] {
   color-scheme: dark;
 
   --vr-bg: #000000;
@@ -30,4 +31,15 @@
   --vr-radius-card: 16px;
   --vr-font-sans: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
   --vr-font-display: "Orbitron", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+}
+
+/* Grafito: superficies grises oscuras, el mismo verde lima. */
+[data-theme="graphite"] {
+  --vr-bg: #15171a;
+  --vr-surface: #1c1f23;
+  --vr-surface-2: #262a30;
+  --vr-border: #353b42;
+
+  --vr-fg: #f2f4f5;
+  --vr-muted: #9ba4ad;
 }

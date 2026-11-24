@@ -27,6 +27,8 @@ mod guard;
 #[cfg(windows)]
 mod hw;
 #[cfg(windows)]
+mod monitor;
+#[cfg(windows)]
 mod resolution;
 mod share;
 #[cfg(windows)]
@@ -117,6 +119,9 @@ enum Command {
     /// Programa en primer plano (detección de juegos).
     #[command(subcommand)]
     Fg(FgCommand),
+    /// Controles por hardware: DDC/CI en monitores externos, WMI en el panel.
+    #[command(subcommand)]
+    Ddc(DdcCommand),
     /// Zoom de pantalla completa (lo que usa Zoom).
     #[command(subcommand)]
     Zoom(ZoomCommand),
@@ -178,6 +183,18 @@ enum ModeCommand {
         #[arg(long)]
         allow_mode_switch: bool,
     },
+}
+
+#[derive(Debug, Subcommand)]
+enum DdcCommand {
+    /// Lee brillo, contraste y ganancias de cada pantalla (no cambia nada).
+    Get {
+        /// Solo esta pantalla (id o \\.\DISPLAYn).
+        #[arg(long)]
+        display: Option<String>,
+    },
+    /// Sube o baja el brillo 1 punto y lo devuelve, en cada pantalla.
+    Test,
 }
 
 #[derive(Debug, Subcommand)]
@@ -508,6 +525,8 @@ fn run(command: Command) -> Report {
             Duration::from_millis(hold_ms.min(resolution::MAX_MODE_HOLD_MS)),
             allow_mode_switch,
         ),
+        Command::Ddc(DdcCommand::Get { display }) => monitor::get(display.as_deref()),
+        Command::Ddc(DdcCommand::Test) => monitor::test(),
         Command::Zoom(ZoomCommand::Test {
             display,
             level,

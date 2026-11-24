@@ -1,5 +1,4 @@
 import {
-  ClipboardCopy,
   Download,
   ExternalLink,
   Languages,
@@ -20,7 +19,8 @@ import { events } from "@/lib/events";
 import { inTauri, ipc, isIpcError } from "@/lib/ipc";
 import { ISSUES_URL, REPOSITORY_URL } from "@/lib/links";
 import { useAppStore } from "@/state/app";
-import { useEngineStore } from "@/state/engine";
+
+import { BehaviorCard, DiagnosticsCard, LicensesCard, ResetCard } from "./SystemCards";
 
 type UpdateState =
   | { kind: "idle" }
@@ -54,7 +54,11 @@ export function MorePage() {
             <CardDescription>{t("more.safety.description")}</CardDescription>
           </CardHeader>
         </Card>
+        <BehaviorCard />
         <AboutCard />
+        <DiagnosticsCard />
+        <LicensesCard />
+        <ResetCard />
       </div>
     </>
   );
@@ -216,27 +220,6 @@ function AboutCard() {
   const { t } = useTranslation();
   const version = useAppStore((state) => state.bootstrap?.appVersion);
   const tauri = inTauri();
-  const [copied, setCopied] = useState(false);
-
-  /** Copia un resumen técnico (sin datos personales) para los reportes. */
-  const copyDiagnostics = () => {
-    const engine = useEngineStore.getState();
-    const report = {
-      version,
-      userAgent: navigator.userAgent,
-      displays: engine.displays,
-      status: engine.status,
-      requested: engine.requested,
-    };
-    navigator.clipboard
-      .writeText(JSON.stringify(report, null, 2))
-      .then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      })
-      .catch((error: unknown) => console.error("diagnóstico", error));
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -255,10 +238,6 @@ function AboutCard() {
           <Button variant="ghost" size="sm" onClick={() => void ipc.openExternal(ISSUES_URL)}>
             <ExternalLink aria-hidden />
             {t("more.about.report")}
-          </Button>
-          <Button variant="ghost" size="sm" onClick={copyDiagnostics}>
-            <ClipboardCopy aria-hidden />
-            {copied ? t("more.about.copied") : t("more.about.copyDiagnostics")}
           </Button>
         </CardContent>
       )}
