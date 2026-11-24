@@ -20,6 +20,11 @@ vi.mock("@/lib/ipc", () => ({
     lookReset: vi.fn().mockResolvedValue(null),
     lookSetEnabled: vi.fn().mockResolvedValue(null),
     lookCompare: vi.fn().mockResolvedValue(undefined),
+    looksPresets: vi.fn().mockResolvedValue([]),
+    crosshairPresets: vi.fn().mockResolvedValue([]),
+    gamesList: vi.fn().mockResolvedValue([]),
+    shareEncodeLook: vi.fn().mockResolvedValue("VRL1-00000"),
+    shareDecode: vi.fn(),
   },
 }));
 

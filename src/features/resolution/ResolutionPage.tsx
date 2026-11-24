@@ -14,7 +14,6 @@ import { useResolutionStore } from "@/state/resolution";
 import { useSettingsStore } from "@/state/settings";
 
 import { applyMode, restoreDisplay, setHdr } from "./actions";
-import { CountdownDialog } from "./CountdownDialog";
 import { aspectLabel, sizeLabel } from "./format";
 import { HotkeyCard } from "./HotkeyCard";
 import { ModesCard } from "./ModesCard";
@@ -210,7 +209,6 @@ export function ResolutionPage() {
 
       {settings && <HotkeyCard settings={settings} displays={displays} busy={busy} />}
 
-      {state.pending && <CountdownDialog pending={state.pending} busy={busy} />}
     </div>
   );
 }

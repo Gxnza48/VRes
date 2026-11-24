@@ -1,6 +1,6 @@
 //! Comandos del motor: pantallas, look y estado.
 
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, Emitter, State};
 use vres_core::ipc::{ErrorCode, IpcError};
 use vres_core::model::display::DisplayInfo;
 use vres_core::model::look::Look;
@@ -8,7 +8,7 @@ use vres_core::planner::Requested;
 use vres_core::status::EngineStatus;
 use vres_engine::{ApplyMode, Command};
 
-use crate::engine_bridge::EngineState;
+use crate::engine_bridge::{EVENT_REQUESTED, EngineState};
 
 fn ensure(engine: &EngineState) -> Result<(), IpcError> {
     if engine.available() {
@@ -55,35 +55,55 @@ pub async fn look_preview(engine: State<'_, EngineState>, look: Look) -> Result<
     Ok(())
 }
 
+/// Avisa a todas las ventanas (la principal y el popup rápido) del cambio.
+fn broadcast(app: &AppHandle, requested: Requested) -> Requested {
+    let _ = app.emit(EVENT_REQUESTED, &requested);
+    requested
+}
+
+/// Lo que está pedido (look, pantallas, interruptores).
+#[tauri::command]
+pub async fn look_get(engine: State<'_, EngineState>) -> Result<Requested, IpcError> {
+    Ok(engine.requested())
+}
+
 /// Aplica y guarda un look.
 #[tauri::command]
 pub async fn look_commit(
+    app: AppHandle,
     engine: State<'_, EngineState>,
     look: Look,
 ) -> Result<Requested, IpcError> {
     ensure(&engine)?;
-    Ok(engine.update(ApplyMode::Commit, |requested| requested.look = look))
+    let requested = engine.update(ApplyMode::Commit, |requested| requested.look = look);
+    Ok(broadcast(&app, requested))
 }
 
 /// Vuelve el look a los valores neutros.
 #[tauri::command]
-pub async fn look_reset(engine: State<'_, EngineState>) -> Result<Requested, IpcError> {
+pub async fn look_reset(
+    app: AppHandle,
+    engine: State<'_, EngineState>,
+) -> Result<Requested, IpcError> {
     ensure(&engine)?;
-    Ok(engine.update(ApplyMode::Commit, |requested| {
+    let requested = engine.update(ApplyMode::Commit, |requested| {
         requested.look = Look::default();
-    }))
+    });
+    Ok(broadcast(&app, requested))
 }
 
 /// Enciende o apaga el color.
 #[tauri::command]
 pub async fn look_set_enabled(
+    app: AppHandle,
     engine: State<'_, EngineState>,
     enabled: bool,
 ) -> Result<Requested, IpcError> {
     ensure(&engine)?;
-    Ok(engine.update(ApplyMode::Commit, |requested| {
+    let requested = engine.update(ApplyMode::Commit, |requested| {
         requested.color_enabled = enabled;
-    }))
+    });
+    Ok(broadcast(&app, requested))
 }
 
 /// "Comparar": mientras está activo se ve la imagen original.

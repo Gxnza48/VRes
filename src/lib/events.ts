@@ -2,6 +2,7 @@
  * Eventos que emite el motor. Es el ÚNICO archivo que llama a `listen`.
  */
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 import type { DisplayInfo } from "./bindings/DisplayInfo";
 import type { EngineStatus } from "./bindings/EngineStatus";
@@ -35,6 +36,9 @@ export const events = {
     on("resolution:resolved", handler),
   /** Cambiaron los ajustes (por ejemplo, se confirmó un modo nuevo). */
   onSettingsChanged: (handler: (settings: Settings) => void) => on("settings:changed", handler),
+  /** La ventana actual ganó o perdió el foco (el popup rápido se cierra al perderlo). */
+  onFocusChanged: (handler: (focused: boolean) => void) =>
+    getCurrentWindow().onFocusChanged((event) => handler(event.payload)),
   /** Progreso de descarga de una actualización. */
   onUpdateProgress: (handler: (progress: UpdateProgress) => void) =>
     on("update:progress", handler),

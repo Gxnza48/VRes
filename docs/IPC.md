@@ -22,9 +22,8 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 | Pantallas | `displays_list` · `displays_set_targets` · `displays_identify` | F1 ✅ |
 | Pantallas | `displays_set_trim` | F8 |
 | Resolución | `resolution_get_state` · `resolution_apply` (devuelve `PendingMode`: `token`, `expiresInMs`, `seconds`) · `resolution_confirm` · `resolution_revert` · `resolution_restore` · `resolution_toggle` · `hdr_set` | F2 ✅ |
-| Biblioteca | `library_list` · `library_get` · `library_save` · `library_delete` · `library_duplicate` · `library_apply` | F5 |
-| Biblioteca | `library_set_favorite` | F5 |
-| Compartir | `share_export` · `share_decode` · `share_import` | F5 |
+| Biblioteca | Looks guardados, favoritos, crosshairs guardados y resoluciones conservadas viven en `settings.json` (`settings_get` · `settings_update`); `looks_presets` · `games_list` | F5 ✅ |
+| Compartir | `share_encode_look` · `share_encode_crosshair` · `share_encode_resolution` · `share_decode` (nunca falla: el motivo viaja en `error`) | F5 ✅ |
 | Crosshair | `crosshair_render` (bytes: lado, centro y RGBA) · `crosshair_presets` · `crosshair_preview`; prender, elegir monitor, guardar e imagen propia van por `settings_update` | F4 ✅ |
 | Juegos y perfiles | `games_list` · `games_add_custom` · `games_remove_custom` · `games_running_candidates` · `profiles_activate` · `profiles_set_auto_switch` | F6 |
 | Dark Boost y zoom | `darkboost_preview` · `darkboost_commit` · `zoom_commit` · `enhancers_set_armed` | F7 |
@@ -34,7 +33,7 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 | Ajustes | `customize_set_background` | F8 |
 | Diagnóstico | `diag_report` · `diag_export` · `diag_selftest` | F1 |
 | Celular | `remote_start` · `remote_stop` · `remote_status` · `remote_regenerate_token` | F9 |
-| Popup | `quick_toggle` | F5 |
+| Popup | `quick_toggle` · `quick_close` · `app_open_main` · `look_get` | F5 ✅ |
 
 ## Eventos
 

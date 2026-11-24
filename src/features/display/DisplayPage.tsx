@@ -23,7 +23,9 @@ import {
   setCompare,
   setTargets,
 } from "./actions";
+import { AdvancedColor } from "./AdvancedColor";
 import { formatDecimal, formatPercent, formatSigned } from "./format";
+import { LooksCard } from "./LooksCard";
 import { MonitorCard } from "./MonitorCard";
 
 type ToneKey = Exclude<keyof Tone, "gain">;
@@ -180,6 +182,8 @@ export function DisplayPage() {
           </CardContent>
         </Card>
 
+        <LooksCard look={look} enabled={enabled} />
+
         <Card>
           <CardHeader className="flex-row items-baseline justify-between">
             <CardTitle>{t("display.saturation.title")}</CardTitle>
@@ -289,6 +293,8 @@ export function DisplayPage() {
             ))}
           </CardContent>
         </Card>
+
+        <AdvancedColor look={look} enabled={enabled} />
 
         <p className="text-xs text-muted">{t("display.emergency")}</p>
       </div>

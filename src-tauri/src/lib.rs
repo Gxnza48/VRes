@@ -69,6 +69,10 @@ pub fn run() {
             commands::app::app_bootstrap,
             commands::app::app_ui_ready,
             commands::app::app_quit,
+            commands::app::app_open_main,
+            commands::app::quick_toggle,
+            commands::app::quick_close,
+            commands::engine::look_get,
             commands::update::update_check,
             commands::update::update_install,
             commands::engine::displays_list,
@@ -98,6 +102,12 @@ pub fn run() {
             commands::crosshair::crosshair_render,
             commands::crosshair::crosshair_presets,
             commands::crosshair::crosshair_preview,
+            commands::share::share_encode_look,
+            commands::share::share_encode_crosshair,
+            commands::share::share_encode_resolution,
+            commands::share::share_decode,
+            commands::share::looks_presets,
+            commands::share::games_list,
         ])
         .build(tauri::generate_context!())
         .expect("VRes no pudo iniciar");

@@ -26,6 +26,7 @@ mod guard;
 mod hw;
 #[cfg(windows)]
 mod resolution;
+mod share;
 #[cfg(windows)]
 mod vibrance;
 
@@ -106,6 +107,9 @@ enum Command {
     /// Ventana del crosshair.
     #[command(subcommand)]
     Overlay(OverlayCommand),
+    /// Códigos para compartir (looks, crosshairs y resoluciones).
+    #[command(subcommand)]
+    Share(ShareCommand),
     /// Mediciones en hardware real.
     #[command(subcommand)]
     Probe(ProbeCommand),
@@ -160,6 +164,22 @@ enum ModeCommand {
         /// Confirma que la pantalla puede parpadear y cambiar unos segundos.
         #[arg(long)]
         allow_mode_switch: bool,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum ShareCommand {
+    /// Muestra qué hay en un código.
+    Decode {
+        /// Por ejemplo `VRL1-…`.
+        code: String,
+    },
+    /// Arma el código de un look o de un crosshair (en JSON).
+    Encode {
+        #[arg(long)]
+        look: Option<String>,
+        #[arg(long)]
+        crosshair: Option<String>,
     },
 }
 
@@ -430,6 +450,10 @@ fn run(command: Command) -> Report {
             Duration::from_millis(hold_ms.min(resolution::MAX_MODE_HOLD_MS)),
             allow_mode_switch,
         ),
+        Command::Share(ShareCommand::Decode { code }) => share::decode(&code),
+        Command::Share(ShareCommand::Encode { look, crosshair }) => {
+            share::encode(look.as_deref(), crosshair.as_deref())
+        }
         Command::Overlay(OverlayCommand::Test { display, hold_ms }) => {
             crosshair::overlay_test(display.as_deref(), hold(hold_ms))
         }

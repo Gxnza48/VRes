@@ -4,6 +4,20 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.5.0] - 2026-11-24
+
+**Looks, Biblioteca, códigos y color avanzado** (fase F5 de la [hoja de ruta](docs/ROADMAP.md)).
+
+### Agregado
+
+- **Looks** en la pestaña Pantalla: cuatro generales y dos por juego (Fortnite, VALORANT, CS2, Apex Legends, Rust y Rainbow Six Siege), propios de VRes. Guarda los tuyos con nombre y juego, y marca favoritos.
+- Pestaña **Biblioteca**: looks, crosshairs y resoluciones en un solo lugar, con búsqueda, filtro por juego, aplicar, copiar a los míos y borrar. Todo queda en tu PC.
+- **Códigos para compartir** por Discord o WhatsApp: `VRL1-…` (look), `VRC1-…` (crosshair) y `VRR1-…` (resolución). Son cortos, toleran errores de copiado (espacios, guiones, O por 0) y se pueden importar desde la Biblioteca.
+- **Color avanzado**: fórmula de luminancia, giro de tono, oscurecer un color, ayudas para daltonismo (rojo, verde y azul débil) y cuidado visual (calidez y atenuación).
+- **Ajuste rápido** desde la bandeja: una ventana chica con color, saturación, vibrance y looks, que se cierra al hacer clic afuera.
+- La cuenta regresiva de resolución aparece en cualquier pestaña.
+- `vres-cli share encode | decode`.
+
 ## [0.4.0] - 2026-11-24
 
 **Crosshair** (fase F4 de la [hoja de ruta](docs/ROADMAP.md)).
@@ -66,7 +80,8 @@ Primera versión pública: la base de la app y la pestaña **Pantalla** (fases F
 - Matemática de color con más de 70 pruebas (incluidas pruebas de propiedades) y resultados de las pruebas en hardware real en [docs/hardware/RESULTADOS.md](docs/hardware/RESULTADOS.md).
 - Documentación: arquitectura, motor de color, anti-cheat, contrato interno, códigos para compartir, desarrollo y hoja de ruta.
 
-[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.4.0...HEAD
+[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/Gxnza48/VRes/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/Gxnza48/VRes/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Gxnza48/VRes/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Gxnza48/VRes/compare/v0.1.0...v0.2.0

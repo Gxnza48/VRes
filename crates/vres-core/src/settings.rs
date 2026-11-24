@@ -10,6 +10,7 @@ use ts_rs::TS;
 
 use crate::crosshair::Crosshair;
 use crate::keys::{Hotkey, check_hotkey};
+use crate::model::look::Look;
 use crate::model::resolution::ModeRequest;
 
 /// Versión del esquema de `settings.json`.
@@ -22,8 +23,10 @@ pub const CONFIRM_SECONDS_RANGE: (u32, u32) = (5, 60);
 pub const MAX_CONFIRMED: usize = 24;
 /// Crosshairs guardados como máximo.
 pub const MAX_SAVED_CROSSHAIRS: usize = 50;
-/// Largo máximo del nombre de un crosshair guardado.
+/// Largo máximo del nombre de un crosshair o look guardado.
 pub const MAX_NAME_CHARS: usize = 40;
+/// Looks guardados como máximo.
+pub const MAX_SAVED_LOOKS: usize = 200;
 
 /// Un modo de una pantalla.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, TS)]
@@ -94,6 +97,28 @@ pub struct CrosshairSettings {
     pub saved: Vec<SavedCrosshair>,
 }
 
+/// Un look guardado por el usuario.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct SavedLook {
+    /// Identificador único (lo genera la interfaz).
+    pub id: String,
+    pub name: String,
+    /// Juego para el que se guardó (`None`: cualquiera).
+    pub game: Option<String>,
+    pub favorite: bool,
+    pub look: Look,
+}
+
+/// Biblioteca local: todo queda en tu PC.
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase", default)]
+#[ts(export)]
+pub struct LibrarySettings {
+    pub looks: Vec<SavedLook>,
+}
+
 /// `settings.json`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase", default)]
@@ -103,6 +128,7 @@ pub struct Settings {
     pub hotkeys: HotkeySettings,
     pub resolution: ResolutionSettings,
     pub crosshair: CrosshairSettings,
+    pub library: LibrarySettings,
 }
 
 impl Default for Settings {
@@ -112,6 +138,7 @@ impl Default for Settings {
             hotkeys: HotkeySettings::default(),
             resolution: ResolutionSettings::default(),
             crosshair: CrosshairSettings::default(),
+            library: LibrarySettings::default(),
         }
     }
 }
@@ -152,6 +179,18 @@ impl Settings {
             saved.name = name;
         }
         self.crosshair.saved.retain(|saved| !saved.name.is_empty());
+
+        let mut ids = std::collections::BTreeSet::new();
+        self.library.looks.retain(|saved| {
+            !saved.id.trim().is_empty()
+                && !saved.name.trim().is_empty()
+                && ids.insert(saved.id.clone())
+        });
+        self.library.looks.truncate(MAX_SAVED_LOOKS);
+        for saved in &mut self.library.looks {
+            saved.look = saved.look.clamped();
+            saved.name = saved.name.trim().chars().take(MAX_NAME_CHARS).collect();
+        }
         self
     }
 

@@ -13,9 +13,11 @@ pub mod color;
 pub mod crosshair;
 pub mod ipc;
 pub mod keys;
+pub mod looks;
 pub mod model;
 pub mod planner;
 pub mod settings;
+pub mod share;
 pub mod status;
 pub mod store;
 

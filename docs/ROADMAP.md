@@ -9,7 +9,7 @@ VRes se construye por **fases**. Cada fase termina en una versión instalable: c
 | **F2** | Resolución estirada, Hz y HDR | v0.2 | ✅ |
 | **F3** | Vibrance por driver | v0.3 | ✅ |
 | **F4** | Crosshair | v0.4 | ✅ |
-| **F5** | Looks, Biblioteca, códigos y color avanzado | v0.5 | 🗓 |
+| **F5** | Looks, Biblioteca, códigos y color avanzado | v0.5 | ✅ |
 | **F6** | Perfiles por juego | v0.6 | 🗓 |
 | **F7** | Dark Boost y Zoom | v0.7 | 🗓 |
 | **F8** | Monitor (DDC/CI), Personalizar y Más | v0.8 | 🗓 |
@@ -77,11 +77,14 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 
 ## F5 — Looks, Biblioteca, códigos y color avanzado
 
-- Almacén genérico de la biblioteca (looks, crosshairs, resoluciones y perfiles)
-- Looks por juego (presets propios) y biblioteca local con búsqueda y filtros
-- Códigos para compartir (`VRL1-…`, `VRC1-…`, `VRR1-…`, `VRP1-…`), tolerantes a errores de copiado
-- Fórmula de luminancia, giro de tono, oscurecer un color, ayudas para daltonismo, cuidado visual
-- Popup rápido de color
+- [x] Biblioteca local (en `settings.json`): looks guardados con juego y favoritos, crosshairs guardados y resoluciones conservadas, con búsqueda y filtro por juego
+- [x] Looks propios: cuatro generales y dos por cada uno de los seis juegos
+- [x] Códigos para compartir `VRL1-…` (look), `VRC1-…` (crosshair) y `VRR1-…` (resolución): TLV + CRC-32 en Base32 de Crockford, tolerantes a errores de copiado y a campos desconocidos; pruebas de propiedades de ida y vuelta
+- [x] Fórmula de luminancia, giro de tono, oscurecer un color, ayudas para daltonismo (Machado et al., 2009) y cuidado visual
+- [x] Popup rápido junto a la bandeja: color, saturación, vibrance y looks
+- [x] `vres-cli share encode | decode`
+- [ ] Código de perfil `VRP1-…`: llega con los perfiles (F6)
+- [ ] A ojo: que los looks incluidos se vean razonables en cada juego
 
 ## F6 — Perfiles por juego
 

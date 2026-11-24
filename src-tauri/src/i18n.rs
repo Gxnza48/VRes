@@ -34,6 +34,7 @@ impl Lang {
 pub struct TrayTexts {
     pub tooltip: &'static str,
     pub open: &'static str,
+    pub quick: &'static str,
     pub pause: &'static str,
     pub reset: &'static str,
     pub quit: &'static str,
@@ -45,6 +46,7 @@ pub fn tray_texts(lang: Lang) -> TrayTexts {
         Lang::Es => TrayTexts {
             tooltip: "VRes",
             open: "Abrir VRes",
+            quick: "Ajuste rápido",
             pause: "Pausar todo",
             reset: "Restablecer pantalla",
             quit: "Salir",
@@ -52,6 +54,7 @@ pub fn tray_texts(lang: Lang) -> TrayTexts {
         Lang::En => TrayTexts {
             tooltip: "VRes",
             open: "Open VRes",
+            quick: "Quick adjust",
             pause: "Pause everything",
             reset: "Reset display",
             quit: "Quit",
@@ -59,6 +62,7 @@ pub fn tray_texts(lang: Lang) -> TrayTexts {
         Lang::PtBr => TrayTexts {
             tooltip: "VRes",
             open: "Abrir o VRes",
+            quick: "Ajuste rápido",
             pause: "Pausar tudo",
             reset: "Restaurar tela",
             quit: "Sair",

@@ -26,16 +26,6 @@
     "roadmap": "Ver o roadmap"
   },
   "pages": {
-    "library": {
-      "title": "Biblioteca",
-      "subtitle": "Seus looks, miras, resoluções e perfis, guardados no seu PC.",
-      "items": [
-        "Looks de cor, miras, resoluções e perfis em um só lugar",
-        "Busca e filtro por jogo",
-        "Compartilhar com um código de texto (pelo Discord ou WhatsApp) e importar o de um amigo",
-        "Tudo fica no seu PC: sem conta e sem servidores"
-      ]
-    },
     "monitor": {
       "title": "Monitor",
       "subtitle": "O que o seu monitor permite ajustar por hardware.",
@@ -118,10 +108,6 @@
       "label": "Iniciar com o Windows"
     }
   },
-  "quick": {
-    "title": "Popup rápido de cor",
-    "description": "Chega na fase F5."
-  },
   "display": {
     "title": "Tela",
     "subtitle": "Saturação e ajuste fino de cor, monitor por monitor.",
@@ -184,6 +170,39 @@
       "driver": "Driver {{backend}}",
       "emulated": "Emulada (sem driver)",
       "original": "No seu painel: {{value}}"
+    },
+    "depth": {
+      "title": "Profundidade de cor",
+      "description": "Como o brilho de cada cor é calculado, giro de matiz e escurecer uma cor.",
+      "luma": "Fórmula de luminância",
+      "lumas": {
+        "rec709": "Rec. 709 (monitores)",
+        "rec601": "Rec. 601 (vídeo clássico)",
+        "rec2020": "Rec. 2020 (HDR)",
+        "average": "Média"
+      },
+      "hueShift": "Giro de matiz",
+      "hueAmount": "Quantidade do giro",
+      "darkenHue": "Matiz a escurecer",
+      "darkenAmount": "Quanto escurecer (clareia a complementar)"
+    },
+    "vision": {
+      "title": "Visão de cores",
+      "description": "Ajuda a distinguir cores se você tem daltonismo.",
+      "mode": "Tipo",
+      "modes": {
+        "off": "Normal",
+        "protan": "Vermelho fraco (protanopia)",
+        "deutan": "Verde fraco (deuteranopia)",
+        "tritan": "Azul fraco (tritanopia)"
+      },
+      "strength": "Intensidade"
+    },
+    "eyeCare": {
+      "title": "Cuidado visual",
+      "description": "Menos azul e menos brilho para jogar à noite. Soma-se a qualquer look.",
+      "warmth": "Calor",
+      "dim": "Atenuação"
     }
   },
   "reasons": {
@@ -443,5 +462,104 @@
       "deg": "{{value}}°",
       "percent": "{{value}}%"
     }
+  },
+  "looks": {
+    "title": "Looks",
+    "description": "Pontos de partida para cada jogo e os seus. Ajuste no olho: cada monitor é diferente.",
+    "allGames": "Todos",
+    "anyGame": "Qualquer jogo",
+    "mine": "Seu",
+    "favorite": "Favorito",
+    "remove": "Apagar",
+    "name": "Nome",
+    "game": "Jogo",
+    "save": "Salvar o look atual",
+    "presets": {
+      "vivid": "Vívido",
+      "clarity": "Nitidez",
+      "night": "Visão noturna",
+      "soft": "Suave",
+      "fortnite-vivid": "Cores vivas",
+      "fortnite-clean": "Limpo",
+      "valorant-pop": "Inimigos em destaque",
+      "valorant-clean": "Limpo",
+      "cs2-visibility": "Mais visibilidade",
+      "cs2-sharp": "Contraste",
+      "apex-vivid": "Vívido",
+      "apex-clean": "Limpo",
+      "rust-night": "Noite",
+      "rust-day": "Dia",
+      "r6-contrast": "Contraste",
+      "r6-vivid": "Vívido"
+    }
+  },
+  "share": {
+    "copy": "Copiar código",
+    "copied": "Copiado!",
+    "paste": "Colar um código",
+    "apply": "Aplicar",
+    "notShareable": "Crosshairs de imagem não cabem num código.",
+    "clamped": "Alguns valores estavam fora do intervalo e foram ajustados.",
+    "lookTitle": "Compartilhar o look",
+    "lookDescription": "Mande pelo Discord ou WhatsApp como texto, ou cole o de um amigo.",
+    "crosshairTitle": "Compartilhar o crosshair",
+    "crosshairDescription": "Um código de texto com a sua mira; cole o de um amigo para testar.",
+    "placeholder": {
+      "look": "VRL1-…",
+      "crosshair": "VRC1-…",
+      "resolution": "VRR1-…"
+    },
+    "errors": {
+      "badPrefix": "Isso não é um código do VRes.",
+      "badChar": "O código tem caracteres que não deveriam estar ali.",
+      "badChecksum": "O código foi copiado errado: confira se está completo.",
+      "unsupportedVersion": "Esse código é de uma versão mais nova do VRes: atualize o app.",
+      "wrongKind": "Esse código é de outra coisa (por exemplo, um crosshair onde vai um look).",
+      "tooLong": "O código é longo demais.",
+      "truncated": "O código está cortado.",
+      "imageNotShareable": "Crosshairs de imagem não cabem num código."
+    }
+  },
+  "library": {
+    "title": "Biblioteca",
+    "subtitle": "Seus looks, crosshairs e resoluções, salvos no seu PC. Sem conta e sem servidores.",
+    "tabs": {
+      "looks": "Looks",
+      "crosshairs": "Crosshairs",
+      "resolutions": "Resoluções",
+      "import": "Importar código"
+    },
+    "search": "Buscar",
+    "empty": "Nada corresponde à busca.",
+    "included": "Incluído",
+    "apply": "Aplicar",
+    "use": "Usar",
+    "copyCode": "Copiar código",
+    "duplicate": "Copiar para os meus",
+    "disconnected": "Monitor desconectado",
+    "resolutionsHint": "As resoluções que você manteve alguma vez. Ao aplicar, o VRes pede confirmação.",
+    "resolutionsEmpty": "Você ainda não manteve nenhuma resolução esticada.",
+    "import": {
+      "title": "Importar um código",
+      "description": "Cole um código do VRes (look, crosshair ou resolução) para salvar ou aplicar.",
+      "placeholder": "VRL1-… · VRC1-… · VRR1-…",
+      "read": "Ler código",
+      "defaultName": "Importado",
+      "found": {
+        "look": "É um look.",
+        "crosshair": "É um crosshair.",
+        "resolution": "É uma resolução: {{mode}}."
+      },
+      "saveLook": "Salvar e aplicar",
+      "saveCrosshair": "Salvar e usar",
+      "applyOn": "Aplicar nessa tela"
+    }
+  },
+  "quick": {
+    "title": "Ajuste rápido",
+    "description": "Cor, saturação, vibrance e looks a um clique.",
+    "looks": "Looks (favoritos e gerais)",
+    "openMain": "Abrir o VRes",
+    "close": "Fechar"
   }
 }

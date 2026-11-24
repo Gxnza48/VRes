@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { PageHeader } from "@/components/common/PageHeader";
 import { ParamSlider, type SliderRange } from "@/components/common/ParamSlider";
+import { ShareBox } from "@/components/common/ShareBox";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Crosshair } from "@/lib/bindings/Crosshair";
@@ -396,6 +397,22 @@ export function CrosshairPage() {
             />
             <p className="text-xs text-muted">{t("crosshair.placement.hideHint")}</p>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("share.crosshairTitle")}</CardTitle>
+          <CardDescription>{t("share.crosshairDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ShareBox
+            kind="crosshair"
+            encode={() => ipc.shareEncodeCrosshair(current)}
+            onDecoded={(decoded) => {
+              if (decoded.crosshair) change(decoded.crosshair, "commit");
+            }}
+          />
         </CardContent>
       </Card>
 

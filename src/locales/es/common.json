@@ -26,16 +26,6 @@
     "roadmap": "Ver la hoja de ruta"
   },
   "pages": {
-    "library": {
-      "title": "Biblioteca",
-      "subtitle": "Tus looks, crosshairs, resoluciones y perfiles, guardados en tu PC.",
-      "items": [
-        "Looks de color, crosshairs, resoluciones y perfiles en un solo lugar",
-        "Búsqueda y filtro por juego",
-        "Compartir con un código de texto (por Discord o WhatsApp) e importar el de un amigo",
-        "Todo queda en tu PC: sin cuenta y sin servidores"
-      ]
-    },
     "monitor": {
       "title": "Monitor",
       "subtitle": "Lo que tu monitor permite ajustar por hardware.",
@@ -118,10 +108,6 @@
       "label": "Iniciar con Windows"
     }
   },
-  "quick": {
-    "title": "Popup rápido de color",
-    "description": "Llega en la fase F5."
-  },
   "display": {
     "title": "Pantalla",
     "subtitle": "Saturación y ajuste fino del color, monitor por monitor.",
@@ -184,6 +170,39 @@
       "driver": "Driver {{backend}}",
       "emulated": "Emulada (sin driver)",
       "original": "En tu panel: {{value}}"
+    },
+    "depth": {
+      "title": "Profundidad de color",
+      "description": "Cómo se calcula el brillo de cada color, giro de tono y oscurecer un color.",
+      "luma": "Fórmula de luminancia",
+      "lumas": {
+        "rec709": "Rec. 709 (monitores)",
+        "rec601": "Rec. 601 (video clásico)",
+        "rec2020": "Rec. 2020 (HDR)",
+        "average": "Promedio"
+      },
+      "hueShift": "Giro de tono",
+      "hueAmount": "Cantidad del giro",
+      "darkenHue": "Tono a oscurecer",
+      "darkenAmount": "Cuánto oscurecer (aclara su complementario)"
+    },
+    "vision": {
+      "title": "Visión de color",
+      "description": "Ayuda para distinguir colores si tienes daltonismo.",
+      "mode": "Tipo",
+      "modes": {
+        "off": "Normal",
+        "protan": "Rojo débil (protanopía)",
+        "deutan": "Verde débil (deuteranopía)",
+        "tritan": "Azul débil (tritanopía)"
+      },
+      "strength": "Intensidad"
+    },
+    "eyeCare": {
+      "title": "Cuidado visual",
+      "description": "Menos azul y menos brillo para jugar de noche. Se suma a cualquier look.",
+      "warmth": "Calidez",
+      "dim": "Atenuación"
     }
   },
   "reasons": {
@@ -443,5 +462,104 @@
       "deg": "{{value}}°",
       "percent": "{{value}} %"
     }
+  },
+  "looks": {
+    "title": "Looks",
+    "description": "Puntos de partida para cada juego y los tuyos. Ajústalos a ojo: cada monitor es distinto.",
+    "allGames": "Todos",
+    "anyGame": "Cualquier juego",
+    "mine": "Tuyo",
+    "favorite": "Favorito",
+    "remove": "Borrar",
+    "name": "Nombre",
+    "game": "Juego",
+    "save": "Guardar el look actual",
+    "presets": {
+      "vivid": "Vívido",
+      "clarity": "Nitidez",
+      "night": "Visión nocturna",
+      "soft": "Suave",
+      "fortnite-vivid": "Colores vivos",
+      "fortnite-clean": "Limpio",
+      "valorant-pop": "Enemigos que resaltan",
+      "valorant-clean": "Limpio",
+      "cs2-visibility": "Más visibilidad",
+      "cs2-sharp": "Contraste",
+      "apex-vivid": "Vívido",
+      "apex-clean": "Limpio",
+      "rust-night": "Noche",
+      "rust-day": "Día",
+      "r6-contrast": "Contraste",
+      "r6-vivid": "Vívido"
+    }
+  },
+  "share": {
+    "copy": "Copiar código",
+    "copied": "¡Copiado!",
+    "paste": "Pegar un código",
+    "apply": "Aplicar",
+    "notShareable": "Los crosshairs de imagen no entran en un código.",
+    "clamped": "Algunos valores estaban fuera de rango y se ajustaron.",
+    "lookTitle": "Compartir el look",
+    "lookDescription": "Pásalo por Discord o WhatsApp como texto, o pega el de un amigo.",
+    "crosshairTitle": "Compartir el crosshair",
+    "crosshairDescription": "Un código de texto con tu mira; pega el de un amigo para probarla.",
+    "placeholder": {
+      "look": "VRL1-…",
+      "crosshair": "VRC1-…",
+      "resolution": "VRR1-…"
+    },
+    "errors": {
+      "badPrefix": "Eso no es un código de VRes.",
+      "badChar": "El código tiene caracteres que no van.",
+      "badChecksum": "El código se copió mal: revisa que esté completo.",
+      "unsupportedVersion": "Ese código es de una versión más nueva de VRes: actualiza la app.",
+      "wrongKind": "Ese código es de otra cosa (por ejemplo, un crosshair donde va un look).",
+      "tooLong": "El código es demasiado largo.",
+      "truncated": "El código está cortado.",
+      "imageNotShareable": "Los crosshairs de imagen no entran en un código."
+    }
+  },
+  "library": {
+    "title": "Biblioteca",
+    "subtitle": "Tus looks, crosshairs y resoluciones, guardados en tu PC. Sin cuenta y sin servidores.",
+    "tabs": {
+      "looks": "Looks",
+      "crosshairs": "Crosshairs",
+      "resolutions": "Resoluciones",
+      "import": "Importar código"
+    },
+    "search": "Buscar",
+    "empty": "Nada coincide con la búsqueda.",
+    "included": "Incluido",
+    "apply": "Aplicar",
+    "use": "Usar",
+    "copyCode": "Copiar código",
+    "duplicate": "Copiar a los míos",
+    "disconnected": "Monitor desconectado",
+    "resolutionsHint": "Las resoluciones que conservaste alguna vez. Al aplicar, VRes pide confirmarla.",
+    "resolutionsEmpty": "Todavía no conservaste ninguna resolución estirada.",
+    "import": {
+      "title": "Importar un código",
+      "description": "Pega un código de VRes (look, crosshair o resolución) para guardarlo o aplicarlo.",
+      "placeholder": "VRL1-… · VRC1-… · VRR1-…",
+      "read": "Leer código",
+      "defaultName": "Importado",
+      "found": {
+        "look": "Es un look.",
+        "crosshair": "Es un crosshair.",
+        "resolution": "Es una resolución: {{mode}}."
+      },
+      "saveLook": "Guardar y aplicar",
+      "saveCrosshair": "Guardar y usar",
+      "applyOn": "Aplicar en esa pantalla"
+    }
+  },
+  "quick": {
+    "title": "Ajuste rápido",
+    "description": "Color, saturación, vibrance y looks al alcance de un clic.",
+    "looks": "Looks (favoritos y generales)",
+    "openMain": "Abrir VRes",
+    "close": "Cerrar"
   }
 }

@@ -5,7 +5,7 @@
 //! van en la fila 4. Para que un gris siga siendo gris, cada columna del bloque
 //! de color tiene que sumar 1.
 
-use crate::model::look::Look;
+use crate::model::look::{Look, VisionMode};
 
 /// Límite por defecto para los coeficientes del bloque de color.
 ///
@@ -212,6 +212,112 @@ pub fn hue_rotation(degrees: f32) -> ColorMatrix {
     ColorMatrix(out)
 }
 
+/// Matriz 3×3 en convención de vector **columna** → `ColorMatrix` (fila).
+fn from_column_major(m: [[f32; 3]; 3]) -> ColorMatrix {
+    let mut out = ColorMatrix::IDENTITY.0;
+    for (i, row) in out.iter_mut().enumerate().take(3) {
+        for (j, value) in row.iter_mut().enumerate().take(3) {
+            *value = m[j][i];
+        }
+    }
+    ColorMatrix(out)
+}
+
+fn mul3(a: [[f32; 3]; 3], b: [[f32; 3]; 3]) -> [[f32; 3]; 3] {
+    let mut out = [[0.0; 3]; 3];
+    for (i, row) in out.iter_mut().enumerate() {
+        for (j, value) in row.iter_mut().enumerate() {
+            *value = (0..3).map(|k| a[i][k] * b[k][j]).sum();
+        }
+    }
+    out
+}
+
+/// Ayuda para daltonismo: corrige el color para quien tiene esa deficiencia.
+///
+/// Simula la deficiencia (matrices de Machado, Oliveira y Fernandes, 2009,
+/// severidad total) y redistribuye lo que se pierde hacia los canales que sí
+/// se distinguen. `strength` (0–1) mezcla con la identidad. Trabaja sobre los
+/// valores sRGB, igual que la matriz de color de Windows.
+pub fn vision_aid(mode: VisionMode, strength: f32) -> ColorMatrix {
+    let simulate: [[f32; 3]; 3] = match mode {
+        VisionMode::Off => return ColorMatrix::IDENTITY,
+        VisionMode::Protan => [
+            [0.152_286, 1.052_583, -0.204_868],
+            [0.114_503, 0.786_281, 0.099_216],
+            [-0.003_882, -0.048_116, 1.051_998],
+        ],
+        VisionMode::Deutan => [
+            [0.367_322, 0.860_646, -0.227_968],
+            [0.280_085, 0.672_501, 0.047_413],
+            [-0.011_820, 0.042_940, 0.968_881],
+        ],
+        VisionMode::Tritan => [
+            [1.255_528, -0.076_749, -0.178_779],
+            [-0.078_411, 0.930_809, 0.147_602],
+            [0.004_733, 0.691_367, 0.303_900],
+        ],
+    };
+    // A dónde va el error: rojo/verde → verde y azul; azul → rojo y verde.
+    let shift: [[f32; 3]; 3] = match mode {
+        VisionMode::Tritan => [[1.0, 0.0, 0.7], [0.0, 1.0, 0.7], [0.0, 0.0, 0.0]],
+        _ => [[0.0, 0.0, 0.0], [0.7, 1.0, 0.0], [0.7, 0.0, 1.0]],
+    };
+    let mut lost = [[0.0; 3]; 3];
+    for i in 0..3 {
+        for j in 0..3 {
+            lost[i][j] = f32::from(u8::from(i == j)) - simulate[i][j];
+        }
+    }
+    let mut corrected = mul3(shift, lost);
+    for (i, row) in corrected.iter_mut().enumerate() {
+        row[i] += 1.0;
+    }
+    ColorMatrix::IDENTITY.lerp(&from_column_major(corrected), strength.clamp(0.0, 1.0))
+}
+
+/// Oscurece un tono y aclara su complementario (es lineal: se documenta así).
+///
+/// `hue` en grados (0 = rojo), `amount` 0–1. El gris no cambia.
+pub fn darken_hue(hue: f32, amount: f32, weights: [f32; 3]) -> ColorMatrix {
+    if amount <= 0.0 {
+        return ColorMatrix::IDENTITY;
+    }
+    // El color puro de ese tono (HSV con S = V = 1), sin su luminancia.
+    let h = hue.rem_euclid(360.0) / 60.0;
+    let x = 1.0 - (h % 2.0 - 1.0).abs();
+    let pure = match h as u32 {
+        0 => [1.0, x, 0.0],
+        1 => [x, 1.0, 0.0],
+        2 => [0.0, 1.0, x],
+        3 => [0.0, x, 1.0],
+        4 => [x, 0.0, 1.0],
+        _ => [1.0, 0.0, x],
+    };
+    let luma: f32 = (0..3).map(|i| pure[i] * weights[i]).sum();
+    let chroma = [pure[0] - luma, pure[1] - luma, pure[2] - luma];
+    let norm: f32 = chroma.iter().map(|c| c * c).sum();
+    if norm <= f32::EPSILON {
+        return ColorMatrix::IDENTITY;
+    }
+    // f(rgb) = (rgb − Y(rgb))·croma / |croma|²: 1 en ese tono, 0 en el gris.
+    let sum: f32 = chroma.iter().sum();
+    let functional = [
+        (chroma[0] - sum * weights[0]) / norm,
+        (chroma[1] - sum * weights[1]) / norm,
+        (chroma[2] - sum * weights[2]) / norm,
+    ];
+    // Como máximo, el tono puro baja a la mitad.
+    let k = 0.5 * amount.clamp(0.0, 1.0);
+    let mut out = ColorMatrix::IDENTITY.0;
+    for (i, row) in out.iter_mut().enumerate().take(3) {
+        for value in row.iter_mut().take(3) {
+            *value -= k * functional[i];
+        }
+    }
+    ColorMatrix(out)
+}
+
 /// Invierte los colores (`1 − valor`).
 #[allow(clippy::needless_range_loop)]
 pub fn invert() -> ColorMatrix {
@@ -238,11 +344,22 @@ pub fn build_matrix(look: &Look, emulated_vibrance: Option<f32>, limit: f32) -> 
     let look = look.clamped();
     let weights = look.color.luma.weights();
 
+    // Orden: visión de color → giro de tono → croma → oscurecer un tono.
+    let vision = vision_aid(look.vision.mode, look.vision.strength / 100.0);
     let amount = look.color.hue_shift_amount / 100.0;
     let hue = ColorMatrix::IDENTITY.lerp(&hue_rotation(look.color.hue_shift_deg), amount);
     let chroma = saturation(chroma_factor(look.saturation, emulated_vibrance), weights);
+    let darken = darken_hue(
+        look.color.darken_hue_deg,
+        look.color.darken_amount / 100.0,
+        weights,
+    );
 
-    hue.then(&chroma).sanitize(limit)
+    vision
+        .then(&hue)
+        .then(&chroma)
+        .then(&darken)
+        .sanitize(limit)
 }
 
 #[cfg(test)]
@@ -305,6 +422,38 @@ mod tests {
         assert_eq!(flat[1], m.0[0][1]);
         assert_eq!(flat[5], m.0[1][0]);
         assert_eq!(ColorMatrix::from_flat(flat), m);
+    }
+
+    #[test]
+    fn vision_aids_keep_gray_and_scale_with_strength() {
+        for mode in [VisionMode::Protan, VisionMode::Deutan, VisionMode::Tritan] {
+            let full = vision_aid(mode, 1.0);
+            assert!(!full.is_identity(1e-3), "{mode:?} cambia algo");
+            let gray = full.apply([0.4, 0.4, 0.4]);
+            assert!(
+                (gray[0] - gray[1]).abs() < 1e-3 && (gray[1] - gray[2]).abs() < 1e-3,
+                "{mode:?}: el gris sigue gris ({gray:?})"
+            );
+            assert!(vision_aid(mode, 0.0).is_identity(1e-6));
+        }
+        assert!(vision_aid(VisionMode::Off, 1.0).is_identity(1e-6));
+    }
+
+    #[test]
+    fn darken_hue_darkens_it_and_lightens_its_complement() {
+        let weights = LumaFormula::Rec709.weights();
+        let matrix = darken_hue(0.0, 1.0, weights);
+        let luma = |rgb: [f32; 3]| rgb[0] * weights[0] + rgb[1] * weights[1] + rgb[2] * weights[2];
+        let red = [1.0, 0.0, 0.0];
+        let cyan = [0.0, 1.0, 1.0];
+        assert!(luma(matrix.apply(red)) < luma(red), "el rojo se oscurece");
+        assert!(luma(matrix.apply(cyan)) > luma(cyan), "el cian se aclara");
+        let gray = matrix.apply([0.5, 0.5, 0.5]);
+        assert!(
+            (gray[0] - 0.5).abs() < 1e-5 && (gray[2] - 0.5).abs() < 1e-5,
+            "el gris no cambia"
+        );
+        assert!(darken_hue(120.0, 0.0, weights).is_identity(1e-6));
     }
 
     #[test]

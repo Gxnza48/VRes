@@ -37,7 +37,7 @@ Está pensado para la comunidad gamer de Latinoamérica: es **gratis de verdad**
 | **Resolución:** estirada 4:3, 5:4 y 16:10, Hz y HDR, con vuelta atrás automática y atajo nativa ↔ estirada | ✅ Disponible | v0.2 |
 | **Vibrance digital** por driver, monitor por monitor: NVIDIA y AMD (en Intel, emulada) | ✅ Disponible | v0.3 |
 | **Crosshair** superpuesto: formas por partes, colores, imagen propia, monitor a elección, oculto en capturas y guardados | ✅ Disponible | v0.4 |
-| **Looks y Biblioteca:** presets por juego, códigos para compartir, tono, ayudas para daltonismo, cuidado visual | 🗓 Planeado | v0.5 |
+| **Looks y Biblioteca:** looks propios por juego, biblioteca local, códigos para compartir, profundidad de color, ayudas para daltonismo, cuidado visual y ajuste rápido desde la bandeja | ✅ Disponible | v0.5 |
 | **Perfiles por juego:** Fortnite, VALORANT, CS2, Apex Legends, Rust y Rainbow Six Siege, y cualquier otro | 🗓 Planeado | v0.6 |
 | **Dark Boost y Zoom** manteniendo una tecla o un botón del mouse | 🗓 Planeado | v0.7 |
 | **Monitor:** brillo y contraste por hardware (DDC/CI); personalización de la interfaz | 🗓 Planeado | v0.8 |

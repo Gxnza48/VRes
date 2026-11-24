@@ -12,15 +12,18 @@ import type { Crosshair } from "./bindings/Crosshair";
 import type { CrosshairPreset } from "./bindings/CrosshairPreset";
 import type { DisplayInfo } from "./bindings/DisplayInfo";
 import type { EngineStatus } from "./bindings/EngineStatus";
+import type { GameInfo } from "./bindings/GameInfo";
 import type { Hotkey } from "./bindings/Hotkey";
 import type { HotkeyCheck } from "./bindings/HotkeyCheck";
 import type { IpcError } from "./bindings/IpcError";
 import type { Look } from "./bindings/Look";
+import type { LookPreset } from "./bindings/LookPreset";
 import type { ModeRequest } from "./bindings/ModeRequest";
 import type { PendingMode } from "./bindings/PendingMode";
 import type { Requested } from "./bindings/Requested";
 import type { ResolutionState } from "./bindings/ResolutionState";
 import type { Settings } from "./bindings/Settings";
+import type { ShareDecoded } from "./bindings/ShareDecoded";
 import type { UpdateInfo } from "./bindings/UpdateInfo";
 
 /** `true` dentro de la app; `false` en un navegador común o en los tests. */
@@ -44,6 +47,12 @@ export const ipc = {
   appUiReady: () => call<void>("app_ui_ready"),
   /** Cierra VRes por completo (no solo la ventana). */
   appQuit: () => call<void>("app_quit"),
+  /** Abre la ventana principal (desde el popup rápido). */
+  appOpenMain: () => call<void>("app_open_main"),
+  /** Abre o cierra el popup rápido. */
+  quickToggle: () => call<void>("quick_toggle"),
+  /** Cierra el popup rápido. */
+  quickClose: () => call<void>("quick_close"),
 
   /** Pantallas activas. */
   displaysList: () => call<DisplayInfo[]>("displays_list"),
@@ -55,6 +64,8 @@ export const ipc = {
 
   /** Vista previa mientras se arrastra un control (no se guarda). */
   lookPreview: (look: Look) => call<void>("look_preview", { look }),
+  /** Lo pedido: look, pantallas e interruptores. */
+  lookGet: () => call<Requested>("look_get"),
   /** Aplica y guarda el look. */
   lookCommit: (look: Look) => call<Requested>("look_commit", { look }),
   /** Vuelve el look a los valores neutros. */
@@ -107,6 +118,20 @@ export const ipc = {
   /** Muestra este crosshair en pantalla mientras se edita (`null` vuelve al guardado). */
   crosshairPreview: (crosshair: Crosshair | null) =>
     call<void>("crosshair_preview", { crosshair }),
+
+  /** Código para compartir un look. */
+  shareEncodeLook: (look: Look) => call<string>("share_encode_look", { look }),
+  /** Código para compartir un crosshair (`null` si es de imagen). */
+  shareEncodeCrosshair: (crosshair: Crosshair) =>
+    call<string | null>("share_encode_crosshair", { crosshair }),
+  /** Código para compartir una resolución. */
+  shareEncodeResolution: (mode: ModeRequest) => call<string>("share_encode_resolution", { mode }),
+  /** Lee cualquier código de VRes (el motivo de un error viaja en `error`). */
+  shareDecode: (code: string) => call<ShareDecoded>("share_decode", { code }),
+  /** Looks incluidos en VRes. */
+  looksPresets: () => call<LookPreset[]>("looks_presets"),
+  /** Juegos conocidos. */
+  gamesList: () => call<GameInfo[]>("games_list"),
 
   /** Consulta si hay una versión nueva en GitHub Releases. */
   updateCheck: () => call<UpdateInfo | null>("update_check"),

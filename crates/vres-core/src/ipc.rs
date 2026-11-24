@@ -6,8 +6,12 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+use crate::crosshair::Crosshair;
 use crate::model::display::DisplayInfo;
+use crate::model::look::Look;
+use crate::model::resolution::ModeRequest;
 use crate::planner::Requested;
+use crate::share::{ShareError, ShareKind};
 use crate::status::EngineStatus;
 
 /// Avisos para el usuario (evento `app:notice` y al arrancar).
@@ -50,6 +54,30 @@ pub struct Bootstrap {
     pub status: EngineStatus,
     /// Avisos pendientes (recuperación, modo seguro…).
     pub notices: Vec<Notice>,
+}
+
+/// Lo que se leyó de un código para compartir.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct ShareDecoded {
+    pub kind: Option<ShareKind>,
+    pub look: Option<Look>,
+    pub crosshair: Option<Crosshair>,
+    pub resolution: Option<ModeRequest>,
+    /// Algún valor estaba fuera de rango y se recortó.
+    pub clamped: bool,
+    /// Por qué no se pudo leer (si no se pudo).
+    pub error: Option<ShareError>,
+}
+
+/// Un juego conocido (looks por juego y, más adelante, perfiles).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct GameInfo {
+    pub id: String,
+    pub name: String,
 }
 
 /// Una actualización disponible en GitHub Releases.

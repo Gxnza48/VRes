@@ -37,7 +37,7 @@ It is built for the Latin-American gaming community: **truly free** (no paid pla
 | **Resolution:** stretched 4:3, 5:4 and 16:10, refresh rate and HDR, with automatic rollback and a native ↔ stretched hotkey | ✅ Available | v0.2 |
 | **Digital vibrance** through the driver, per monitor: NVIDIA and AMD (emulated on Intel) | ✅ Available | v0.3 |
 | **Crosshair** overlay: shapes by parts, colors, your own image, any monitor, hidden from captures and saved crosshairs | ✅ Available | v0.4 |
-| **Looks & Library:** per-game presets, share codes, hue, color-blindness aids, eye care | 🗓 Planned | v0.5 |
+| **Looks & Library:** own per-game looks, local library, share codes, color depth, color-blindness aids, eye care and quick adjust from the tray | ✅ Available | v0.5 |
 | **Per-game profiles:** Fortnite, VALORANT, CS2, Apex Legends, Rust, Rainbow Six Siege and any other game | 🗓 Planned | v0.6 |
 | **Dark Boost & Zoom** while holding a key or a mouse button | 🗓 Planned | v0.7 |
 | **Monitor:** hardware brightness and contrast (DDC/CI); interface customization | 🗓 Planned | v0.8 |

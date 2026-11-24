@@ -31,6 +31,27 @@ pub async fn app_ui_ready(window: WebviewWindow) -> Result<(), IpcError> {
     Ok(())
 }
 
+/// Abre o cierra el popup rápido.
+#[tauri::command]
+pub async fn quick_toggle(app: AppHandle) -> Result<(), IpcError> {
+    app_windows::toggle_quick(&app);
+    Ok(())
+}
+
+/// Cierra el popup rápido.
+#[tauri::command]
+pub async fn quick_close(app: AppHandle) -> Result<(), IpcError> {
+    app_windows::close_quick(&app);
+    Ok(())
+}
+
+/// Abre la ventana principal (desde el popup rápido).
+#[tauri::command]
+pub async fn app_open_main(app: AppHandle) -> Result<(), IpcError> {
+    app_windows::open_main(&app);
+    Ok(())
+}
+
 /// Cierra VRes por completo (no solo la ventana).
 #[tauri::command]
 pub async fn app_quit(app: AppHandle) -> Result<(), IpcError> {

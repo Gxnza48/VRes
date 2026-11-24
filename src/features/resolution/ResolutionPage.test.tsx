@@ -11,6 +11,7 @@ import { useResolutionStore } from "@/state/resolution";
 import { useSettingsStore } from "@/state/settings";
 import { defaultSettings } from "@/test/fixtures";
 
+import { CountdownDialog } from "./CountdownDialog";
 import { aspectLabel, stretchLabel } from "./format";
 import { ResolutionPage } from "./ResolutionPage";
 
@@ -131,18 +132,20 @@ describe("ResolutionPage", () => {
   });
 
   it("un cambio pendiente muestra la cuenta regresiva y se puede conservar", async () => {
-    useResolutionStore.setState({
-      state: state({
-        token: "t-1",
-        displayId: "d-mag",
-        mode: { width: 1440, height: 1080, refreshHz: 200, scaling: "stretched" },
-        expiresInMs: 15_000,
-        seconds: 15,
-        reason: null,
-      }),
-    });
     const user = userEvent.setup();
-    render(<ResolutionPage />);
+    render(
+      <CountdownDialog
+        busy={false}
+        pending={{
+          token: "t-1",
+          displayId: "d-mag",
+          mode: { width: 1440, height: 1080, refreshHz: 200, scaling: "stretched" },
+          expiresInMs: 15_000,
+          seconds: 15,
+          reason: null,
+        }}
+      />,
+    );
     const dialog = screen.getByRole("alertdialog", { name: "¿Conservar esta resolución?" });
     expect(within(dialog).getByText("15")).toBeInTheDocument();
     expect(within(dialog).getByRole("button", { name: "Revertir" })).toHaveFocus();

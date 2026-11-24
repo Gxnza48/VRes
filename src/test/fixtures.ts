@@ -42,5 +42,6 @@ export function defaultSettings(): Settings {
       current: defaultCrosshair(),
       saved: [],
     },
+    library: { looks: [] },
   };
 }
