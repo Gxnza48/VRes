@@ -48,7 +48,7 @@ Reglas del planificador:
 
 Un único **hilo del motor** con una ventana oculta de nivel superior y su bucle de mensajes de Win32 (las ventanas *message-only* no reciben `WM_DISPLAYCHANGE` ni `WM_POWERBROADCAST`). Solo ese hilo toca la Magnification API, registra los atajos (`RegisterHotKey`) y el aviso de cambio de primer plano, recibe los mensajes del sistema y es dueño de las ventanas superpuestas.
 
-- Los comandos de la interfaz y del celular le llegan por un canal más un mensaje de despertar; el motor conserva solo la **última** vista previa de cada slider.
+- Los comandos de la interfaz le llegan por un canal más un mensaje de despertar; el motor conserva solo la **última** vista previa de cada slider.
 - Las operaciones lentas (cambio de resolución, HDR, DDC/CI) corren en un hilo auxiliar (`vres-modes`), uno a la vez: el atajo de emergencia y la cuenta regresiva siguen respondiendo. La lógica de esos cambios (`vres-engine/src/resolution.rs`) no toca Windows: decide trabajos y recibe resultados, así se prueba con un reloj falso.
 - Temporizadores: 120 ms de asentamiento tras un cambio de foco, pantalla o sesión; chequeo de salud cada ~1 s **solo** si hay alguna capa activa; ningún temporizador más rápido salvo con una tecla de "mantener" armada.
 

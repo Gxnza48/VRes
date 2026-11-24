@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { ParamSlider } from "@/components/common/ParamSlider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Accent } from "@/lib/bindings/Accent";
 import type { AppearanceSettings } from "@/lib/bindings/AppearanceSettings";
 import type { ErrorCode } from "@/lib/bindings/ErrorCode";
 import type { Theme } from "@/lib/bindings/Theme";
@@ -14,11 +15,21 @@ import { cn } from "@/lib/utils";
 import { saveSettings, useSettingsStore } from "@/state/settings";
 
 const THEMES: Theme[] = ["black", "graphite"];
-/** Igual que `MAX_BACKGROUND_BYTES` en Rust. */
+const ACCENTS: Accent[] = ["lime", "cyan", "blue", "violet", "pink", "red", "orange", "yellow"];
+/** Igual que `UI_SCALES` en Rust. */
+const SCALES = [90, 100, 110, 125] as const;
+/** Igual que `MAX_BACKGROUND_BYTES` y `MAX_BACKGROUND_BLUR` en Rust. */
 const MAX_BYTES = 25 * 1024 * 1024;
+const MAX_BLUR = 24;
 const ACCEPT = "image/png,image/jpeg,image/gif,image/webp";
 
-/** Pestaña Personalizar: tema y fondo propio. */
+const choice = (selected: boolean) =>
+  cn(
+    "flex items-center gap-3 rounded-xl border p-3 text-left transition-colors",
+    selected ? "border-accent bg-accent/10" : "border-border hover:bg-surface-2",
+  );
+
+/** Pestaña Personalizar: tema, color de acento, tamaño y fondo propio. */
 export function CustomizePage() {
   const { t } = useTranslation();
   const settings = useSettingsStore((store) => store.settings);
@@ -33,6 +44,9 @@ export function CustomizePage() {
   const appearance = settings.appearance;
   const save = (patch: Partial<AppearanceSettings>) =>
     void saveSettings({ ...settings, appearance: { ...appearance, ...patch } });
+  // Mientras se arrastra, solo cambia acá (se ve en vivo); al soltar, se guarda.
+  const preview = (patch: Partial<AppearanceSettings>) =>
+    setSettings({ ...settings, appearance: { ...appearance, ...patch } });
 
   const upload = (file: File) => {
     if (file.size > MAX_BYTES) {
@@ -69,10 +83,7 @@ export function CustomizePage() {
                 type="button"
                 aria-pressed={selected}
                 onClick={() => save({ theme })}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl border p-3 text-left transition-colors",
-                  selected ? "border-accent bg-accent/10" : "border-border hover:bg-surface-2",
-                )}
+                className={choice(selected)}
               >
                 {/* Muestra con los colores del tema (los tokens cambian con data-theme). */}
                 <span
@@ -90,6 +101,64 @@ export function CustomizePage() {
                   <span className="text-xs text-muted">{t(`customize.theme.${theme}Hint`)}</span>
                 </span>
                 {selected && <Check aria-hidden className="size-4 text-accent" />}
+              </button>
+            );
+          })}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("customize.accent.title")}</CardTitle>
+          <CardDescription>{t("customize.accent.description")}</CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {ACCENTS.map((accent) => {
+            const selected = appearance.accent === accent;
+            return (
+              <button
+                key={accent}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => save({ accent })}
+                className={choice(selected)}
+              >
+                {/* Muestra con el color (el token cambia con data-accent). */}
+                <span
+                  data-accent={accent}
+                  aria-hidden
+                  className="size-6 shrink-0 rounded-full bg-accent ring-2 ring-accent/30"
+                />
+                <span className="flex-1 text-sm font-medium text-fg">
+                  {t(`customize.accent.${accent}`)}
+                </span>
+                {selected && <Check aria-hidden className="size-4 text-accent" />}
+              </button>
+            );
+          })}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("customize.size.title")}</CardTitle>
+          <CardDescription>{t("customize.size.description")}</CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {SCALES.map((scale) => {
+            const selected = appearance.uiScale === scale;
+            return (
+              <button
+                key={scale}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => save({ uiScale: scale })}
+                className={cn(choice(selected), "flex-col items-start gap-1")}
+              >
+                <span className="text-sm font-medium text-fg">{t(`customize.size.s${scale}`)}</span>
+                <span className="text-xs text-muted">
+                  {t("customize.units.percent", { value: scale })}
+                </span>
               </button>
             );
           })}
@@ -146,21 +215,30 @@ export function CustomizePage() {
             </p>
           )}
           {appearance.background && (
-            <ParamSlider
-              id="background-opacity"
-              label={t("customize.background.opacity")}
-              value={appearance.backgroundOpacity}
-              range={{ min: 0, max: 100, default: 25, step: 1 }}
-              display={t("customize.units.percent", {
-                value: Math.round(appearance.backgroundOpacity),
-              })}
-              resetTitle={t("display.resetParam")}
-              // Mientras se arrastra, solo cambia acá (se ve en vivo); al soltar, se guarda.
-              onChange={(backgroundOpacity) =>
-                setSettings({ ...settings, appearance: { ...appearance, backgroundOpacity } })
-              }
-              onCommit={(backgroundOpacity) => save({ backgroundOpacity })}
-            />
+            <div className="grid gap-5 md:grid-cols-2">
+              <ParamSlider
+                id="background-opacity"
+                label={t("customize.background.opacity")}
+                value={appearance.backgroundOpacity}
+                range={{ min: 0, max: 100, default: 25, step: 1 }}
+                display={t("customize.units.percent", {
+                  value: Math.round(appearance.backgroundOpacity),
+                })}
+                resetTitle={t("display.resetParam")}
+                onChange={(backgroundOpacity) => preview({ backgroundOpacity })}
+                onCommit={(backgroundOpacity) => save({ backgroundOpacity })}
+              />
+              <ParamSlider
+                id="background-blur"
+                label={t("customize.background.blur")}
+                value={appearance.backgroundBlur}
+                range={{ min: 0, max: MAX_BLUR, default: 0, step: 1 }}
+                display={t("customize.units.px", { value: Math.round(appearance.backgroundBlur) })}
+                resetTitle={t("display.resetParam")}
+                onChange={(backgroundBlur) => preview({ backgroundBlur })}
+                onCommit={(backgroundBlur) => save({ backgroundBlur })}
+              />
+            </div>
           )}
           <p className="text-xs text-muted">{t("customize.background.note")}</p>
         </CardContent>

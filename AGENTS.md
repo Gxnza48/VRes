@@ -4,7 +4,7 @@ Este archivo es para cualquier asistente de IA (Claude, Codex, Copilot…) que t
 
 ## Qué es VRes
 
-App de bandeja para Windows 10/11 (Tauri 2 + Rust + React/TypeScript) que ajusta cómo el monitor muestra la imagen: saturación, vibrance por driver, ajuste fino por monitor, resolución estirada, crosshair, perfiles por juego, Dark Boost, zoom y control desde el celular. Gratis, GPL-3.0, sin cuenta ni telemetría. Se construye por fases ([docs/ROADMAP.md](docs/ROADMAP.md)); la arquitectura está en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).
+App de bandeja para Windows 10/11 (Tauri 2 + Rust + React/TypeScript) que ajusta cómo el monitor muestra la imagen: saturación, vibrance por driver, ajuste fino por monitor, resolución estirada, crosshair, perfiles por juego, Dark Boost, zoom y personalización de la interfaz. Gratis, GPL-3.0, sin cuenta ni telemetría. Se construye por fases ([docs/ROADMAP.md](docs/ROADMAP.md)); la arquitectura está en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).
 
 ## Reglas (no negociables)
 

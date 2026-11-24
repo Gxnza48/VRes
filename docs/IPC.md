@@ -27,12 +27,10 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 | Crosshair | `crosshair_render` (bytes: lado, centro y RGBA) · `crosshair_presets` · `crosshair_preview`; prender, elegir monitor, guardar e imagen propia van por `settings_update` | F4 ✅ |
 | Juegos y perfiles | `games_list` (con ejecutables y anti-cheat) · `games_running_candidates` · `profile_active`; los perfiles, el cambio automático y los juegos propios van por `settings_update` | F6 ✅ |
 | Dark Boost y zoom | `enhancers_state` · `enhancers_key_supported`; armar, teclas y efectos van por `settings_update` | F7 ✅ |
-| Monitor | `monitor_details` · `ddc_set` · `panel_brightness_set` · `hardware_restore_initial` · `displays_set_trim` | F8 ✅ |
 | Ajustes | `settings_get_autostart` · `settings_set_autostart` | F1 ✅ |
 | Ajustes | `settings_get` · `settings_update` (falla con `hotkeyTaken` si otro programa usa el atajo) · `hotkeys_check` · `hotkeys_suspend` | F2 ✅ |
 | Ajustes | `customize_background_set` (los bytes viajan tal cual, sin JSON) · `customize_background_get` · `customize_background_clear` · `settings_reset` | F8 ✅ |
 | Diagnóstico | `diag_report` (sin usuario, carpeta de usuario ni nombre del equipo) | F8 ✅ |
-| Celular | `remote_start` · `remote_stop` · `remote_status` · `remote_regenerate_token` | F9 |
 | Popup | `quick_toggle` · `quick_close` · `app_open_main` · `look_get` | F5 ✅ |
 
 ## Eventos
@@ -40,7 +38,7 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 | Evento | Cuándo | Fase |
 |---|---|---|
 | `update:progress` | Progreso de descarga de una actualización | F0 ✅ |
-| `state:snapshot` | Tras cada cambio confirmado (commit, atajo, cambio automático, celular) | F1 |
+| `state:snapshot` | Tras cada cambio confirmado (commit, atajo, cambio automático) | F1 |
 | `engine:status` | Cambia el estado de alguna capa | F1 ✅ |
 | `displays:changed` | Cambio de monitores, modo o HDR (tras el asentamiento) | F1 ✅ |
 | `app:notice` | Recuperación tras un cierre inesperado, modo seguro, atajo ocupado, restablecimiento | F1 ✅ |
@@ -50,7 +48,6 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 | `settings:changed` | Cambiaron los ajustes (por ejemplo, se conservó un modo nuevo) | F2 ✅ |
 | `profile:active` | Cambió el perfil de juego en uso (`null`: el escritorio) | F6 ✅ |
 | `enhancers:state` | Dark Boost o Zoom empezaron o dejaron de escuchar su tecla, o de estar activos | F7 ✅ |
-| `remote:clients` | Teléfonos conectados | F9 |
 
 ## Desde otros procesos
 

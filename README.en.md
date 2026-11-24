@@ -9,6 +9,7 @@ Saturation up to 300%, digital vibrance, stretched resolution, crosshair, per-ga
 [![CI](https://github.com/Gxnza48/VRes/actions/workflows/ci.yml/badge.svg)](https://github.com/Gxnza48/VRes/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/Gxnza48/VRes?include_prereleases)](https://github.com/Gxnza48/VRes/releases)
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-community-5865F2?logo=discord&logoColor=white)](https://discord.gg/aG2ByWDHfG)
 ![Windows 10 and 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6)
 
 [Español](README.md) · **English**
@@ -40,8 +41,7 @@ It is built for the Latin-American gaming community: **truly free** (no paid pla
 | **Looks & Library:** own per-game looks, local library, share codes, color depth, color-blindness aids, eye care and quick adjust from the tray | ✅ Available | v0.5 |
 | **Per-game profiles:** Fortnite, VALORANT, CS2, Apex Legends, Rust, Rainbow Six Siege and any other game; look and crosshair while in front, resolution while the game is open | ✅ Available | v0.6 |
 | **Dark Boost & Zoom** while holding (or toggling) a key or a mouse button, Mouse 4 and 5 included; they ship disarmed | ✅ Available | v0.7 |
-| **Monitor:** hardware brightness, contrast and RGB (DDC/CI) plus laptop panel brightness; per-display gamma and warmth. **Customize:** themes and your own background (image or GIF). Diagnostic report without personal data | ✅ Available | v0.8 |
-| **Phone remote** over your Wi-Fi | 🗓 Planned | v0.9 |
+| **Customize:** theme, accent color, interface size and your own background (image or GIF). Diagnostic report without personal data | ✅ Available | v0.8 – v0.9 |
 | Per-GPU custom resolutions and a signed installer | 🗓 Planned | v1.0 |
 
 ## Install
@@ -103,7 +103,7 @@ VRes doesn't interact with games and uses the same API families as GPU control p
 
 ## Privacy
 
-No account, no data collection, nothing sent to any server. The only network connections are the update check on GitHub (can be turned off) and the phone remote over your local Wi-Fi, **off by default** (from v0.9).
+No account, no data collection, nothing sent to any server. The only network connection is the update check on GitHub, and it can be turned off.
 
 ## Build from source
 
@@ -118,6 +118,10 @@ npm run tauri dev
 ```
 
 Tests: `cargo test --workspace`, `npx vitest --run`, `npm run lint`, `npm run check:i18n`. More in [docs/DESARROLLO.md](docs/DESARROLLO.md).
+
+## Community
+
+Join the **[VRes Discord](https://discord.gg/aG2ByWDHfG)**: release news, help, looks and crosshairs to share, and ideas.
 
 ## Contributing
 

@@ -24,7 +24,7 @@ describe("Shell", () => {
     useAppStore.setState({ tab: "display", bootstrap: null });
   });
 
-  it("muestra las 9 secciones en la barra lateral", () => {
+  it("muestra todas las secciones en la barra lateral", () => {
     render(<App />);
     const nav = screen.getByRole("navigation", { name: "Secciones" });
     expect(within(nav).getAllByRole("button")).toHaveLength(TAB_IDS.length);

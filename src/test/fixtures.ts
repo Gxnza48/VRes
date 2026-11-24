@@ -74,7 +74,14 @@ export function defaultSettings(): Settings {
     library: { looks: [] },
     profiles: { autoSwitch: false, profiles: [], customGames: [] },
     enhancers: defaultEnhancers(),
-    appearance: { theme: "black", background: null, backgroundOpacity: 25 },
+    appearance: {
+      theme: "black",
+      accent: "lime",
+      uiScale: 100,
+      background: null,
+      backgroundOpacity: 25,
+      backgroundBlur: 0,
+    },
     behavior: { closeToTray: true },
   };
 }

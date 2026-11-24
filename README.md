@@ -10,6 +10,7 @@ Saturación hasta 300 %, vibrance digital, resolución estirada, crosshair, perf
 [![Versión](https://img.shields.io/github/v/release/Gxnza48/VRes?include_prereleases&label=versi%C3%B3n)](https://github.com/Gxnza48/VRes/releases)
 [![Licencia: GPL-3.0](https://img.shields.io/badge/licencia-GPL--3.0-blue)](LICENSE)
 ![Windows 10 y 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6)
+[![Discord](https://img.shields.io/badge/Discord-comunidad-5865F2?logo=discord&logoColor=white)](https://discord.gg/aG2ByWDHfG)
 
 **Español** · [English](README.en.md)
 
@@ -40,8 +41,7 @@ Está pensado para la comunidad gamer de Latinoamérica: es **gratis de verdad**
 | **Looks y Biblioteca:** looks propios por juego, biblioteca local, códigos para compartir, profundidad de color, ayudas para daltonismo, cuidado visual y ajuste rápido desde la bandeja | ✅ Disponible | v0.5 |
 | **Perfiles por juego:** Fortnite, VALORANT, CS2, Apex Legends, Rust y Rainbow Six Siege, y cualquier otro; look y crosshair al frente, resolución mientras el juego está abierto | ✅ Disponible | v0.6 |
 | **Dark Boost y Zoom** manteniendo (o alternando) una tecla o un botón del mouse, incluidos Mouse 4 y 5; vienen desarmados | ✅ Disponible | v0.7 |
-| **Monitor:** brillo, contraste y RGB por hardware (DDC/CI) y brillo del panel de la notebook; gamma y calidez propias de cada pantalla. **Personalizar:** temas y fondo propio (imagen o GIF). Reporte de diagnóstico sin datos personales | ✅ Disponible | v0.8 |
-| **Control desde el celular** por tu WiFi | 🗓 Planeado | v0.9 |
+| **Personalizar:** tema, color de acento, tamaño de la interfaz y fondo propio (imagen o GIF). Reporte de diagnóstico sin datos personales | ✅ Disponible | v0.8 – v0.9 |
 | Resoluciones personalizadas por GPU e instalador firmado | 🗓 Planeado | v1.0 |
 
 ## Por qué VRes
@@ -120,10 +120,7 @@ El **crosshair**, el **zoom** y el **Dark Boost** pueden considerarse trampa seg
 
 ## Privacidad
 
-VRes no tiene cuenta, no recolecta datos y no envía nada a ningún servidor. Las únicas conexiones de red son:
-
-- la búsqueda de actualizaciones en GitHub (se puede apagar), y
-- el control desde el celular por tu WiFi local, **apagado por defecto** (desde la v0.9).
+VRes no tiene cuenta, no recolecta datos y no envía nada a ningún servidor. La única conexión de red es la búsqueda de actualizaciones en GitHub, y se puede apagar.
 
 Tus ajustes se guardan en tu PC (`%APPDATA%\io.github.gxnza48.vres`) y los registros, en `%LOCALAPPDATA%\io.github.gxnza48.vres\logs`.
 
@@ -207,6 +204,10 @@ src/                 la interfaz (React + TypeScript)
 ## Hoja de ruta
 
 VRes se construye por fases y cada una termina en una versión instalable. El plan completo, con lo que entra en cada fase, está en [docs/ROADMAP.md](docs/ROADMAP.md).
+
+## Comunidad
+
+Sumate al **[Discord de VRes](https://discord.gg/aG2ByWDHfG)**: novedades de cada versión, ayuda, looks y crosshairs para compartir, y propuestas.
 
 ## Contribuir
 

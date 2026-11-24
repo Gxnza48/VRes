@@ -6,7 +6,9 @@
  * cambiar este archivo.
  *
  * Identidad: fondo negro total, verde lima del logo (#9EFA12) y texto negro
- * sobre el verde.
+ * sobre el verde. En Personalizar se elige el tema (data-theme) y el color de
+ * acento (data-accent); los dos se pueden poner en cualquier elemento para
+ * mostrar una muestra.
  */
 :root,
 [data-theme="black"] {
@@ -20,10 +22,6 @@
   --vr-fg: #f4f4f4;
   --vr-muted: #8f8f8f;
 
-  --vr-accent: #9efa12;
-  --vr-accent-fg: #000000;
-  --vr-accent-soft: rgb(158 250 18 / 0.28);
-
   --vr-success: #9efa12;
   --vr-warning: #ffb020;
   --vr-danger: #ff4d4f;
@@ -33,7 +31,7 @@
   --vr-font-display: "Orbitron", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
 }
 
-/* Grafito: superficies grises oscuras, el mismo verde lima. */
+/* Grafito: superficies grises oscuras. */
 [data-theme="graphite"] {
   --vr-bg: #15171a;
   --vr-surface: #1c1f23;
@@ -42,4 +40,47 @@
 
   --vr-fg: #f2f4f5;
   --vr-muted: #9ba4ad;
+}
+
+/* Colores de acento. El texto sobre el acento es negro: todos tienen contraste. */
+:root,
+[data-accent="lime"] {
+  --vr-accent: #9efa12;
+  --vr-accent-fg: #000000;
+  --vr-accent-soft: rgb(158 250 18 / 0.28);
+}
+
+[data-accent="cyan"] {
+  --vr-accent: #22d3ee;
+  --vr-accent-soft: rgb(34 211 238 / 0.28);
+}
+
+[data-accent="blue"] {
+  --vr-accent: #4f8cff;
+  --vr-accent-soft: rgb(79 140 255 / 0.28);
+}
+
+[data-accent="violet"] {
+  --vr-accent: #a78bfa;
+  --vr-accent-soft: rgb(167 139 250 / 0.28);
+}
+
+[data-accent="pink"] {
+  --vr-accent: #f472b6;
+  --vr-accent-soft: rgb(244 114 182 / 0.28);
+}
+
+[data-accent="red"] {
+  --vr-accent: #f43f5e;
+  --vr-accent-soft: rgb(244 63 94 / 0.28);
+}
+
+[data-accent="orange"] {
+  --vr-accent: #fb923c;
+  --vr-accent-soft: rgb(251 146 60 / 0.28);
+}
+
+[data-accent="yellow"] {
+  --vr-accent: #facc15;
+  --vr-accent-soft: rgb(250 204 21 / 0.28);
 }

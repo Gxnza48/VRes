@@ -31,6 +31,58 @@ impl<'de> Deserialize<'de> for Theme {
     }
 }
 
+/// Color de acento de la interfaz (el verde lima es el de VRes).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub enum Accent {
+    #[default]
+    Lime,
+    Cyan,
+    Blue,
+    Violet,
+    Pink,
+    Red,
+    Orange,
+    Yellow,
+}
+
+impl Accent {
+    /// Todos, en el orden en que se muestran.
+    pub const ALL: [Self; 8] = [
+        Self::Lime,
+        Self::Cyan,
+        Self::Blue,
+        Self::Violet,
+        Self::Pink,
+        Self::Red,
+        Self::Orange,
+        Self::Yellow,
+    ];
+}
+
+impl<'de> Deserialize<'de> for Accent {
+    /// Un acento desconocido vuelve al verde lima.
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let name = String::deserialize(deserializer)?;
+        Ok(match name.as_str() {
+            "cyan" => Self::Cyan,
+            "blue" => Self::Blue,
+            "violet" => Self::Violet,
+            "pink" => Self::Pink,
+            "red" => Self::Red,
+            "orange" => Self::Orange,
+            "yellow" => Self::Yellow,
+            _ => Self::Lime,
+        })
+    }
+}
+
+/// Tamaños de la interfaz permitidos (%).
+pub const UI_SCALES: [u32; 4] = [90, 100, 110, 125];
+/// Desenfoque máximo del fondo (px).
+pub const MAX_BACKGROUND_BLUR: f32 = 24.0;
+
 /// La imagen de fondo guardada (`media/background.bin`).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
@@ -48,19 +100,27 @@ pub struct BackgroundImage {
 #[ts(export)]
 pub struct AppearanceSettings {
     pub theme: Theme,
+    pub accent: Accent,
+    /// Tamaño de la interfaz (%): 90, 100, 110 o 125.
+    pub ui_scale: u32,
     /// Imagen o GIF de fondo (`None`: sin fondo). Solo la cambia
     /// `customize_background_set`.
     pub background: Option<BackgroundImage>,
     /// Cuánto se ve el fondo (0–100).
     pub background_opacity: f32,
+    /// Desenfoque del fondo (0–24 px).
+    pub background_blur: f32,
 }
 
 impl Default for AppearanceSettings {
     fn default() -> Self {
         Self {
             theme: Theme::Black,
+            accent: Accent::Lime,
+            ui_scale: 100,
             background: None,
             background_opacity: 25.0,
+            background_blur: 0.0,
         }
     }
 }
@@ -73,6 +133,16 @@ impl AppearanceSettings {
         } else {
             25.0
         };
+        self.background_blur = if self.background_blur.is_finite() {
+            self.background_blur.clamp(0.0, MAX_BACKGROUND_BLUR)
+        } else {
+            0.0
+        };
+        // El tamaño permitido más cercano.
+        self.ui_scale = UI_SCALES
+            .into_iter()
+            .min_by_key(|scale| scale.abs_diff(self.ui_scale))
+            .unwrap_or(100);
         if self
             .background
             .as_ref()
@@ -146,6 +216,33 @@ mod tests {
         assert_eq!(parsed.sanitized().background_opacity, 100.0);
         let graphite: Theme = serde_json::from_str(r#""graphite""#).expect("válido");
         assert_eq!(graphite, Theme::Graphite);
+    }
+
+    #[test]
+    fn accent_scale_and_blur_stay_valid() {
+        let parsed: AppearanceSettings =
+            serde_json::from_str(r#"{"accent":"magenta","uiScale":300,"backgroundBlur":-4}"#)
+                .expect("válido");
+        let clean = parsed.sanitized();
+        assert_eq!(
+            clean.accent,
+            Accent::Lime,
+            "un acento desconocido vuelve al lima"
+        );
+        assert_eq!(clean.ui_scale, 125, "el tamaño más cercano");
+        assert_eq!(clean.background_blur, 0.0);
+        let violet: Accent = serde_json::from_str(r#""violet""#).expect("válido");
+        assert_eq!(violet, Accent::Violet);
+        assert_eq!(
+            serde_json::to_string(&Accent::Pink).expect("json"),
+            r#""pink""#
+        );
+        let old: AppearanceSettings =
+            serde_json::from_str(r#"{"theme":"graphite"}"#).expect("válido");
+        assert_eq!(
+            old.ui_scale, 100,
+            "los ajustes viejos toman los valores nuevos por defecto"
+        );
     }
 
     #[test]

@@ -35,15 +35,28 @@ describe("CustomizePage", () => {
     );
   });
 
+  it("cambia el color de acento y el tamaño de la interfaz", async () => {
+    const user = userEvent.setup();
+    render(<CustomizePage />);
+    expect(screen.getByRole("button", { name: /Lima/ })).toHaveAttribute("aria-pressed", "true");
+    await user.click(screen.getByRole("button", { name: /Violeta/ }));
+    expect(ipc.settingsUpdate).toHaveBeenLastCalledWith(
+      expect.objectContaining({ appearance: expect.objectContaining({ accent: "violet" }) }),
+    );
+    await user.click(screen.getByRole("button", { name: /^Grande/ }));
+    expect(ipc.settingsUpdate).toHaveBeenLastCalledWith(
+      expect.objectContaining({ appearance: expect.objectContaining({ uiScale: 110 }) }),
+    );
+  });
+
   it("sube una imagen de fondo", async () => {
     const user = userEvent.setup();
     vi.mocked(ipc.customizeBackgroundSet).mockImplementation(() =>
       Promise.resolve({
         ...defaultSettings(),
         appearance: {
-          theme: "black",
+          ...defaultSettings().appearance,
           background: { mime: "image/png", revision: 1 },
-          backgroundOpacity: 25,
         },
       }),
     );
@@ -55,5 +68,6 @@ describe("CustomizePage", () => {
     expect(ipc.customizeBackgroundSet).toHaveBeenCalledWith(expect.any(Uint8Array));
     expect(await screen.findByRole("button", { name: /Quitar fondo/ })).toBeInTheDocument();
     expect(screen.getByLabelText("Cuánto se ve")).toBeInTheDocument();
+    expect(screen.getByLabelText("Desenfoque")).toBeInTheDocument();
   });
 });

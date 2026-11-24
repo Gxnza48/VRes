@@ -4,6 +4,20 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.9.0] - 2026-11-24
+
+**Personalizar completo** y comunidad en Discord.
+
+### Agregado
+
+- **Personalizar**: color de acento (lima, cian, azul, violeta, rosa, rojo, naranja o amarillo), tamaño de la interfaz (compacta, normal, grande o muy grande) y desenfoque del fondo.
+- Enlace a la **comunidad en Discord** en Más → Acerca de y en el README.
+
+### Quitado
+
+- La pestaña **Monitor**: era redundante con Pantalla. (`vres-cli ddc` sigue disponible para diagnóstico.)
+- El control desde el celular (que estaba planeado para esta versión) quedó descartado: VRes no abre ningún servidor ni puerto.
+
 ## [0.8.0] - 2026-11-24
 
 **Monitor, Personalizar y Más** (fase F8 de la [hoja de ruta](docs/ROADMAP.md)).
@@ -123,7 +137,8 @@ Primera versión pública: la base de la app y la pestaña **Pantalla** (fases F
 - Matemática de color con más de 70 pruebas (incluidas pruebas de propiedades) y resultados de las pruebas en hardware real en [docs/hardware/RESULTADOS.md](docs/hardware/RESULTADOS.md).
 - Documentación: arquitectura, motor de color, anti-cheat, contrato interno, códigos para compartir, desarrollo y hoja de ruta.
 
-[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.8.0...HEAD
+[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/Gxnza48/VRes/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/Gxnza48/VRes/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Gxnza48/VRes/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/Gxnza48/VRes/compare/v0.5.0...v0.6.0

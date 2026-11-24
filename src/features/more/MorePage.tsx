@@ -2,6 +2,7 @@ import {
   Download,
   ExternalLink,
   Languages,
+  MessagesSquare,
   Power,
   RefreshCw,
   ShieldCheck,
@@ -17,7 +18,7 @@ import { LANGUAGES, type Lang, toSupported } from "@/i18n/language";
 import type { UpdateInfo } from "@/lib/bindings/UpdateInfo";
 import { events } from "@/lib/events";
 import { inTauri, ipc, isIpcError } from "@/lib/ipc";
-import { ISSUES_URL, REPOSITORY_URL } from "@/lib/links";
+import { DISCORD_URL, ISSUES_URL, REPOSITORY_URL } from "@/lib/links";
 import { useAppStore } from "@/state/app";
 
 import { BehaviorCard, DiagnosticsCard, LicensesCard, ResetCard } from "./SystemCards";
@@ -231,6 +232,10 @@ function AboutCard() {
       </CardHeader>
       {tauri && (
         <CardContent className="flex-row flex-wrap">
+          <Button variant="primary" size="sm" onClick={() => void ipc.openExternal(DISCORD_URL)}>
+            <MessagesSquare aria-hidden />
+            {t("more.about.discord")}
+          </Button>
           <Button variant="ghost" size="sm" onClick={() => void ipc.openExternal(REPOSITORY_URL)}>
             <ExternalLink aria-hidden />
             {t("more.about.repository")}

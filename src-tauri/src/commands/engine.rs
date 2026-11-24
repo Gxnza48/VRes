@@ -3,7 +3,7 @@
 use tauri::{AppHandle, Emitter, State};
 use vres_core::ipc::{ErrorCode, IpcError};
 use vres_core::model::display::DisplayInfo;
-use vres_core::model::look::{DisplayTrim, Look};
+use vres_core::model::look::Look;
 use vres_core::planner::Requested;
 use vres_core::status::EngineStatus;
 use vres_engine::{ApplyMode, Command};
@@ -77,37 +77,6 @@ pub async fn look_commit(
     ensure(&engine)?;
     let requested = engine.update(ApplyMode::Commit, |requested| requested.look = look);
     Ok(broadcast(&app, requested))
-}
-
-/// Ajuste propio de una pantalla (gamma, calidez y ganancia RGB, sobre el
-/// look). `None` lo quita. Con `preview` no se guarda (mientras se arrastra).
-#[tauri::command]
-pub async fn displays_set_trim(
-    app: AppHandle,
-    engine: State<'_, EngineState>,
-    display_id: String,
-    trim: Option<DisplayTrim>,
-    preview: bool,
-) -> Result<Requested, IpcError> {
-    ensure(&engine)?;
-    let mode = if preview {
-        ApplyMode::Preview
-    } else {
-        ApplyMode::Commit
-    };
-    let requested = engine.update(mode, |requested| match trim {
-        Some(trim) => {
-            requested.trims.insert(display_id, trim.clamped());
-        }
-        None => {
-            requested.trims.remove(&display_id);
-        }
-    });
-    Ok(if preview {
-        requested
-    } else {
-        broadcast(&app, requested)
-    })
 }
 
 /// Vuelve el look a los valores neutros.

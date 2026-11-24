@@ -13,7 +13,6 @@
     "display": "Display",
     "library": "Library",
     "resolution": "Resolution",
-    "monitor": "Monitor",
     "customize": "Customize",
     "crosshair": "Crosshair",
     "profiles": "Profiles",
@@ -58,7 +57,8 @@
       "version": "Version {{version}}",
       "license": "Free software under the GPL-3.0 license. No account and no telemetry.",
       "repository": "Source code",
-      "report": "Report a problem"
+      "report": "Report a problem",
+      "discord": "Discord community"
     },
     "startup": {
       "title": "Startup",
@@ -360,8 +360,6 @@
     "hotkeyTaken": "Another program already uses that hotkey. Choose another one.",
     "settingsFailed": "The settings couldn't be saved.",
     "crosshairInvalid": "That crosshair could not be drawn.",
-    "hardwareUnsupported": "The monitor doesn't allow that adjustment.",
-    "hardwareFailed": "The monitor didn't respond to the change. Try again.",
     "backgroundInvalid": "That image won't work: it must be PNG, JPEG, GIF or WebP, up to 25 MB."
   },
   "crosshair": {
@@ -662,52 +660,6 @@
       "times": "{{value}}×"
     }
   },
-  "monitor": {
-    "title": "Monitor",
-    "subtitle": "What each display can adjust in hardware, and its own fine-tuning.",
-    "refresh": "Read again",
-    "reading": "Reading the monitors…",
-    "primary": "Main",
-    "internal": "Laptop screen",
-    "external": "External monitor",
-    "hdrOn": "HDR on",
-    "scale": "{{value}}% scale",
-    "unknownGpu": "Unknown graphics card",
-    "vibrance": {
-      "nvidia": "Driver vibrance: NVIDIA",
-      "amd": "Driver vibrance: AMD",
-      "none": "No driver vibrance"
-    },
-    "hardware": {
-      "title": "Hardware",
-      "brightness": "Brightness",
-      "contrast": "Contrast",
-      "redGain": "Red",
-      "greenGain": "Green",
-      "blueGain": "Blue",
-      "panelBrightness": "Panel brightness",
-      "restore": "Restore the values from before VRes",
-      "noDdc": "This monitor doesn't answer DDC/CI. Some ship with it off: look for it in the monitor's menu.",
-      "noPanel": "This screen's brightness can't be changed from Windows.",
-      "dragHint": "Applied when you let go"
-    },
-    "trim": {
-      "title": "This display's own adjustment",
-      "description": "Added on top of the Display tab's look, only on this monitor.",
-      "gamma": "Gamma",
-      "warmth": "Warmth",
-      "cool": "Cool",
-      "warm": "Warm",
-      "red": "Red",
-      "green": "Green",
-      "blue": "Blue",
-      "reset": "Remove adjustment",
-      "colorOff": "Applies while VRes color is on."
-    },
-    "units": {
-      "percent": "{{value}}%"
-    }
-  },
   "customize": {
     "title": "Customize",
     "subtitle": "Make VRes look the way you like.",
@@ -727,10 +679,32 @@
       "uploading": "Saving…",
       "remove": "Remove background",
       "opacity": "How visible",
-      "note": "The GIF stays still while VRes isn't in front, so it costs nothing while you play. The image never leaves your PC."
+      "note": "The GIF stays still while VRes isn't in front, so it costs nothing while you play. The image never leaves your PC.",
+      "blur": "Blur"
     },
     "units": {
-      "percent": "{{value}}%"
+      "percent": "{{value}}%",
+      "px": "{{value}} px"
+    },
+    "accent": {
+      "title": "Accent color",
+      "description": "The color of buttons, marks and details.",
+      "lime": "Lime",
+      "cyan": "Cyan",
+      "blue": "Blue",
+      "violet": "Violet",
+      "pink": "Pink",
+      "red": "Red",
+      "orange": "Orange",
+      "yellow": "Yellow"
+    },
+    "size": {
+      "title": "Interface size",
+      "description": "Makes everything bigger or smaller: text, buttons and spacing.",
+      "s90": "Compact",
+      "s100": "Normal",
+      "s110": "Large",
+      "s125": "Extra large"
     }
   }
 }

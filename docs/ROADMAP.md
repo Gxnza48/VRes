@@ -12,8 +12,8 @@ VRes se construye por **fases**. Cada fase termina en una versión instalable: c
 | **F5** | Looks, Biblioteca, códigos y color avanzado | v0.5 | ✅ |
 | **F6** | Perfiles por juego | v0.6 | ✅ |
 | **F7** | Dark Boost y Zoom | v0.7 | ✅ |
-| **F8** | Monitor (DDC/CI), Personalizar y Más | v0.8 | ✅ |
-| **F9** | Control desde el celular | v0.9 | 🗓 |
+| **F8** | Personalizar y Más (la pestaña Monitor se quitó en la v0.9) | v0.8 – v0.9 | ✅ |
+| **F9** | ~~Control desde el celular~~ | — | ✖ Descartada |
 | **F10** | Resoluciones personalizadas, asistentes por juego, firma | v1.0 | 🗓 |
 
 Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan gratuito; con **F7**, todo lo de sus planes pagos.
@@ -117,9 +117,15 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 - [x] `vres-cli ddc get`, `vres-cli ddc test` (brillo ±1 y vuelta) y la versión de Windows en `vres-cli diag`
 - [ ] A ojo: el brillo y el contraste del monitor cambian al soltar el control; el tema Grafito y el fondo se ven bien
 
-## F9 — Control desde el celular
+## v0.9 — Personalizar completo
 
-- Servidor local apagado por defecto, código QR con un token aleatorio, sin pasar por internet
+- [x] Color de acento (lima, cian, azul, violeta, rosa, rojo, naranja y amarillo), tamaño de la interfaz (90 % a 125 %) y desenfoque del fondo
+- [x] Se quita la pestaña Monitor: era redundante con Pantalla (`vres-cli ddc` sigue para diagnóstico)
+- [x] Enlace a la comunidad en Discord desde la app y el README
+
+## F9 — Control desde el celular (descartada)
+
+Se decidió no hacerla: VRes no abre ningún servidor ni puerto.
 
 ## F10 — Hacia la 1.0
 

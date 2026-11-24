@@ -13,7 +13,6 @@
     "display": "Pantalla",
     "library": "Biblioteca",
     "resolution": "Resolución",
-    "monitor": "Monitor",
     "customize": "Personalizar",
     "crosshair": "Crosshair",
     "profiles": "Perfiles",
@@ -58,7 +57,8 @@
       "version": "Versión {{version}}",
       "license": "Software libre bajo licencia GPL-3.0. Sin cuenta y sin telemetría.",
       "repository": "Código fuente",
-      "report": "Reportar un problema"
+      "report": "Reportar un problema",
+      "discord": "Comunidad en Discord"
     },
     "startup": {
       "title": "Inicio",
@@ -360,8 +360,6 @@
     "hotkeyTaken": "Otro programa ya usa ese atajo. Elige otro.",
     "settingsFailed": "No se pudieron guardar los ajustes.",
     "crosshairInvalid": "No se pudo dibujar ese crosshair.",
-    "hardwareUnsupported": "El monitor no permite ese ajuste.",
-    "hardwareFailed": "El monitor no respondió al cambio. Prueba de nuevo.",
     "backgroundInvalid": "Esa imagen no sirve: tiene que ser PNG, JPEG, GIF o WebP de hasta 25 MB."
   },
   "crosshair": {
@@ -662,52 +660,6 @@
       "times": "{{value}}×"
     }
   },
-  "monitor": {
-    "title": "Monitor",
-    "subtitle": "Lo que cada pantalla permite ajustar por hardware y su ajuste propio.",
-    "refresh": "Volver a leer",
-    "reading": "Leyendo los monitores…",
-    "primary": "Principal",
-    "internal": "Pantalla de la notebook",
-    "external": "Monitor externo",
-    "hdrOn": "HDR activo",
-    "scale": "Escala {{value}} %",
-    "unknownGpu": "Placa de video desconocida",
-    "vibrance": {
-      "nvidia": "Vibrance por driver: NVIDIA",
-      "amd": "Vibrance por driver: AMD",
-      "none": "Sin vibrance por driver"
-    },
-    "hardware": {
-      "title": "Por hardware",
-      "brightness": "Brillo",
-      "contrast": "Contraste",
-      "redGain": "Rojo",
-      "greenGain": "Verde",
-      "blueGain": "Azul",
-      "panelBrightness": "Brillo del panel",
-      "restore": "Volver a los valores de antes de VRes",
-      "noDdc": "Este monitor no responde a DDC/CI. Algunos lo traen apagado: búscalo en el menú del monitor.",
-      "noPanel": "Esta pantalla no permite cambiar el brillo desde Windows.",
-      "dragHint": "Se aplica al soltar"
-    },
-    "trim": {
-      "title": "Ajuste propio de esta pantalla",
-      "description": "Se suma al look de la pestaña Pantalla, solo en este monitor.",
-      "gamma": "Gamma",
-      "warmth": "Calidez",
-      "cool": "Frío",
-      "warm": "Cálido",
-      "red": "Rojo",
-      "green": "Verde",
-      "blue": "Azul",
-      "reset": "Quitar ajuste",
-      "colorOff": "Se aplica cuando el color de VRes está prendido."
-    },
-    "units": {
-      "percent": "{{value}} %"
-    }
-  },
   "customize": {
     "title": "Personalizar",
     "subtitle": "El aspecto de VRes, a tu gusto.",
@@ -727,10 +679,32 @@
       "uploading": "Guardando…",
       "remove": "Quitar fondo",
       "opacity": "Cuánto se ve",
-      "note": "El GIF se queda quieto mientras VRes no está al frente, para no gastar mientras juegas. La imagen no sale de tu PC."
+      "note": "El GIF se queda quieto mientras VRes no está al frente, para no gastar mientras juegas. La imagen no sale de tu PC.",
+      "blur": "Desenfoque"
     },
     "units": {
-      "percent": "{{value}} %"
+      "percent": "{{value}} %",
+      "px": "{{value}} px"
+    },
+    "accent": {
+      "title": "Color de acento",
+      "description": "El color de los botones, las marcas y los detalles.",
+      "lime": "Lima",
+      "cyan": "Cian",
+      "blue": "Azul",
+      "violet": "Violeta",
+      "pink": "Rosa",
+      "red": "Rojo",
+      "orange": "Naranja",
+      "yellow": "Amarillo"
+    },
+    "size": {
+      "title": "Tamaño de la interfaz",
+      "description": "Agranda o achica todo: textos, botones y espacios.",
+      "s90": "Compacta",
+      "s100": "Normal",
+      "s110": "Grande",
+      "s125": "Muy grande"
     }
   }
 }

@@ -12,6 +12,7 @@ import { useSettingsStore } from "@/state/settings";
 export function Backdrop() {
   const background = useSettingsStore((store) => store.settings?.appearance.background ?? null);
   const opacity = useSettingsStore((store) => store.settings?.appearance.backgroundOpacity ?? 25);
+  const blur = useSettingsStore((store) => store.settings?.appearance.backgroundBlur ?? 0);
   const [url, setUrl] = useState<string | null>(null);
   const [still, setStill] = useState<string | null>(null);
   const [focused, setFocused] = useState(true);
@@ -72,6 +73,8 @@ export function Backdrop() {
   }, []);
 
   if (!background || !url) return null;
+  // Con desenfoque, la imagen se agranda un poco para que no se vean bordes transparentes.
+  const layer = blur > 0 ? { filter: `blur(${blur}px)`, transform: "scale(1.08)" } : undefined;
   return (
     <div
       aria-hidden
@@ -79,9 +82,9 @@ export function Backdrop() {
       style={{ opacity: opacity / 100 }}
     >
       {focused || !still ? (
-        <img ref={image} src={url} alt="" className="h-full w-full object-cover" />
+        <img ref={image} src={url} alt="" className="h-full w-full object-cover" style={layer} />
       ) : (
-        <img src={still} alt="" className="h-full w-full object-cover" />
+        <img src={still} alt="" className="h-full w-full object-cover" style={layer} />
       )}
     </div>
   );

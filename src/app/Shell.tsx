@@ -3,7 +3,6 @@ import { CustomizePage } from "@/features/customize/CustomizePage";
 import { DisplayPage } from "@/features/display/DisplayPage";
 import { EnhancersPage } from "@/features/enhancers/EnhancersPage";
 import { LibraryPage } from "@/features/library/LibraryPage";
-import { MonitorPage } from "@/features/monitor/MonitorPage";
 import { ProfilesPage } from "@/features/profiles/ProfilesPage";
 import { MorePage } from "@/features/more/MorePage";
 import { CountdownDialog } from "@/features/resolution/CountdownDialog";
@@ -23,7 +22,7 @@ export function Shell() {
   // La cuenta regresiva de resolución aparece en cualquier pestaña.
   const pending = useResolutionStore((store) => store.state?.pending ?? null);
   const busy = useResolutionStore((store) => store.busy);
-  useTheme();
+  useTheme({ scale: true });
 
   return (
     <div className="relative flex h-full overflow-hidden bg-bg text-fg">
@@ -44,8 +43,6 @@ export function Shell() {
             <ResolutionPage />
           ) : tab.id === "enhancers" ? (
             <EnhancersPage />
-          ) : tab.id === "monitor" ? (
-            <MonitorPage />
           ) : tab.id === "customize" ? (
             <CustomizePage />
           ) : (
