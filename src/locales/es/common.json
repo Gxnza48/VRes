@@ -228,7 +228,8 @@
     "dismiss": "Cerrar aviso",
     "modeExpired": "La resolución nueva volvió sola porque no la confirmaste.",
     "toggleHotkeyTaken": "Otro programa usa el atajo de resolución que elegiste. Elige otro en la pestaña Resolución.",
-    "zoomUnavailable": "No se pudo hacer zoom. Si la Lupa de Windows está abierta, ciérrala y vuelve a intentarlo."
+    "zoomUnavailable": "No se pudo hacer zoom. Si la Lupa de Windows está abierta, ciérrala y vuelve a intentarlo.",
+    "crosshairHotkeyTaken": "Otro programa usa el atajo de la mira que elegiste. Elige otro en la pestaña Crosshair."
   },
   "resolution": {
     "title": "Resolución",
@@ -325,7 +326,8 @@
         "reserved": "Está reservada (atajo de emergencia, F12 o Escape).",
         "altGrClash": "Ctrl + Alt equivale a AltGr en teclados latinoamericanos: podría impedirte escribir caracteres como la arroba.",
         "overlayClash": "La usa el overlay de tu placa de video.",
-        "taken": "Otro programa ya usa ese atajo."
+        "taken": "Otro programa ya usa ese atajo.",
+        "duplicate": "Ya lo usa otro atajo de VRes."
       }
     },
     "confirm": {
@@ -373,6 +375,10 @@
       "title": "Vista previa",
       "description": "Así se ve sobre el juego: tamaño real y ampliado ×4.",
       "zoom": "Vista ampliada ×4"
+    },
+    "hotkey": {
+      "title": "Atajo para mostrar u ocultar",
+      "description": "Muestra u oculta la mira sin salir del juego. Si un perfil de juego la controla, el cambio vale mientras ese juego siga al frente."
     },
     "presets": {
       "title": "Presets",

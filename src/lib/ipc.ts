@@ -92,9 +92,10 @@ export const ipc = {
   settingsGet: () => call<Settings>("settings_get"),
   /** Guarda los ajustes; falla con `hotkeyTaken` si otro programa usa el atajo. */
   settingsUpdate: (settings: Settings) => call<Settings>("settings_update", { settings }),
-  /** Revisa un atajo (teclas reservadas y choques conocidos). */
-  hotkeysCheck: (hotkey: Hotkey) => call<HotkeyCheck>("hotkeys_check", { hotkey }),
-  /** Suspende el atajo de resolución mientras se graba uno nuevo. */
+  /** Revisa un atajo (teclas reservadas, choques conocidos y los demás atajos de VRes). */
+  hotkeysCheck: (hotkey: Hotkey, others: Hotkey[] = []) =>
+    call<HotkeyCheck>("hotkeys_check", { hotkey, others }),
+  /** Suspende los atajos configurables mientras se graba uno nuevo. */
   hotkeysSuspend: (suspended: boolean) => call<void>("hotkeys_suspend", { suspended }),
 
   /** Modos de cada pantalla, presets y el cambio pendiente. */

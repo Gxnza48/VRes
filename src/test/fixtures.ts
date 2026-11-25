@@ -62,7 +62,7 @@ export function defaultEnhancers(): EnhancerSettings {
 export function defaultSettings(): Settings {
   return {
     schemaVersion: 1,
-    hotkeys: { resolutionToggle: null },
+    hotkeys: { resolutionToggle: null, crosshairToggle: null },
     resolution: { confirmSeconds: 15, tones: true, toggle: null, confirmed: [] },
     crosshair: {
       enabled: false,

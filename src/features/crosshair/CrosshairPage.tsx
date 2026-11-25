@@ -2,6 +2,7 @@ import { Crosshair as CrosshairIcon, ImageUp, Save, Shapes, Trash2 } from "lucid
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { HotkeyRecorder } from "@/components/common/HotkeyRecorder";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ParamSlider, type SliderRange } from "@/components/common/ParamSlider";
 import { ShareBox } from "@/components/common/ShareBox";
@@ -11,6 +12,7 @@ import type { Crosshair } from "@/lib/bindings/Crosshair";
 import type { CrosshairPreset } from "@/lib/bindings/CrosshairPreset";
 import type { CrosshairSettings } from "@/lib/bindings/CrosshairSettings";
 import type { ErrorCode } from "@/lib/bindings/ErrorCode";
+import type { Hotkey } from "@/lib/bindings/Hotkey";
 import ranges from "@/lib/bindings/ranges.json";
 import { ipc } from "@/lib/ipc";
 import { cn } from "@/lib/utils";
@@ -55,6 +57,7 @@ export function CrosshairPage() {
   const [draft, setDraft] = useState<Crosshair | null>(null);
   const [presets, setPresets] = useState<CrosshairPreset[]>([]);
   const [error, setError] = useState<ErrorCode | null>(null);
+  const [hotkeyError, setHotkeyError] = useState<ErrorCode | null>(null);
   const [imageError, setImageError] = useState(false);
   const [name, setName] = useState("");
   const frame = useRef<number | null>(null);
@@ -85,6 +88,19 @@ export function CrosshairPage() {
     },
     [],
   );
+
+  // El atajo vive con los demás atajos; si otro programa lo usa, no se guarda.
+  const onHotkeyChange = useCallback((hotkey: Hotkey | null) => {
+    const latest = useSettingsStore.getState().settings;
+    if (!latest) return;
+    setHotkeyError(null);
+    void saveSettings({
+      ...latest,
+      hotkeys: { ...latest.hotkeys, crosshairToggle: hotkey },
+    }).then((code) => {
+      if (code) setHotkeyError(code);
+    });
+  }, []);
 
   const change = useCallback(
     (next: Crosshair, mode: Mode) => {
@@ -146,6 +162,7 @@ export function CrosshairPage() {
   );
 
   const isImage = current.kind === "image";
+  const hotkeys = settings?.hotkeys;
 
   return (
     <div className="flex flex-col gap-6">
@@ -179,6 +196,25 @@ export function CrosshairPage() {
         <CardContent className="flex-row flex-wrap items-center gap-6">
           <CrosshairCanvas crosshair={current} box={160} label={t("crosshair.preview.title")} />
           <CrosshairCanvas crosshair={current} box={160} zoom={4} label={t("crosshair.preview.zoom")} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("crosshair.hotkey.title")}</CardTitle>
+          <CardDescription>{t("crosshair.hotkey.description")}</CardDescription>
+        </CardHeader>
+        <CardContent className="gap-3">
+          <HotkeyRecorder
+            value={hotkeys?.crosshairToggle ?? null}
+            others={hotkeys?.resolutionToggle ? [hotkeys.resolutionToggle] : []}
+            onChange={onHotkeyChange}
+          />
+          {hotkeyError && (
+            <p role="alert" className="text-sm text-danger">
+              {t(`errors.${hotkeyError}`)}
+            </p>
+          )}
         </CardContent>
       </Card>
 

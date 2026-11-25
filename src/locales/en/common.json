@@ -228,7 +228,8 @@
     "dismiss": "Dismiss",
     "modeExpired": "The new resolution reverted by itself because you didn't confirm it.",
     "toggleHotkeyTaken": "Another program uses the resolution hotkey you chose. Pick another one in the Resolution tab.",
-    "zoomUnavailable": "Zoom failed. If Windows Magnifier is open, close it and try again."
+    "zoomUnavailable": "Zoom failed. If Windows Magnifier is open, close it and try again.",
+    "crosshairHotkeyTaken": "Another program uses the crosshair hotkey you chose. Pick another one in the Crosshair tab."
   },
   "resolution": {
     "title": "Resolution",
@@ -325,7 +326,8 @@
         "reserved": "It's reserved (emergency hotkey, F12 or Escape).",
         "altGrClash": "Ctrl + Alt equals AltGr on Latin American keyboards: it could stop you from typing characters like @.",
         "overlayClash": "Your graphics card's overlay uses it.",
-        "taken": "Another program already uses that hotkey."
+        "taken": "Another program already uses that hotkey.",
+        "duplicate": "Another VRes hotkey already uses it."
       }
     },
     "confirm": {
@@ -373,6 +375,10 @@
       "title": "Preview",
       "description": "How it looks over the game: real size and zoomed ×4.",
       "zoom": "Zoomed ×4 preview"
+    },
+    "hotkey": {
+      "title": "Show/hide hotkey",
+      "description": "Shows or hides the crosshair without leaving the game. If a game profile controls it, the change lasts while that game stays in the foreground."
     },
     "presets": {
       "title": "Presets",

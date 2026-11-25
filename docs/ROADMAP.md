@@ -123,6 +123,12 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 - [x] Se quita la pestaña Monitor: era redundante con Pantalla (`vres-cli ddc` sigue para diagnóstico)
 - [x] Enlace a la comunidad en Discord desde la app y el README
 
+## v0.9.1 — Atajo del crosshair
+
+- [x] Atajo para mostrar u ocultar el crosshair (si un perfil de juego lo controla, el cambio vale mientras ese juego siga al frente)
+- [x] La misma combinación no se puede usar para dos atajos, y un atajo que ocupa otro programa ya no impide guardar los demás ajustes
+- [ ] A ojo: el atajo muestra y oculta la mira sobre un juego en ventana sin bordes
+
 ## F9 — Control desde el celular (descartada)
 
 Se decidió no hacerla: VRes no abre ningún servidor ni puerto.

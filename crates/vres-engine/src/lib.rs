@@ -21,6 +21,6 @@ mod thread;
 #[cfg(windows)]
 pub use thread::{
     ApplyMode, Command, EngineConfig, EngineEvent, EngineHandle, EngineSettings, EngineSnapshot,
-    EventSink, Reply, emergency_restore, modes_restore_path, recover_from_disk, restore_path,
-    spawn, state_dir,
+    EventSink, HotkeyStatus, Reply, emergency_restore, modes_restore_path, recover_from_disk,
+    restore_path, spawn, state_dir,
 };

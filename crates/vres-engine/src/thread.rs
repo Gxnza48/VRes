@@ -31,7 +31,10 @@ use vres_core::model::resolution::{
 };
 use vres_core::model::vibrance::VibranceInfo;
 use vres_core::planner::Requested;
-use vres_core::profiles::{Observed, ProfileSettings, SessionPlan, match_game, resolve};
+use vres_core::profiles::{
+    CrosshairToggle, Observed, ProfileSettings, SessionPlan, crosshair_visible, match_game,
+    resolve, toggle_crosshair,
+};
 use vres_core::settings::{CrosshairSettings, DEFAULT_CONFIRM_SECONDS, SavedMode};
 use vres_core::status::{EngineStatus, ReasonCode};
 use vres_win::control::{self, ACK, RemoteCommand};
@@ -83,6 +86,7 @@ const TIMER_GAME: usize = 6;
 const TIMER_HOLD: usize = 7;
 const HOTKEY_EMERGENCY: i32 = 1;
 const HOTKEY_TOGGLE: i32 = 2;
+const HOTKEY_CROSSHAIR: i32 = 3;
 
 const HEALTH_INTERVAL_MS: u32 = 1000;
 const IDENTIFY_MS: u32 = 2500;
@@ -107,6 +111,8 @@ pub struct EngineSettings {
     pub confirm_seconds: u32,
     /// El crosshair: si está prendido, dónde y cuál.
     pub crosshair: CrosshairSettings,
+    /// Atajo que prende o apaga el crosshair.
+    pub crosshair_hotkey: Option<Hotkey>,
     /// Perfiles por juego.
     pub profiles: ProfileSettings,
     /// Dark Boost y Zoom.
@@ -121,10 +127,29 @@ impl Default for EngineSettings {
             tones: true,
             confirm_seconds: DEFAULT_CONFIRM_SECONDS,
             crosshair: CrosshairSettings::default(),
+            crosshair_hotkey: None,
             profiles: ProfileSettings::default(),
             enhancers: EnhancerSettings::default(),
         }
     }
+}
+
+/// Qué atajos configurables quedaron registrados. `true` también cuando no hay
+/// ninguno elegido; `false`, cuando otro programa ya lo usa.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct HotkeyStatus {
+    /// El de resolución (nativa ↔ estirada).
+    pub resolution: bool,
+    /// El del crosshair.
+    pub crosshair: bool,
+}
+
+impl HotkeyStatus {
+    /// Todos registrados (o sin elegir).
+    pub const OK: Self = Self {
+        resolution: true,
+        crosshair: true,
+    };
 }
 
 /// Configuración del motor.
@@ -184,12 +209,12 @@ pub enum Command {
         enabled: bool,
         reply: Reply<()>,
     },
-    /// Nuevos ajustes. Responde si el atajo de resolución se pudo registrar.
+    /// Nuevos ajustes. Responde qué atajos se pudieron registrar.
     Configure {
         settings: Box<EngineSettings>,
-        reply: Sender<bool>,
+        reply: Sender<HotkeyStatus>,
     },
-    /// Suspender el atajo de resolución (mientras se graba uno nuevo).
+    /// Suspender los atajos configurables (mientras se graba uno nuevo).
     SuspendHotkeys(bool),
     /// Mostrar este crosshair mientras se edita (sin guardar). `None` vuelve
     /// al guardado.
@@ -221,6 +246,9 @@ pub enum EngineEvent {
     Profile(Option<String>),
     /// Cambió el estado de Dark Boost o Zoom.
     Enhancers(EnhancerState),
+    /// El atajo prendió (`true`) o apagó el crosshair sin un perfil que lo
+    /// controle: hay que guardarlo en los ajustes.
+    CrosshairToggled(bool),
 }
 
 /// Estado inicial, al terminar de arrancar.
@@ -235,6 +263,8 @@ pub struct EngineSnapshot {
     pub hotkey_registered: bool,
     /// Se pudo registrar el atajo de resolución (o no hay ninguno configurado).
     pub toggle_hotkey_registered: bool,
+    /// Se pudo registrar el atajo del crosshair (o no hay ninguno configurado).
+    pub crosshair_hotkey_registered: bool,
 }
 
 /// Carpeta de estado de la máquina: `%LOCALAPPDATA%\io.github.gxnza48.vres\state`.
@@ -503,6 +533,9 @@ struct Shell {
     resolution_rev: u64,
     overlay: Option<CrosshairOverlay>,
     crosshair_preview: Option<Crosshair>,
+    /// Lo que se cambió con el atajo del crosshair mientras un perfil lo
+    /// controla (vale hasta que cambie el perfil en uso).
+    crosshair_override: Option<bool>,
     /// Lo que pidió el usuario para el escritorio (sin los perfiles).
     desktop: Requested,
     /// El juego abierto que tiene la sesión (el último que estuvo al frente).
@@ -544,6 +577,8 @@ impl Shell {
                     self.emergency_reset();
                 } else if wparam == HOTKEY_TOGGLE as usize {
                     self.toggle();
+                } else if wparam == HOTKEY_CROSSHAIR as usize {
+                    self.on_crosshair_hotkey();
                 }
                 Some(0)
             }
@@ -801,7 +836,7 @@ impl Shell {
             Command::Configure { settings, reply } => {
                 self.settings = *settings;
                 self.crosshair_preview = None;
-                let registered = self.register_toggle_hotkey();
+                let registered = self.register_hotkeys();
                 self.apply_crosshair();
                 self.observe_games();
                 let _ = reply.send(registered);
@@ -812,7 +847,7 @@ impl Shell {
             }
             Command::SuspendHotkeys(suspended) => {
                 self.hotkeys_suspended = suspended;
-                self.register_toggle_hotkey();
+                self.register_hotkeys();
                 // Mientras se graba una tecla, Dark Boost y Zoom no escuchan.
                 self.update_listening();
             }
@@ -827,8 +862,13 @@ impl Shell {
     /// Dibuja (o esconde) el crosshair según los ajustes y la vista previa.
     fn apply_crosshair(&mut self) {
         let config = self.settings.crosshair.clone();
-        // Un perfil de juego puede prenderlo o apagarlo mientras está al frente.
-        let enabled = self.session.crosshair.unwrap_or(config.enabled);
+        // Un perfil de juego puede prenderlo o apagarlo mientras está al
+        // frente, y el atajo cambiarlo durante esa partida.
+        let enabled = crosshair_visible(
+            config.enabled,
+            self.session.crosshair,
+            self.crosshair_override,
+        );
         if !enabled {
             if let Some(overlay) = &mut self.overlay {
                 overlay.hide();
@@ -878,22 +918,49 @@ impl Shell {
         }
     }
 
-    /// (Re)registra el atajo de resolución. Devuelve `false` si otro programa
-    /// ya lo usa o la tecla no se puede registrar.
-    fn register_toggle_hotkey(&mut self) -> bool {
+    /// (Re)registra los atajos configurables (resolución y crosshair). Un
+    /// `false` es un atajo que otro programa ya usa o que no se puede registrar.
+    fn register_hotkeys(&mut self) -> HotkeyStatus {
+        // Primero se sueltan los dos, así un atajo puede pasar de uno al otro.
         window::unregister_hotkey(self.hwnd, HOTKEY_TOGGLE);
+        window::unregister_hotkey(self.hwnd, HOTKEY_CROSSHAIR);
         if self.hotkeys_suspended {
-            return true;
+            return HotkeyStatus::OK;
         }
-        let Some(hotkey) = &self.settings.toggle_hotkey else {
+        HotkeyStatus {
+            resolution: self.register_hotkey(HOTKEY_TOGGLE, self.settings.toggle_hotkey.as_ref()),
+            crosshair: self
+                .register_hotkey(HOTKEY_CROSSHAIR, self.settings.crosshair_hotkey.as_ref()),
+        }
+    }
+
+    /// Registra un atajo. `true` si quedó registrado o si no hay ninguno.
+    fn register_hotkey(&self, id: i32, hotkey: Option<&Hotkey>) -> bool {
+        let Some(hotkey) = hotkey else {
             return true;
         };
-        match keyboard::hotkey_registration(hotkey) {
-            Some((modifiers, vk)) => {
-                window::register_hotkey(self.hwnd, HOTKEY_TOGGLE, modifiers, vk).is_ok()
+        keyboard::hotkey_registration(hotkey).is_some_and(|(modifiers, vk)| {
+            window::register_hotkey(self.hwnd, id, modifiers, vk).is_ok()
+        })
+    }
+
+    /// El atajo del crosshair: lo muestra u oculta. Si un perfil lo controla,
+    /// el cambio vale mientras ese perfil siga en uso; si no, cambia el
+    /// interruptor de la pestaña y la app lo guarda.
+    fn on_crosshair_hotkey(&mut self) {
+        match toggle_crosshair(
+            self.settings.crosshair.enabled,
+            self.session.crosshair,
+            self.crosshair_override,
+        ) {
+            CrosshairToggle::Session(visible) => self.crosshair_override = Some(visible),
+            CrosshairToggle::Setting(enabled) => {
+                self.crosshair_override = None;
+                self.settings.crosshair.enabled = enabled;
+                (self.sink)(EngineEvent::CrosshairToggled(enabled));
             }
-            None => false,
         }
+        self.apply_crosshair();
     }
 
     fn toggle(&mut self) {
@@ -1244,6 +1311,9 @@ impl Shell {
         let active_changed = plan.active != self.session.active;
         let look_changed = plan.look != self.session.look;
         let crosshair_changed = plan.crosshair != self.session.crosshair;
+        // Lo que se cambió con el atajo valía para el perfil anterior.
+        let override_cleared = (active_changed || plan.crosshair.is_none())
+            && self.crosshair_override.take().is_some();
         let wanted_resolution = plan.resolution.clone();
         self.session = plan;
         if active_changed {
@@ -1252,7 +1322,7 @@ impl Shell {
         if look_changed {
             self.apply_effective();
         }
-        if crosshair_changed {
+        if crosshair_changed || override_cleared {
             self.apply_crosshair();
         }
         if wanted_resolution != self.profile_resolution {
@@ -1440,6 +1510,7 @@ fn run(
         resolution_rev: 0,
         overlay: None,
         crosshair_preview: None,
+        crosshair_override: None,
         desktop,
         game: None,
         session: SessionPlan::default(),
@@ -1486,7 +1557,7 @@ fn run(
     if let Ok(mut shell) = shell.try_borrow_mut() {
         shell.hwnd = window.handle();
         shell.after_change(false);
-        let toggle_ok = shell.register_toggle_hotkey();
+        let hotkeys = shell.register_hotkeys();
         shell.apply_crosshair();
         let resolution = shell.resolution_state();
         let snapshot = EngineSnapshot {
@@ -1495,7 +1566,8 @@ fn run(
             resolution,
             recovered,
             hotkey_registered: hotkey_ok,
-            toggle_hotkey_registered: toggle_ok,
+            toggle_hotkey_registered: hotkeys.resolution,
+            crosshair_hotkey_registered: hotkeys.crosshair,
         };
         let _ = ready.send(Ok((window.handle(), snapshot)));
         // Un juego ya abierto puede tener perfil; Dark Boost y Zoom pueden escuchar.
@@ -1507,6 +1579,7 @@ fn run(
     drop(foreground);
     window.unregister_hotkey(HOTKEY_EMERGENCY);
     window.unregister_hotkey(HOTKEY_TOGGLE);
+    window.unregister_hotkey(HOTKEY_CROSSHAIR);
     drop(window);
     if let Ok(mut shell) = shell.try_borrow_mut()
         && let Some(reply) = shell.shutdown_reply.take()

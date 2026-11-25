@@ -48,6 +48,8 @@ pub enum HotkeyIssue {
     OverlayClash,
     /// Otro programa ya registró ese atajo.
     Taken,
+    /// Ya lo usa otro atajo de VRes (Windows no registra el mismo dos veces).
+    Duplicate,
 }
 
 /// Resultado de revisar un atajo.
@@ -208,6 +210,17 @@ pub fn check_hotkey(hotkey: &Hotkey) -> HotkeyCheck {
     HotkeyCheck { error, warning }
 }
 
+/// Revisa un atajo junto con los demás atajos de VRes (`others`).
+pub fn check_hotkey_among(hotkey: &Hotkey, others: &[Hotkey]) -> HotkeyCheck {
+    if others.contains(hotkey) {
+        return HotkeyCheck {
+            error: Some(HotkeyIssue::Duplicate),
+            warning: None,
+        };
+    }
+    check_hotkey(hotkey)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -299,5 +312,23 @@ mod tests {
             Some(HotkeyIssue::OverlayClash)
         );
         assert_eq!(check_hotkey(&key("F8", true, true, false)).warning, None);
+    }
+
+    #[test]
+    fn the_same_hotkey_cannot_be_used_twice() {
+        let f8 = key("F8", false, false, false);
+        assert_eq!(
+            check_hotkey_among(&f8, std::slice::from_ref(&f8)).error,
+            Some(HotkeyIssue::Duplicate)
+        );
+        assert_eq!(
+            check_hotkey_among(&f8, &[key("F8", true, false, false)]),
+            HotkeyCheck::default(),
+            "otros modificadores: es otro atajo"
+        );
+        assert_eq!(
+            check_hotkey_among(&key("F12", false, false, false), &[]).error,
+            Some(HotkeyIssue::Reserved)
+        );
     }
 }

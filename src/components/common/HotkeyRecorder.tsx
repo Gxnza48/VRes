@@ -1,5 +1,5 @@
 import { Keyboard, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 interface HotkeyRecorderProps {
   value: Hotkey | null;
   disabled?: boolean;
+  /** Los demás atajos de VRes: no se puede repetir ninguno. */
+  others?: Hotkey[];
   onChange: (hotkey: Hotkey | null) => void;
 }
 
@@ -25,10 +27,15 @@ interface Problem {
  * con sus modificadores. Mientras graba, el atajo actual queda suspendido
  * (si no, Windows lo atraparía antes de que llegue acá).
  */
-export function HotkeyRecorder({ value, disabled, onChange }: HotkeyRecorderProps) {
+export function HotkeyRecorder({ value, disabled, others, onChange }: HotkeyRecorderProps) {
   const { t } = useTranslation();
   const [recording, setRecording] = useState(false);
   const [problem, setProblem] = useState<Problem | null>(null);
+  // En una referencia: que cambie la lista no reinicia la grabación.
+  const othersRef = useRef<Hotkey[]>([]);
+  useEffect(() => {
+    othersRef.current = others ?? [];
+  }, [others]);
 
   useEffect(() => {
     if (!recording) return;
@@ -50,7 +57,7 @@ export function HotkeyRecorder({ value, disabled, onChange }: HotkeyRecorderProp
         win: event.metaKey,
       };
       ipc
-        .hotkeysCheck(hotkey)
+        .hotkeysCheck(hotkey, othersRef.current)
         .then((check) => {
           if (check.error) {
             setProblem({ kind: "error", issue: check.error });

@@ -20,7 +20,7 @@ Saturación hasta 300 %, vibrance digital, resolución estirada, crosshair, perf
 </div>
 
 > [!IMPORTANT]
-> **VRes está en alfa.** Ya están las pestañas **Pantalla** (saturación hasta 300 %, vibrance por driver NVIDIA y AMD, y ajuste fino por monitor) **Resolución** (estirada, HDR y atajo nativa ↔ estirada) y **Crosshair** (formas, imagen propia y oculto en capturas), con su red de seguridad, y se van sumando funciones por fases. Mira en qué está cada una en la [tabla de funciones](#funciones) y en la [hoja de ruta](docs/ROADMAP.md).
+> **VRes está en alfa.** Ya están las pestañas **Pantalla** (saturación hasta 300 %, vibrance por driver NVIDIA y AMD, y ajuste fino por monitor) **Resolución** (estirada, HDR y atajo nativa ↔ estirada) y **Crosshair** (formas, imagen propia, oculto en capturas y atajo para mostrarlo u ocultarlo), con su red de seguridad, y se van sumando funciones por fases. Mira en qué está cada una en la [tabla de funciones](#funciones) y en la [hoja de ruta](docs/ROADMAP.md).
 
 ---
 
@@ -38,7 +38,7 @@ Está pensado para la comunidad gamer de Latinoamérica: es **gratis de verdad**
 | **Pantalla:** saturación de 0 a 300 % y ajuste fino por monitor (brillo, contraste, gamma, temperatura, sombras, altas luces, negros, blancos y tintes) | ✅ Disponible | v0.1 |
 | **Resolución:** estirada 4:3, 5:4 y 16:10, Hz y HDR, con vuelta atrás automática y atajo nativa ↔ estirada | ✅ Disponible | v0.2 |
 | **Vibrance digital** por driver, monitor por monitor: NVIDIA y AMD (en Intel, emulada) | ✅ Disponible | v0.3 |
-| **Crosshair** superpuesto: formas por partes, colores, imagen propia, monitor a elección, oculto en capturas y guardados | ✅ Disponible | v0.4 |
+| **Crosshair** superpuesto: formas por partes, colores, imagen propia, monitor a elección, oculto en capturas, guardados y atajo para mostrarlo u ocultarlo | ✅ Disponible | v0.4 – v0.9.1 |
 | **Looks y Biblioteca:** looks propios por juego, biblioteca local, códigos para compartir, profundidad de color, ayudas para daltonismo, cuidado visual y ajuste rápido desde la bandeja | ✅ Disponible | v0.5 |
 | **Perfiles por juego:** Fortnite, VALORANT, CS2, Apex Legends, Rust y Rainbow Six Siege, y cualquier otro; look y crosshair al frente, resolución mientras el juego está abierto | ✅ Disponible | v0.6 |
 | **Dark Boost y Zoom** manteniendo (o alternando) una tecla o un botón del mouse, incluidos Mouse 4 y 5; vienen desarmados | ✅ Disponible | v0.7 |

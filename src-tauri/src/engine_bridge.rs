@@ -17,7 +17,9 @@ use vres_core::planner::Requested;
 use vres_core::settings::Settings;
 use vres_core::status::{EngineStatus, ReasonCode};
 use vres_core::store::{self, Loaded};
-use vres_engine::{ApplyMode, Command, EngineConfig, EngineEvent, EngineHandle, EventSink, Reply};
+use vres_engine::{
+    ApplyMode, Command, EngineConfig, EngineEvent, EngineHandle, EventSink, HotkeyStatus, Reply,
+};
 
 use crate::settings::{SettingsState, engine_settings};
 
@@ -110,6 +112,9 @@ impl EngineState {
                 }
                 if !snapshot.toggle_hotkey_registered {
                     notices.push(Notice::ToggleHotkeyTaken);
+                }
+                if !snapshot.crosshair_hotkey_registered {
+                    notices.push(Notice::CrosshairHotkeyTaken);
                 }
                 Self {
                     handle: Mutex::new(Some(handle)),
@@ -212,17 +217,21 @@ impl EngineState {
         }
     }
 
-    /// Le pasa los ajustes al motor. Devuelve `false` si el atajo de
-    /// resolución no se pudo registrar. **Bloquea** (como `request`).
-    pub fn configure(&self, settings: &Settings) -> bool {
+    /// Le pasa los ajustes al motor y devuelve qué atajos se pudieron
+    /// registrar. **Bloquea** (como `request`).
+    pub fn configure(&self, settings: &Settings) -> HotkeyStatus {
         let (tx, rx) = mpsc::channel();
         if !self.send(Command::Configure {
             settings: Box::new(engine_settings(settings)),
             reply: tx,
         }) {
-            return true;
+            return HotkeyStatus::OK;
         }
-        rx.recv_timeout(Duration::from_secs(3)).unwrap_or(false)
+        rx.recv_timeout(Duration::from_secs(3))
+            .unwrap_or(HotkeyStatus {
+                resolution: false,
+                crosshair: false,
+            })
     }
 
     /// Modifica lo pedido, se lo envía al motor y, si es un cambio
@@ -357,6 +366,25 @@ fn on_engine_event(app: &AppHandle, event: EngineEvent) {
         EngineEvent::Enhancers(enhancers) => {
             *lock(&state.enhancers) = enhancers;
             let _ = app.emit(EVENT_ENHANCERS, enhancers);
+        }
+        EngineEvent::CrosshairToggled(enabled) => {
+            tracing::info!(enabled, "crosshair con el atajo");
+            // Esto corre en el hilo del motor: guardar el archivo va en otra
+            // tarea. El motor ya tiene el valor nuevo: no hace falta reconfigurarlo.
+            let app = app.clone();
+            tauri::async_runtime::spawn_blocking(move || {
+                let Some(settings) = app.try_state::<SettingsState>() else {
+                    return;
+                };
+                let mut updated = settings.get();
+                updated.crosshair.enabled = enabled;
+                match settings.set(updated.clone()) {
+                    Ok(()) => {
+                        let _ = app.emit(EVENT_SETTINGS, updated);
+                    }
+                    Err(error) => tracing::warn!(%error, "no se pudo guardar el crosshair"),
+                }
+            });
         }
     }
 }

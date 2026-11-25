@@ -56,6 +56,7 @@ export function HotkeyCard({ settings, displays, busy }: HotkeyCardProps) {
         <HotkeyRecorder
           value={settings.hotkeys.resolutionToggle}
           disabled={busy}
+          others={settings.hotkeys.crosshairToggle ? [settings.hotkeys.crosshairToggle] : []}
           onChange={onHotkeyChange}
         />
 

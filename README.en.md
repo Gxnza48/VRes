@@ -20,7 +20,7 @@ Saturation up to 300%, digital vibrance, stretched resolution, crosshair, per-ga
 </div>
 
 > [!IMPORTANT]
-> **VRes is in alpha.** The **Display** tab (saturation up to 300%, NVIDIA and AMD driver vibrance, and per-monitor fine tuning) the **Resolution** tab (stretched, HDR and a native ↔ stretched hotkey) and the **Crosshair** tab (shapes, your own image, hidden from captures) are here, with their safety net, and features land phase by phase. See the [feature table](#features) and the [roadmap](docs/ROADMAP.md) (in Spanish).
+> **VRes is in alpha.** The **Display** tab (saturation up to 300%, NVIDIA and AMD driver vibrance, and per-monitor fine tuning) the **Resolution** tab (stretched, HDR and a native ↔ stretched hotkey) and the **Crosshair** tab (shapes, your own image, hidden from captures and a show/hide hotkey) are here, with their safety net, and features land phase by phase. See the [feature table](#features) and the [roadmap](docs/ROADMAP.md) (in Spanish).
 
 ---
 
@@ -38,7 +38,7 @@ It is built for the Latin-American gaming community: **truly free** (no paid pla
 | **Display:** 0–300% saturation and per-monitor fine tuning (brightness, contrast, gamma, temperature, shadows, highlights, blacks, whites and tints) | ✅ Available | v0.1 |
 | **Resolution:** stretched 4:3, 5:4 and 16:10, refresh rate and HDR, with automatic rollback and a native ↔ stretched hotkey | ✅ Available | v0.2 |
 | **Digital vibrance** through the driver, per monitor: NVIDIA and AMD (emulated on Intel) | ✅ Available | v0.3 |
-| **Crosshair** overlay: shapes by parts, colors, your own image, any monitor, hidden from captures and saved crosshairs | ✅ Available | v0.4 |
+| **Crosshair** overlay: shapes by parts, colors, your own image, any monitor, hidden from captures, saved crosshairs and a show/hide hotkey | ✅ Available | v0.4 – v0.9.1 |
 | **Looks & Library:** own per-game looks, local library, share codes, color depth, color-blindness aids, eye care and quick adjust from the tray | ✅ Available | v0.5 |
 | **Per-game profiles:** Fortnite, VALORANT, CS2, Apex Legends, Rust, Rainbow Six Siege and any other game; look and crosshair while in front, resolution while the game is open | ✅ Available | v0.6 |
 | **Dark Boost & Zoom** while holding (or toggling) a key or a mouse button, Mouse 4 and 5 included; they ship disarmed | ✅ Available | v0.7 |

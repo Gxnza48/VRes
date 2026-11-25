@@ -47,6 +47,8 @@ pub struct SavedMode {
 pub struct HotkeySettings {
     /// Alterna entre la resolución de Windows y la estirada.
     pub resolution_toggle: Option<Hotkey>,
+    /// Prende o apaga el crosshair.
+    pub crosshair_toggle: Option<Hotkey>,
 }
 
 /// Ajustes de la pestaña Resolución.
@@ -181,6 +183,13 @@ impl Settings {
         {
             self.hotkeys.resolution_toggle = None;
         }
+        // Windows no registra el mismo atajo dos veces: gana el de resolución.
+        if let Some(hotkey) = &self.hotkeys.crosshair_toggle
+            && (check_hotkey(hotkey).error.is_some()
+                || self.hotkeys.resolution_toggle.as_ref() == Some(hotkey))
+        {
+            self.hotkeys.crosshair_toggle = None;
+        }
 
         self.crosshair.current = self.crosshair.current.clamped();
         self.crosshair.saved.truncate(MAX_SAVED_CROSSHAIRS);
@@ -289,6 +298,47 @@ mod tests {
         assert_eq!(settings.resolution.confirm_seconds, DEFAULT_CONFIRM_SECONDS);
         assert!(settings.resolution.tones);
         assert_eq!(settings.hotkeys.resolution_toggle, None);
+        assert_eq!(settings.hotkeys.crosshair_toggle, None);
+    }
+
+    #[test]
+    fn crosshair_hotkey_cannot_repeat_the_resolution_one() {
+        let f8 = Hotkey {
+            code: "F8".into(),
+            ctrl: false,
+            alt: false,
+            shift: false,
+            win: false,
+        };
+        let mut settings = Settings::default();
+        settings.hotkeys.resolution_toggle = Some(f8.clone());
+        settings.hotkeys.crosshair_toggle = Some(f8.clone());
+        let clean = settings.sanitized();
+        assert_eq!(clean.hotkeys.resolution_toggle, Some(f8.clone()));
+        assert_eq!(clean.hotkeys.crosshair_toggle, None, "repetido");
+
+        let f9 = Hotkey {
+            code: "F9".into(),
+            ..f8.clone()
+        };
+        let mut settings = Settings::default();
+        settings.hotkeys.resolution_toggle = Some(f8);
+        settings.hotkeys.crosshair_toggle = Some(f9.clone());
+        assert_eq!(settings.sanitized().hotkeys.crosshair_toggle, Some(f9));
+
+        let mut settings = Settings::default();
+        settings.hotkeys.crosshair_toggle = Some(Hotkey {
+            code: "Escape".into(),
+            ctrl: true,
+            alt: false,
+            shift: false,
+            win: false,
+        });
+        assert_eq!(
+            settings.sanitized().hotkeys.crosshair_toggle,
+            None,
+            "reservada"
+        );
     }
 
     #[test]

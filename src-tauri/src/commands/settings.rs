@@ -3,7 +3,7 @@
 use tauri::{AppHandle, Emitter, Manager, State};
 use tauri_plugin_autostart::ManagerExt;
 use vres_core::ipc::{ErrorCode, IpcError};
-use vres_core::keys::{Hotkey, HotkeyCheck, check_hotkey};
+use vres_core::keys::{Hotkey, HotkeyCheck, check_hotkey_among};
 use vres_core::settings::Settings;
 use vres_engine::Command;
 
@@ -38,8 +38,9 @@ pub async fn settings_get(settings: State<'_, SettingsState>) -> Result<Settings
     Ok(settings.get())
 }
 
-/// Guarda los ajustes. Si el atajo nuevo lo usa otro programa, no se guarda
-/// y el anterior sigue activo.
+/// Guarda los ajustes. Si un atajo **nuevo** lo usa otro programa, no se
+/// guarda nada y los anteriores siguen activos. Un atajo que ya estaba (y que
+/// otro programa ocupó) no impide guardar lo demás: ya se avisó al arrancar.
 #[tauri::command]
 pub async fn settings_update(app: AppHandle, settings: Settings) -> Result<Settings, IpcError> {
     tauri::async_runtime::spawn_blocking(move || {
@@ -50,13 +51,24 @@ pub async fn settings_update(app: AppHandle, settings: Settings) -> Result<Setti
         let merged = current.merged_from_ui(settings);
         if let Some(engine) = app.try_state::<EngineState>()
             && engine.available()
-            && !engine.configure(&merged)
         {
-            engine.configure(&current);
-            return Err(IpcError::new(
-                ErrorCode::HotkeyTaken,
-                "the resolution hotkey is used by another program",
-            ));
+            let registered = engine.configure(&merged);
+            let resolution_taken = !registered.resolution
+                && merged.hotkeys.resolution_toggle != current.hotkeys.resolution_toggle;
+            let crosshair_taken = !registered.crosshair
+                && merged.hotkeys.crosshair_toggle != current.hotkeys.crosshair_toggle;
+            if resolution_taken || crosshair_taken {
+                engine.configure(&current);
+                let which = if resolution_taken {
+                    "resolution"
+                } else {
+                    "crosshair"
+                };
+                return Err(IpcError::new(
+                    ErrorCode::HotkeyTaken,
+                    format!("the {which} hotkey is used by another program"),
+                ));
+            }
         }
         state
             .set(merged.clone())
@@ -68,13 +80,14 @@ pub async fn settings_update(app: AppHandle, settings: Settings) -> Result<Setti
     .map_err(failed)?
 }
 
-/// Revisa un atajo antes de guardarlo (teclas reservadas, choques conocidos).
+/// Revisa un atajo antes de guardarlo (teclas reservadas, choques conocidos y
+/// los demás atajos de VRes, `others`).
 #[tauri::command]
-pub async fn hotkeys_check(hotkey: Hotkey) -> Result<HotkeyCheck, IpcError> {
-    Ok(check_hotkey(&hotkey))
+pub async fn hotkeys_check(hotkey: Hotkey, others: Vec<Hotkey>) -> Result<HotkeyCheck, IpcError> {
+    Ok(check_hotkey_among(&hotkey, &others))
 }
 
-/// Suspende el atajo de resolución mientras se graba uno nuevo (si no, al
+/// Suspende los atajos configurables mientras se graba uno nuevo (si no, al
 /// apretarlo se activaría en vez de grabarse).
 #[tauri::command]
 pub async fn hotkeys_suspend(

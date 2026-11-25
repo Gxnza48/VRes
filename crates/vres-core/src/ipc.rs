@@ -35,6 +35,8 @@ pub enum Notice {
     ToggleHotkeyTaken,
     /// No se pudo hacer zoom (por ejemplo, con la Lupa de Windows abierta).
     ZoomUnavailable,
+    /// Otro programa usa el atajo del crosshair.
+    CrosshairHotkeyTaken,
 }
 
 /// Datos que la interfaz pide una sola vez, al arrancar.

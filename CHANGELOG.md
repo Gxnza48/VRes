@@ -4,6 +4,19 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.9.1] - 2026-11-24
+
+**Atajo para el crosshair.**
+
+### Agregado
+
+- **Atajo para mostrar u ocultar el crosshair**, en la pestaña Crosshair: lo prende o lo apaga sin salir del juego. Si un perfil de juego lo controla, el cambio vale mientras ese juego siga al frente; si no, queda guardado como el interruptor de la pestaña.
+- VRes no deja elegir la misma combinación para dos atajos.
+
+### Corregido
+
+- Si otro programa ocupaba el atajo de resolución, VRes no guardaba ningún otro ajuste. Ahora solo rechaza un atajo **nuevo** que esté ocupado.
+
 ## [0.9.0] - 2026-11-24
 
 **Personalizar completo** y comunidad en Discord.
@@ -137,7 +150,8 @@ Primera versión pública: la base de la app y la pestaña **Pantalla** (fases F
 - Matemática de color con más de 70 pruebas (incluidas pruebas de propiedades) y resultados de las pruebas en hardware real en [docs/hardware/RESULTADOS.md](docs/hardware/RESULTADOS.md).
 - Documentación: arquitectura, motor de color, anti-cheat, contrato interno, códigos para compartir, desarrollo y hoja de ruta.
 
-[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.9.0...HEAD
+[Sin publicar]: https://github.com/Gxnza48/VRes/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/Gxnza48/VRes/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/Gxnza48/VRes/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/Gxnza48/VRes/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Gxnza48/VRes/compare/v0.6.0...v0.7.0

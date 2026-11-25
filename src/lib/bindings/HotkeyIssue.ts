@@ -3,4 +3,4 @@
 /**
  * Problemas de un atajo.
  */
-export type HotkeyIssue = "unknownKey" | "needsModifier" | "reserved" | "altGrClash" | "overlayClash" | "taken";
+export type HotkeyIssue = "unknownKey" | "needsModifier" | "reserved" | "altGrClash" | "overlayClash" | "taken" | "duplicate";

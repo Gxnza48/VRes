@@ -197,6 +197,37 @@ pub fn resolve(settings: &ProfileSettings, observed: &Observed) -> SessionPlan {
     plan
 }
 
+/// Si el crosshair se ve: manda lo que se cambió con el atajo mientras un
+/// perfil lo controla, después el perfil y por último el interruptor de la
+/// pestaña Crosshair.
+pub fn crosshair_visible(enabled: bool, profile: Option<bool>, hotkey: Option<bool>) -> bool {
+    hotkey.or(profile).unwrap_or(enabled)
+}
+
+/// Lo que cambia el atajo del crosshair.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CrosshairToggle {
+    /// El interruptor de la pestaña Crosshair (queda guardado).
+    Setting(bool),
+    /// Solo mientras siga en uso el perfil que lo controla.
+    Session(bool),
+}
+
+/// El atajo del crosshair invierte lo que se ve. Si un perfil lo controla, el
+/// cambio vale para esa partida; si no, cambia el interruptor de la pestaña.
+pub fn toggle_crosshair(
+    enabled: bool,
+    profile: Option<bool>,
+    hotkey: Option<bool>,
+) -> CrosshairToggle {
+    let next = !crosshair_visible(enabled, profile, hotkey);
+    if profile.is_some() {
+        CrosshairToggle::Session(next)
+    } else {
+        CrosshairToggle::Setting(next)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -303,6 +334,46 @@ mod tests {
             resolve(&disabled, &observed(Some("cs2"), Some("cs2"))),
             SessionPlan::default()
         );
+    }
+
+    #[test]
+    fn the_crosshair_hotkey_flips_the_setting_without_a_profile() {
+        assert_eq!(
+            toggle_crosshair(false, None, None),
+            CrosshairToggle::Setting(true)
+        );
+        assert_eq!(
+            toggle_crosshair(true, None, None),
+            CrosshairToggle::Setting(false)
+        );
+    }
+
+    #[test]
+    fn with_a_profile_the_crosshair_hotkey_only_lasts_the_session() {
+        // El perfil lo apaga aunque la pestaña lo tenga prendido: el atajo lo muestra.
+        assert_eq!(
+            toggle_crosshair(true, Some(false), None),
+            CrosshairToggle::Session(true)
+        );
+        assert!(crosshair_visible(true, Some(false), Some(true)));
+        // Otra vez: se vuelve a ocultar.
+        assert_eq!(
+            toggle_crosshair(true, Some(false), Some(true)),
+            CrosshairToggle::Session(false)
+        );
+        // El perfil lo prende aunque la pestaña lo tenga apagado: el atajo lo oculta.
+        assert_eq!(
+            toggle_crosshair(false, Some(true), None),
+            CrosshairToggle::Session(false)
+        );
+    }
+
+    #[test]
+    fn crosshair_visibility_follows_hotkey_then_profile_then_setting() {
+        assert!(crosshair_visible(true, None, None));
+        assert!(!crosshair_visible(true, Some(false), None));
+        assert!(crosshair_visible(false, Some(true), None));
+        assert!(!crosshair_visible(false, Some(true), Some(false)));
     }
 
     #[test]

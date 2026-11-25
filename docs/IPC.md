@@ -28,7 +28,7 @@ La interfaz (React) habla con el motor (Rust) solo a través de `src/lib/ipc.ts`
 | Juegos y perfiles | `games_list` (con ejecutables y anti-cheat) · `games_running_candidates` · `profile_active`; los perfiles, el cambio automático y los juegos propios van por `settings_update` | F6 ✅ |
 | Dark Boost y zoom | `enhancers_state` · `enhancers_key_supported`; armar, teclas y efectos van por `settings_update` | F7 ✅ |
 | Ajustes | `settings_get_autostart` · `settings_set_autostart` | F1 ✅ |
-| Ajustes | `settings_get` · `settings_update` (falla con `hotkeyTaken` si otro programa usa el atajo) · `hotkeys_check` · `hotkeys_suspend` | F2 ✅ |
+| Ajustes | `settings_get` · `settings_update` (falla con `hotkeyTaken` si otro programa usa un atajo nuevo) · `hotkeys_check` (también contra los demás atajos de VRes) · `hotkeys_suspend` | F2 ✅ |
 | Ajustes | `customize_background_set` (los bytes viajan tal cual, sin JSON) · `customize_background_get` · `customize_background_clear` · `settings_reset` | F8 ✅ |
 | Diagnóstico | `diag_report` (sin usuario, carpeta de usuario ni nombre del equipo) | F8 ✅ |
 | Popup | `quick_toggle` · `quick_close` · `app_open_main` · `look_get` | F5 ✅ |

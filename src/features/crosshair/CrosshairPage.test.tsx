@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { Hotkey } from "@/lib/bindings/Hotkey";
 import { ipc } from "@/lib/ipc";
 import { useEngineStore } from "@/state/engine";
 import { useSettingsStore } from "@/state/settings";
@@ -18,8 +19,12 @@ vi.mock("@/lib/ipc", () => ({
     crosshairPresets: vi.fn().mockResolvedValue([]),
     crosshairPreview: vi.fn().mockResolvedValue(undefined),
     settingsUpdate: vi.fn(),
+    hotkeysCheck: vi.fn(),
+    hotkeysSuspend: vi.fn().mockResolvedValue(undefined),
   },
 }));
+
+const F8: Hotkey = { code: "F8", ctrl: false, alt: false, shift: false, win: false };
 
 describe("CrosshairPage", () => {
   beforeEach(() => {
@@ -68,6 +73,39 @@ describe("CrosshairPage", () => {
         }),
       }),
     );
+  });
+
+  it("graba el atajo para mostrar u ocultar la mira y lo guarda", async () => {
+    const user = userEvent.setup();
+    vi.mocked(ipc.hotkeysCheck).mockResolvedValue({ error: null, warning: null });
+    const settings = defaultSettings();
+    useSettingsStore.setState({
+      settings: { ...settings, hotkeys: { resolutionToggle: F8, crosshairToggle: null } },
+    });
+    render(<CrosshairPage />);
+    expect(screen.getByText("Atajo para mostrar u ocultar")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Elegir atajo" }));
+    await waitFor(() => expect(ipc.hotkeysSuspend).toHaveBeenCalledWith(true));
+    fireEvent.keyDown(window, { code: "F9" });
+    await waitFor(() =>
+      expect(ipc.settingsUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          hotkeys: { resolutionToggle: F8, crosshairToggle: { ...F8, code: "F9" } },
+        }),
+      ),
+    );
+    // Se revisa contra el atajo de resolución, que no se puede repetir.
+    expect(ipc.hotkeysCheck).toHaveBeenCalledWith({ ...F8, code: "F9" }, [F8]);
+  });
+
+  it("no guarda un atajo que ya usa VRes", async () => {
+    const user = userEvent.setup();
+    vi.mocked(ipc.hotkeysCheck).mockResolvedValue({ error: "duplicate", warning: null });
+    render(<CrosshairPage />);
+    await user.click(screen.getByRole("button", { name: "Elegir atajo" }));
+    fireEvent.keyDown(window, { code: "F8" });
+    expect(await screen.findByText("Ya lo usa otro atajo de VRes.")).toBeInTheDocument();
+    expect(ipc.settingsUpdate).not.toHaveBeenCalled();
   });
 
   it("muestra el aviso de reglas de los juegos", () => {

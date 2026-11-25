@@ -8,4 +8,8 @@ export type HotkeySettings = {
 /**
  * Alterna entre la resolución de Windows y la estirada.
  */
-resolutionToggle: Hotkey | null, };
+resolutionToggle: Hotkey | null, 
+/**
+ * Prende o apaga el crosshair.
+ */
+crosshairToggle: Hotkey | null, };
