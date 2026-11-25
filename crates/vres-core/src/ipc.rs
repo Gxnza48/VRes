@@ -181,6 +181,12 @@ pub enum ErrorCode {
     CrosshairInvalid,
     /// La imagen de fondo no es PNG, JPEG, GIF o WebP, o es muy grande.
     BackgroundInvalid,
+    /// No hay driver de NVIDIA con perfiles.
+    PotatoUnavailable,
+    /// Se canceló el permiso de administrador.
+    PotatoCancelled,
+    /// El driver no guardó los ajustes.
+    PotatoFailed,
 }
 
 /// Error que devuelven todos los comandos de Tauri.

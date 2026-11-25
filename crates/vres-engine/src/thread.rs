@@ -547,6 +547,9 @@ struct Shell {
     game_timer_armed: bool,
     /// Hay un juego conocido (o agregado) al frente.
     in_game: bool,
+    /// Un juego en pantalla completa exclusiva (se mira al cambiar de ventana
+    /// y en cada chequeo de salud).
+    exclusive_fullscreen: bool,
     hold_timer_armed: bool,
     dark_boost: HoldTracker,
     zoom: HoldTracker,
@@ -656,11 +659,15 @@ impl Shell {
                 self.after_change(changed);
             }
             TIMER_HEALTH => {
+                if self.sync_fullscreen() {
+                    return;
+                }
                 let changed = self.core.health_check();
                 self.after_change(changed);
             }
             TIMER_FOREGROUND => {
                 window::kill_timer(self.hwnd, TIMER_FOREGROUND);
+                self.sync_fullscreen();
                 if self.core.is_active() {
                     let changed = self.core.health_check();
                     self.after_change(changed);
@@ -1127,7 +1134,20 @@ impl Shell {
         if let Some(look) = &self.session.look {
             requested.look = look.clone();
         }
+        requested.exclusive_fullscreen = self.exclusive_fullscreen;
         requested
+    }
+
+    /// Mira si hay un juego en pantalla completa exclusiva y, si cambió,
+    /// vuelve a planificar. Devuelve `true` si cambió.
+    fn sync_fullscreen(&mut self) -> bool {
+        let fullscreen = process::exclusive_fullscreen();
+        if fullscreen == self.exclusive_fullscreen {
+            return false;
+        }
+        self.exclusive_fullscreen = fullscreen;
+        self.apply_effective();
+        true
     }
 
     fn apply_effective(&mut self) {
@@ -1148,8 +1168,9 @@ impl Shell {
             None
         };
         self.in_game = foreground.is_some();
-        if profiles.auto_switch {
-            if let Some((id, process)) = &foreground
+        if profiles.auto_switch || profiles.main_only_in_games {
+            if profiles.auto_switch
+                && let Some((id, process)) = &foreground
                 && self.game.as_ref().map(|(_, current)| current) != Some(process)
             {
                 self.game = Some((id.clone(), process.clone()));
@@ -1180,6 +1201,7 @@ impl Shell {
         let enhancers = &self.settings.enhancers;
         let for_games = |armed: bool, scope: EnhancerScope| armed && scope == EnhancerScope::Games;
         self.settings.profiles.auto_switch
+            || self.settings.profiles.main_only_in_games
             || for_games(enhancers.dark_boost.armed, enhancers.dark_boost.scope)
             || for_games(enhancers.zoom.armed, enhancers.zoom.scope)
     }
@@ -1517,6 +1539,7 @@ fn run(
         profile_resolution: None,
         game_timer_armed: false,
         in_game: false,
+        exclusive_fullscreen: false,
         hold_timer_armed: false,
         dark_boost: HoldTracker::default(),
         zoom: HoldTracker::default(),

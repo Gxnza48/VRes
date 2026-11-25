@@ -72,7 +72,7 @@ export function defaultSettings(): Settings {
       saved: [],
     },
     library: { looks: [] },
-    profiles: { autoSwitch: false, profiles: [], customGames: [] },
+    profiles: { autoSwitch: false, profiles: [], customGames: [], mainOnlyInGames: false, mainGames: [] },
     enhancers: defaultEnhancers(),
     appearance: {
       theme: "black",

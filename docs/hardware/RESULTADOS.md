@@ -220,3 +220,11 @@ Medido el 2026-11-24 con `vres-cli ddc get` y `vres-cli ddc test` (brillo ±1 y 
 ### Pendiente de F8
 
 - A ojo: el brillo y el contraste del monitor cambian al soltar el control, y "Volver a los valores de antes de VRes" los devuelve.
+
+## v0.10 — Perfiles del driver de NVIDIA (potato)
+
+Probado el 2026-11-25 en la RTX 5060 Laptop (driver de noviembre de 2026), con `vres-cli potato`:
+
+- Leer los perfiles (`NvAPI_DRS_CreateSession`, `LoadSettings`, `FindApplicationByName`, `GetSetting`) funciona **sin** administrador.
+- Escribir (`SetSetting`, `DeleteProfileSetting`) devuelve **−137** (`NVAPI_INVALID_USER_PRIVILEGE`) sin administrador, igual que Profile Inspector (que siempre pide elevación). No se guarda nada: el error llega antes de `SaveSettings`.
+- Decisión: la app relanza `vres.exe --potato JUEGO NIVEL` con UAC solo para guardar, espera el código de salida y relee el nivel.

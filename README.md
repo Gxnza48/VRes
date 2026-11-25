@@ -4,7 +4,7 @@
 
 **Ajustes de pantalla para gaming. Gratis, local y de código abierto.**
 
-Saturación hasta 300 %, vibrance digital, resolución estirada, crosshair, perfiles por juego, Dark Boost y zoom, en una sola app para Windows. Sin cuenta, sin suscripción y sin telemetría.
+Saturación hasta 300 %, vibrance digital, resolución estirada, crosshair, perfiles por juego, Dark Boost y gráficos potato, en una sola app para Windows. Sin cuenta, sin suscripción y sin telemetría.
 
 [![CI](https://github.com/Gxnza48/VRes/actions/workflows/ci.yml/badge.svg)](https://github.com/Gxnza48/VRes/actions/workflows/ci.yml)
 [![Versión](https://img.shields.io/github/v/release/Gxnza48/VRes?include_prereleases&label=versi%C3%B3n)](https://github.com/Gxnza48/VRes/releases)
@@ -41,8 +41,10 @@ Está pensado para la comunidad gamer de Latinoamérica: es **gratis de verdad**
 | **Crosshair** superpuesto: formas por partes, colores, imagen propia, monitor a elección, oculto en capturas, guardados y atajo para mostrarlo u ocultarlo | ✅ Disponible | v0.4 – v0.9.1 |
 | **Looks y Biblioteca:** looks propios por juego, biblioteca local, códigos para compartir, profundidad de color, ayudas para daltonismo, cuidado visual y ajuste rápido desde la bandeja | ✅ Disponible | v0.5 |
 | **Perfiles por juego:** Fortnite, VALORANT, CS2, Apex Legends, Rust y Rainbow Six Siege, y cualquier otro; look y crosshair al frente, resolución mientras el juego está abierto | ✅ Disponible | v0.6 |
-| **Dark Boost y Zoom** manteniendo (o alternando) una tecla o un botón del mouse, incluidos Mouse 4 y 5; vienen desarmados | ✅ Disponible | v0.7 |
-| **Personalizar:** tema, color de acento, tamaño de la interfaz y fondo propio (imagen o GIF). Reporte de diagnóstico sin datos personales | ✅ Disponible | v0.8 – v0.9 |
+| **Dark Boost** manteniendo (o alternando) una tecla o un botón del mouse, incluidos Mouse 4 y 5; viene desarmado | ✅ Disponible | v0.7 |
+| **Inicio:** tu config principal (colores, mira, resolución y atajos) en un lugar, siempre o **solo en juegos** | ✅ Disponible | v0.10 |
+| **Gráficos potato** para NVIDIA (texturas planas, más FPS) en ROB RUN, desde el perfil del juego en el driver | ✅ Disponible | v0.10 |
+| 24 miras propias y [galería en la web](https://vresolution.vercel.app/miras) con sus códigos | ✅ Disponible | v0.10 |
 | Resoluciones personalizadas por GPU e instalador firmado | 🗓 Planeado | v1.0 |
 
 ## Por qué VRes
@@ -76,7 +78,7 @@ VRes trabaja en tres capas, todas en modo usuario y **sin tocar el juego**:
 | **Rampa de gamma** | Gamma, brillo, contraste, temperatura, sombras, altas luces | Tabla de gamma de la placa de video (`SetDeviceGammaRamp`) | Cada monitor |
 | **Driver** | Vibrance digital | API pública de cada fabricante (NVIDIA NVAPI, AMD ADL) | Cada monitor |
 
-Además: el **crosshair** es una ventana transparente que no recibe clics; el **zoom** usa la lupa de Windows; la **resolución** se cambia de forma temporal (Windows la devuelve sola si algo sale mal) y siempre pide confirmación; los **perfiles** detectan qué programa está en primer plano por su nombre.
+Además: el **crosshair** es una ventana transparente que no recibe clics; la **resolución** se cambia de forma temporal (Windows la devuelve sola si algo sale mal) y siempre pide confirmación; los **perfiles** detectan qué programa está en primer plano por su nombre.
 
 Lo que VRes **no** hace: no inyecta código, no lee ni escribe la memoria de ningún juego, no instala drivers ni servicios, no usa hooks de teclado o mouse, y no abre el proceso del juego.
 
@@ -91,7 +93,7 @@ Los detalles técnicos están en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) y 
 | Vibrance por driver | ✅ | ✅ | 🧪 se emula por software |
 | Resoluciones personalizadas | v1.0 | v1.0 | 🧪 |
 
-**Modo de pantalla del juego.** Recomendamos **ventana sin bordes** (*borderless*). En **pantalla completa exclusiva** el juego salta la capa de color de Windows: ahí no se ven la saturación de la matriz, el crosshair ni el zoom, pero sí el vibrance por driver y las rampas de gamma. VRes detecta ese modo y te avisa.
+**Modo de pantalla del juego.** Recomendamos **ventana sin bordes** (*borderless*). En **pantalla completa exclusiva** el juego salta la capa de color de Windows: VRes lo detecta y pasa la saturación a la vibrance del driver (NVIDIA o AMD), que sí se ve ahí, igual que las rampas de gamma. El crosshair no aparece en la exclusiva antigua (sí en la pantalla completa de Windows 10/11).
 
 **HDR.** Con HDR activo, Windows no garantiza el comportamiento de las rampas de gamma y la matriz se limita a los ajustes que no rompen la imagen. VRes marca esas capas como *limitadas* y te dice por qué.
 
@@ -109,7 +111,7 @@ VRes no interactúa con los juegos (ver [lo que no hace](#cómo-funciona-sin-mis
 - **Riot Games (VALORANT)** menciona las herramientas de zoom entre las que dan una ventaja indebida. ([fuente](https://support.riotgames.com/en-us/riot/events/third-party-applications))
 - **FACEIT** sanciona cualquier software que dé una ventaja injusta, y nombra a otra herramienta de vibrance (VibranceGUI) entre los programas seguros. ([fuente](https://support.faceit.com/hc/en-us/articles/360015788779))
 
-El **crosshair**, el **zoom** y el **Dark Boost** pueden considerarse trampa según el juego o el torneo: por eso vienen apagados y muestran un aviso. Revisa las reglas de lo que juegas. El detalle por función está en [docs/ANTI-CHEAT.md](docs/ANTI-CHEAT.md).
+El **crosshair**, el **Dark Boost** y los **gráficos potato** pueden considerarse trampa según el juego o el torneo: por eso vienen apagados y muestran un aviso. Revisa las reglas de lo que juegas. El detalle por función está en [docs/ANTI-CHEAT.md](docs/ANTI-CHEAT.md).
 
 ## La seguridad de tu pantalla
 

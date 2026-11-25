@@ -9,4 +9,13 @@ export type ProfileSettings = {
 /**
  * Cambiar solo al detectar el juego.
  */
-autoSwitch: boolean, profiles: Array<GameProfile>, customGames: Array<CustomGame>, };
+autoSwitch: boolean, profiles: Array<GameProfile>, customGames: Array<CustomGame>, 
+/**
+ * La config principal (look y crosshair) vale solo con un juego al
+ * frente; en el escritorio la pantalla queda normal.
+ */
+mainOnlyInGames: boolean, 
+/**
+ * Juegos donde vale la config principal (vacío: cualquier juego).
+ */
+mainGames: Array<string>, };

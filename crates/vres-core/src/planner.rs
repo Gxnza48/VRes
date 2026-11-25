@@ -33,6 +33,9 @@ pub struct Requested {
     pub targets: Option<BTreeSet<String>>,
     /// Ajuste propio de cada pantalla.
     pub trims: BTreeMap<String, DisplayTrim>,
+    /// Hay un juego en pantalla completa exclusiva: el filtro de color de
+    /// Windows no se ve, así que la saturación pasa a la vibrance del driver.
+    pub exclusive_fullscreen: bool,
 }
 
 impl Default for Requested {
@@ -44,6 +47,7 @@ impl Default for Requested {
             look: Look::default(),
             targets: None,
             trims: BTreeMap::new(),
+            exclusive_fullscreen: false,
         }
     }
 }
@@ -213,7 +217,17 @@ pub fn plan_full(
     }
     let mut approximate = false;
     if !built.matrix.is_identity(1e-6) {
-        if all_targeted {
+        if requested.exclusive_fullscreen && driver_vibrance {
+            // La matriz no se vería: la saturación se aproxima con el driver,
+            // que sí funciona en pantalla completa exclusiva.
+            approximate = (look.saturation - 100.0).abs() > f32::EPSILON;
+            plan.notes.push(PlanNote {
+                layer: Layer::Matrix,
+                display: None,
+                status: LayerStatus::Limited,
+                reason: ReasonCode::ExclusiveFullscreen,
+            });
+        } else if all_targeted {
             plan.matrix = built.matrix;
         } else {
             approximate = driver_vibrance && (look.saturation - 100.0).abs() > f32::EPSILON;
@@ -585,5 +599,27 @@ mod tests {
         let json = serde_json::to_string(&request).expect("serializable");
         let back: Requested = serde_json::from_str(&json).expect("deserializable");
         assert_eq!(back, request);
+    }
+
+    #[test]
+    fn exclusive_fullscreen_moves_saturation_to_the_driver() {
+        let displays = vec![display("a", 0, false)];
+        let capable: BTreeSet<String> = ["a".to_owned()].into();
+        let mut requested = Requested::default();
+        requested.look.saturation = 180.0;
+        requested.exclusive_fullscreen = true;
+        let plan = plan_with(&requested, &displays, &capable);
+        assert_eq!(plan.matrix, ColorMatrix::IDENTITY);
+        assert!(
+            matches!(plan.vibrance.get("a"), Some(VibranceTarget::Level(level)) if *level > 50.0)
+        );
+        assert!(
+            plan.notes
+                .iter()
+                .any(|note| note.reason == ReasonCode::ExclusiveFullscreen)
+        );
+        // Sin driver con vibrance, la matriz queda (es lo único que hay).
+        let plan = plan_with(&requested, &displays, &BTreeSet::new());
+        assert_ne!(plan.matrix, ColorMatrix::IDENTITY);
     }
 }

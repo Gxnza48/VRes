@@ -110,6 +110,8 @@ pub fn run() {
             commands::share::games_list,
             commands::profiles::profile_active,
             commands::profiles::games_running_candidates,
+            commands::potato::potato_status,
+            commands::potato::potato_apply,
             commands::enhancers::enhancers_state,
             commands::enhancers::enhancers_key_supported,
             commands::customize::customize_background_set,

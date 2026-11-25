@@ -21,6 +21,8 @@ import type { Look } from "./bindings/Look";
 import type { LookPreset } from "./bindings/LookPreset";
 import type { ModeRequest } from "./bindings/ModeRequest";
 import type { PendingMode } from "./bindings/PendingMode";
+import type { PotatoLevel } from "./bindings/PotatoLevel";
+import type { PotatoStatus } from "./bindings/PotatoStatus";
 import type { Requested } from "./bindings/Requested";
 import type { RunningApp } from "./bindings/RunningApp";
 import type { ResolutionState } from "./bindings/ResolutionState";
@@ -152,6 +154,10 @@ export const ipc = {
   /** Si una tecla física sirve para Dark Boost o Zoom. */
   enhancersKeySupported: (code: string) => call<boolean>("enhancers_key_supported", { code }),
   /** Programas abiertos con ventana, para agregar un juego propio. */
+  potatoStatus: () => call<PotatoStatus[]>("potato_status"),
+  /** Puede mostrar el aviso de administrador de Windows. */
+  potatoApply: (game: string, level: PotatoLevel) =>
+    call<PotatoStatus[]>("potato_apply", { game, level }),
   gamesRunningCandidates: () => call<RunningApp[]>("games_running_candidates"),
 
   /** Consulta si hay una versión nueva en GitHub Releases. */

@@ -9,6 +9,7 @@ pub mod customize;
 pub mod diag;
 pub mod engine;
 pub mod enhancers;
+pub mod potato;
 pub mod profiles;
 pub mod resolution;
 pub mod settings;

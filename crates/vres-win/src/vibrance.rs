@@ -23,12 +23,12 @@ use windows::core::{PCSTR, w};
 
 use crate::{WinError, WinResult};
 
-fn load_system_dll(name: windows::core::PCWSTR) -> Option<HMODULE> {
+pub(crate) fn load_system_dll(name: windows::core::PCWSTR) -> Option<HMODULE> {
     // SAFETY: solo se busca en System32; un error significa "no hay driver".
     unsafe { LoadLibraryExW(name, None, LOAD_LIBRARY_SEARCH_SYSTEM32) }.ok()
 }
 
-fn symbol(module: HMODULE, name: &[u8]) -> Option<*const c_void> {
+pub(crate) fn symbol(module: HMODULE, name: &[u8]) -> Option<*const c_void> {
     // SAFETY: `name` termina en cero; GetProcAddress no retiene el puntero.
     unsafe { GetProcAddress(module, PCSTR(name.as_ptr())) }.map(|f| f as *const c_void)
 }
@@ -37,7 +37,7 @@ fn symbol(module: HMODULE, name: &[u8]) -> Option<*const c_void> {
 ///
 /// # Safety
 /// `F` tiene que ser un puntero a función con la firma real de `pointer`.
-unsafe fn typed<F: Copy>(pointer: *const c_void) -> F {
+pub(crate) unsafe fn typed<F: Copy>(pointer: *const c_void) -> F {
     const { assert!(size_of::<F>() == size_of::<*const c_void>()) };
     // SAFETY: lo garantiza quien llama; el tamaño se verifica al compilar.
     unsafe { std::mem::transmute_copy::<*const c_void, F>(&pointer) }
@@ -47,12 +47,12 @@ unsafe fn typed<F: Copy>(pointer: *const c_void) -> F {
 ///
 /// # Safety
 /// La misma que [`typed`].
-unsafe fn typed_optional<F: Copy>(pointer: Option<*const c_void>) -> Option<F> {
+pub(crate) unsafe fn typed_optional<F: Copy>(pointer: Option<*const c_void>) -> Option<F> {
     // SAFETY: lo garantiza quien llama.
     pointer.map(|pointer| unsafe { typed(pointer) })
 }
 
-fn driver_error(api: &'static str, code: i32) -> WinError {
+pub(crate) fn driver_error(api: &'static str, code: i32) -> WinError {
     WinError::DisplayChange { api, code }
 }
 

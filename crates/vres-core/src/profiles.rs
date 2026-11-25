@@ -27,7 +27,7 @@ pub struct KnownGame {
     pub anti_cheat: &'static str,
 }
 
-/// Los seis juegos con soporte desde el inicio. Los nombres de ejecutable se
+/// Los juegos con soporte de fábrica. Los nombres de ejecutable se
 /// confirman en una PC real antes de marcarlos como verificados.
 pub const KNOWN_GAMES: &[KnownGame] = &[
     KnownGame {
@@ -69,6 +69,12 @@ pub const KNOWN_GAMES: &[KnownGame] = &[
             "RainbowSix_BE.exe",
         ],
         anti_cheat: "BattlEye",
+    },
+    KnownGame {
+        id: "robrun",
+        name: "ROB RUN",
+        executables: &["ROB RUN.exe"],
+        anti_cheat: "Easy Anti-Cheat",
     },
 ];
 
@@ -121,6 +127,11 @@ pub struct ProfileSettings {
     pub auto_switch: bool,
     pub profiles: Vec<GameProfile>,
     pub custom_games: Vec<CustomGame>,
+    /// La config principal (look y crosshair) vale solo con un juego al
+    /// frente; en el escritorio la pantalla queda normal.
+    pub main_only_in_games: bool,
+    /// Juegos donde vale la config principal (vacío: cualquier juego).
+    pub main_games: Vec<String>,
 }
 
 /// Solo el nombre del archivo, sin la carpeta.
@@ -169,6 +180,16 @@ pub struct SessionPlan {
 /// Resuelve qué aplicar con los perfiles y lo que se observa.
 pub fn resolve(settings: &ProfileSettings, observed: &Observed) -> SessionPlan {
     let mut plan = SessionPlan::default();
+    if settings.main_only_in_games {
+        let in_main_game = observed.foreground.as_deref().is_some_and(|game| {
+            settings.main_games.is_empty() || settings.main_games.iter().any(|id| id == game)
+        });
+        if !in_main_game {
+            // Fuera de esos juegos, la pantalla queda como Windows la muestra.
+            plan.look = Some(Look::default());
+            plan.crosshair = Some(false);
+        }
+    }
     if !settings.auto_switch {
         return plan;
     }
@@ -182,12 +203,15 @@ pub fn resolve(settings: &ProfileSettings, observed: &Observed) -> SessionPlan {
         && let Some(profile) = profile(game)
     {
         plan.active = Some(game.to_owned());
-        plan.look = profile.look.clone();
-        plan.crosshair = match profile.crosshair {
-            CrosshairChoice::Keep => None,
-            CrosshairChoice::On => Some(true),
-            CrosshairChoice::Off => Some(false),
-        };
+        // Sin look ni crosshair propios, el perfil deja lo de la config principal.
+        if profile.look.is_some() {
+            plan.look = profile.look.clone();
+        }
+        match profile.crosshair {
+            CrosshairChoice::Keep => {}
+            CrosshairChoice::On => plan.crosshair = Some(true),
+            CrosshairChoice::Off => plan.crosshair = Some(false),
+        }
     }
     if let Some(game) = observed.running.as_deref()
         && let Some(profile) = profile(game)
@@ -264,6 +288,7 @@ mod tests {
                 name: "Minecraft".into(),
                 executable: "Minecraft.exe".into(),
             }],
+            ..ProfileSettings::default()
         }
     }
 
@@ -406,5 +431,29 @@ mod tests {
                 "{id} sin ejecutables"
             );
         }
+    }
+
+    #[test]
+    fn main_config_only_in_games() {
+        let mut only = settings();
+        only.auto_switch = false;
+        only.main_only_in_games = true;
+        // En el escritorio: pantalla normal y sin crosshair.
+        let desktop = resolve(&only, &observed(None, None));
+        assert_eq!(desktop.look, Some(Look::default()));
+        assert_eq!(desktop.crosshair, Some(false));
+        // Con un juego al frente: la config principal.
+        assert_eq!(
+            resolve(&only, &observed(Some("cs2"), Some("cs2"))),
+            SessionPlan::default()
+        );
+        // Con una lista de juegos, solo en esos.
+        only.main_games = vec!["fortnite".into()];
+        let other = resolve(&only, &observed(Some("cs2"), Some("cs2")));
+        assert_eq!(other.crosshair, Some(false));
+        assert_eq!(
+            resolve(&only, &observed(Some("fortnite"), None)),
+            SessionPlan::default()
+        );
     }
 }

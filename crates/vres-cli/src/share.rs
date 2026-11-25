@@ -63,3 +63,26 @@ pub fn encode(look: Option<&str>, crosshair: Option<&str>) -> Report {
         ),
     }
 }
+
+/// `vres-cli share presets`: los crosshairs de fábrica con su código.
+pub fn presets() -> Report {
+    let list: Vec<_> = vres_core::crosshair::presets()
+        .into_iter()
+        .filter_map(|preset| {
+            let code = share::encode_crosshair(&preset.crosshair).ok()?;
+            Some(json!({ "id": preset.id, "code": code, "crosshair": preset.crosshair }))
+        })
+        .collect();
+    let text = list
+        .iter()
+        .map(|item| {
+            format!(
+                "{}  {}",
+                item["id"].as_str().unwrap_or_default(),
+                item["code"].as_str().unwrap_or_default()
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    Report::ok(json!({ "ok": true, "presets": list }), text)
+}

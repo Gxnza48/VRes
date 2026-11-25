@@ -48,6 +48,7 @@ const requested: Requested = {
   compare: false,
   targets: null,
   trims: {},
+  exclusiveFullscreen: false,
   look: {
     saturation: 100,
     vibrance: 50,

@@ -19,6 +19,7 @@ pub mod looks;
 pub mod model;
 pub mod monitor;
 pub mod planner;
+pub mod potato;
 pub mod profiles;
 pub mod settings;
 pub mod share;

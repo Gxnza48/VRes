@@ -1,4 +1,4 @@
-import { MoonStar, ShieldAlert, ZoomIn } from "lucide-react";
+import { MoonStar, ShieldAlert } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -17,7 +17,6 @@ import { cn } from "@/lib/utils";
 import { useEngineStore } from "@/state/engine";
 import { saveSettings, useSettingsStore } from "@/state/settings";
 
-import { sameBinding } from "./binding";
 import { BindingRecorder } from "./BindingRecorder";
 
 const field = "rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-sm text-fg";
@@ -29,11 +28,10 @@ interface CommonControls {
   scope: EnhancerScope;
 }
 
-/** Pestaña Dark Boost y Zoom. */
+/** Pestaña Dark Boost. */
 export function EnhancersPage() {
   const { t } = useTranslation();
   const settings = useSettingsStore((store) => store.settings);
-  const displays = useEngineStore((store) => store.displays);
   const live = useEngineStore((store) => store.enhancers);
   // Valor de un deslizador mientras se arrastra (se guarda al soltar).
   const [drafts, setDrafts] = useState<Record<string, number>>({});
@@ -47,8 +45,6 @@ export function EnhancersPage() {
     save({ ...config, darkBoost: { ...config.darkBoost, ...patch } });
   const saveEffect = (patch: Partial<DarkBoost>) =>
     saveDark({ effect: { ...config.darkBoost.effect, ...patch } });
-  const saveZoom = (patch: Partial<EnhancerSettings["zoom"]>) =>
-    save({ ...config, zoom: { ...config.zoom, ...patch } });
 
   const slider = (
     id: string,
@@ -75,7 +71,6 @@ export function EnhancersPage() {
     />
   );
   const percent = (value: number) => t("enhancers.units.percent", { value: Math.round(value) });
-  const times = (value: number) => t("enhancers.units.times", { value: value.toFixed(1) });
 
   /** Estado en vivo: desarmado, activo, listo o esperando. */
   const stateBadge = (
@@ -157,8 +152,6 @@ export function EnhancersPage() {
   );
 
   const dark = config.darkBoost;
-  const zoom = config.zoom;
-  const clash = dark.armed && zoom.armed && sameBinding(dark.binding, zoom.binding);
 
   return (
     <div className="flex flex-col gap-6">
@@ -168,11 +161,6 @@ export function EnhancersPage() {
         <ShieldAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-warning" />
         {t("enhancers.warning")}
       </p>
-      {clash && (
-        <p role="alert" className="text-sm text-warning">
-          {t("enhancers.binding.same")}
-        </p>
-      )}
 
       <Card className={cn(dark.armed && "border-accent/50")}>
         {header(
@@ -253,40 +241,6 @@ export function EnhancersPage() {
         </CardContent>
       </Card>
 
-      <Card className={cn(zoom.armed && "border-accent/50")}>
-        {header(
-          <ZoomIn aria-hidden className="size-4 text-accent" />,
-          t("enhancers.zoom.title"),
-          t("enhancers.zoom.description"),
-          stateBadge(zoom.armed, live.zoom, live.zoomListening, zoom.scope),
-          zoom.armed,
-          () => saveZoom({ armed: !zoom.armed }),
-        )}
-        <CardContent className="flex flex-col gap-5">
-          {common("zoom", zoom, (patch) => saveZoom(patch))}
-          <div className="grid gap-5 md:grid-cols-2">
-            {slider("level", t("enhancers.zoom.level"), zoom.level, ranges.zoom, times, (level) =>
-              saveZoom({ level: Math.round(level * 10) / 10 }),
-            )}
-            <label className="flex flex-col gap-1.5 text-sm text-muted">
-              {t("enhancers.zoom.display")}
-              <select
-                value={zoom.displayId ?? ""}
-                onChange={(event) => saveZoom({ displayId: event.target.value || null })}
-                className={field}
-              >
-                <option value="">{t("enhancers.zoom.primary")}</option>
-                {displays.map((display) => (
-                  <option key={display.id} value={display.id}>
-                    {display.friendlyName || display.gdiName}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-          <p className="text-xs text-muted">{t("enhancers.zoom.magnifierNote")}</p>
-        </CardContent>
-      </Card>
     </div>
   );
 }

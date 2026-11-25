@@ -1,4 +1,4 @@
-import { Crosshair as CrosshairIcon, ImageUp, Save, Shapes, Trash2 } from "lucide-react";
+import { Crosshair as CrosshairIcon, ExternalLink, ImageUp, Save, Shapes, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -15,6 +15,7 @@ import type { ErrorCode } from "@/lib/bindings/ErrorCode";
 import type { Hotkey } from "@/lib/bindings/Hotkey";
 import ranges from "@/lib/bindings/ranges.json";
 import { ipc } from "@/lib/ipc";
+import { CROSSHAIRS_URL, openSite } from "@/lib/links";
 import { cn } from "@/lib/utils";
 import { useEngineStore } from "@/state/engine";
 import { saveSettings, useSettingsStore } from "@/state/settings";
@@ -223,7 +224,7 @@ export function CrosshairPage() {
           <CardTitle>{t("crosshair.presets.title")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-4 gap-3 lg:grid-cols-8">
+          <div className="grid grid-cols-4 gap-3 md:grid-cols-6 lg:grid-cols-8">
             {presets.map((preset) => (
               <button
                 key={preset.id}
@@ -237,6 +238,17 @@ export function CrosshairPage() {
             ))}
           </div>
         </CardContent>
+      </Card>
+
+      <Card className="flex flex-row flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <CardTitle>{t("crosshair.browse.title")}</CardTitle>
+          <CardDescription>{t("crosshair.browse.description")}</CardDescription>
+        </div>
+        <Button variant="primary" onClick={() => openSite(CROSSHAIRS_URL)}>
+          <ExternalLink aria-hidden />
+          {t("crosshair.browse.open")}
+        </Button>
       </Card>
 
       {!isImage && (

@@ -1,8 +1,9 @@
 import { CrosshairPage } from "@/features/crosshair/CrosshairPage";
-import { CustomizePage } from "@/features/customize/CustomizePage";
 import { DisplayPage } from "@/features/display/DisplayPage";
 import { EnhancersPage } from "@/features/enhancers/EnhancersPage";
+import { HomePage } from "@/features/home/HomePage";
 import { LibraryPage } from "@/features/library/LibraryPage";
+import { PotatoPage } from "@/features/potato/PotatoPage";
 import { ProfilesPage } from "@/features/profiles/ProfilesPage";
 import { MorePage } from "@/features/more/MorePage";
 import { CountdownDialog } from "@/features/resolution/CountdownDialog";
@@ -31,7 +32,9 @@ export function Shell() {
       <main className="relative z-10 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-5xl px-8 py-8">
           <Notices />
-          {tab.id === "display" ? (
+          {tab.id === "home" ? (
+            <HomePage />
+          ) : tab.id === "display" ? (
             <DisplayPage />
           ) : tab.id === "profiles" ? (
             <ProfilesPage />
@@ -43,8 +46,8 @@ export function Shell() {
             <ResolutionPage />
           ) : tab.id === "enhancers" ? (
             <EnhancersPage />
-          ) : tab.id === "customize" ? (
-            <CustomizePage />
+          ) : tab.id === "potato" ? (
+            <PotatoPage />
           ) : (
             <MorePage />
           )}

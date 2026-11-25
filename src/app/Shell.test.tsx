@@ -16,6 +16,9 @@ vi.mock("@/lib/ipc", () => ({
     updateCheck: vi.fn(),
     updateInstall: vi.fn(),
     openExternal: vi.fn(),
+    looksPresets: vi.fn(() => Promise.resolve([])),
+    crosshairPresets: vi.fn(() => Promise.resolve([])),
+    gamesList: vi.fn(() => Promise.resolve([])),
   },
 }));
 
@@ -36,8 +39,8 @@ describe("Shell", () => {
 
   it("cambia de sección al hacer clic", async () => {
     render(<App />);
-    await userEvent.click(screen.getByRole("button", { name: "Personalizar" }));
-    expect(screen.getByRole("heading", { level: 1, name: "Personalizar" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Inicio" }));
+    expect(screen.getByRole("heading", { level: 1, name: "Inicio" })).toBeInTheDocument();
   });
 
   it("la sección Más permite elegir el idioma", async () => {

@@ -4,7 +4,7 @@ Este archivo es para cualquier asistente de IA (Claude, Codex, Copilot…) que t
 
 ## Qué es VRes
 
-App de bandeja para Windows 10/11 (Tauri 2 + Rust + React/TypeScript) que ajusta cómo el monitor muestra la imagen: saturación, vibrance por driver, ajuste fino por monitor, resolución estirada, crosshair, perfiles por juego, Dark Boost, zoom y personalización de la interfaz. Gratis, GPL-3.0, sin cuenta ni telemetría. Se construye por fases ([docs/ROADMAP.md](docs/ROADMAP.md)); la arquitectura está en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).
+App de bandeja para Windows 10/11 (Tauri 2 + Rust + React/TypeScript) que ajusta cómo el monitor muestra la imagen: saturación, vibrance por driver, ajuste fino por monitor, resolución estirada, crosshair, perfiles por juego, Dark Boost y gráficos potato para NVIDIA. Gratis, GPL-3.0, sin cuenta ni telemetría. Se construye por fases ([docs/ROADMAP.md](docs/ROADMAP.md)); la arquitectura está en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).
 
 ## Reglas (no negociables)
 
@@ -14,7 +14,7 @@ App de bandeja para Windows 10/11 (Tauri 2 + Rust + React/TypeScript) que ajusta
 4. **Los tipos que cruzan la frontera con la interfaz viven en `vres-core`** con `#[derive(TS)]`. `src/lib/ipc.ts` es el único archivo que llama a `invoke`; `src/lib/events.ts`, el único que llama a `listen`. No editar `src/lib/bindings` a mano (se genera con `cargo test`).
 5. **Sin colores literales** fuera de `src/styles/` y `src/components/ui/` (`npm run check:tokens`). **Todo texto visible en los tres idiomas** (`src/locales/{es,en,pt-BR}`), con el español neutro como fuente (`npm run check:i18n`).
 6. **El motor emite códigos de motivo (`ReasonCode`), nunca frases.** La interfaz traduce.
-7. **Prohibido:** hooks de teclado o mouse de bajo nivel (`WH_KEYBOARD_LL`, `WH_MOUSE_LL`), abrir el proceso de un juego (`OpenProcess` solo sobre el propio VRes), inyección, drivers, servicios, conexiones de red nuevas, telemetría y `set_device_event_filter` fuera de `src-tauri/src/lib.rs`. El sondeo de teclas (`GetAsyncKeyState`, sin hooks) solo existe para Dark Boost y Zoom armados y en su alcance.
+7. **Prohibido:** hooks de teclado o mouse de bajo nivel (`WH_KEYBOARD_LL`, `WH_MOUSE_LL`), abrir el proceso de un juego (`OpenProcess` solo sobre el propio VRes), inyección, drivers, servicios, conexiones de red nuevas, telemetría y `set_device_event_filter` fuera de `src-tauri/src/lib.rs`. El sondeo de teclas (`GetAsyncKeyState`, sin hooks) solo existe para Dark Boost armado y en su alcance. La única elevación permitida es `vres.exe --potato` (relanzado con UAC solo para guardar el perfil del driver).
 8. **Tauri:** todos los comandos son `async`; las ventanas se crean desde `setup` o desde tareas async (crearlas desde un handler síncrono provoca un deadlock en Windows); la limpieza va en `RunEvent::Exit` y en el hook `on_before_exit` del updater.
 9. **Si el hardware contradice el plan,** anotarlo en `docs/hardware/RESULTADOS.md` y consultar antes de improvisar.
 10. **No tocar** `%USERPROFILE%\.tauri\` (clave de firma del updater) ni los secretos del repositorio.

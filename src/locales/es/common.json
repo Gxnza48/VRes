@@ -13,11 +13,12 @@
     "display": "Pantalla",
     "library": "Biblioteca",
     "resolution": "Resolución",
-    "customize": "Personalizar",
     "crosshair": "Crosshair",
     "profiles": "Perfiles",
-    "enhancers": "Dark Boost y Zoom",
-    "more": "Más"
+    "enhancers": "Dark Boost",
+    "more": "Más",
+    "home": "Inicio",
+    "potato": "Potato"
   },
   "phase": {
     "badge": "Llega en la fase {{phase}}",
@@ -89,7 +90,7 @@
       "title": "Restablecer todo",
       "description": "Vuelve VRes a como estaba al instalarlo.",
       "button": "Restablecer todo…",
-      "confirm": "Se borran tus looks y crosshairs guardados, los perfiles y juegos agregados, los atajos, Dark Boost y Zoom, el tema y el fondo, y el look vuelve a neutro. No se puede deshacer.",
+      "confirm": "Se borran tus looks y crosshairs guardados, los perfiles y juegos agregados, los atajos, Dark Boost, el tema y el fondo, y el look vuelve a neutro. No se puede deshacer.",
       "yes": "Sí, restablecer todo",
       "cancel": "Cancelar",
       "done": "Listo: VRes quedó como recién instalado.",
@@ -197,7 +198,7 @@
   "reasons": {
     "hdrActive": "HDR activo: el ajuste fino no se aplica en este monitor.",
     "partialTargets": "En pausa porque hay monitores sin tildar.",
-    "exclusiveFullscreen": "Un juego en pantalla completa exclusiva no muestra esta capa. Usa ventana sin bordes.",
+    "exclusiveFullscreen": "Juego en pantalla completa exclusiva: la saturación pasa a la vibrance del driver, que sí se ve ahí.",
     "magUnavailable": "Windows no permitió aplicar la saturación.",
     "magDropped": "Windows descartó la saturación.",
     "magConflict": "Otra app (por ejemplo, la Lupa o los filtros de color de Windows) está usando el filtro de color.",
@@ -362,7 +363,10 @@
     "hotkeyTaken": "Otro programa ya usa ese atajo. Elige otro.",
     "settingsFailed": "No se pudieron guardar los ajustes.",
     "crosshairInvalid": "No se pudo dibujar ese crosshair.",
-    "backgroundInvalid": "Esa imagen no sirve: tiene que ser PNG, JPEG, GIF o WebP de hasta 25 MB."
+    "backgroundInvalid": "Esa imagen no sirve: tiene que ser PNG, JPEG, GIF o WebP de hasta 25 MB.",
+    "potatoUnavailable": "No hay driver de NVIDIA con perfiles de juego.",
+    "potatoCancelled": "No se cambió nada: hace falta aceptar el aviso de administrador.",
+    "potatoFailed": "El driver no guardó el cambio. Prueba de nuevo o reinicia la PC."
   },
   "crosshair": {
     "title": "Crosshair",
@@ -389,7 +393,23 @@
       "circle": "Círculo",
       "plus": "Cruz sólida",
       "cross": "Equis",
-      "large": "Grande"
+      "large": "Grande",
+      "micro": "Micro",
+      "cyan": "Cian",
+      "magenta": "Magenta",
+      "yellow": "T amarilla",
+      "red": "Cruz roja",
+      "white": "Blanca fina",
+      "purple": "Violeta",
+      "bigdot": "Punto grande",
+      "squaredot": "Punto cuadrado",
+      "target": "Diana",
+      "halo": "Halo",
+      "scope": "Mira larga",
+      "rail": "Riel",
+      "xdot": "Equis con punto",
+      "bold": "Gruesa",
+      "tiny": "Mínima"
     },
     "color": {
       "title": "Color",
@@ -459,6 +479,11 @@
       "px": "{{value}} px",
       "deg": "{{value}}°",
       "percent": "{{value}} %"
+    },
+    "browse": {
+      "title": "Más miras",
+      "description": "La galería de miras está en la web, así la app sigue liviana. Copia un código y pégalo abajo en «Compartir».",
+      "open": "Explorar miras en la web"
     }
   },
   "looks": {
@@ -596,9 +621,9 @@
     }
   },
   "enhancers": {
-    "title": "Dark Boost y Zoom",
+    "title": "Dark Boost",
     "subtitle": "Para ver mejor en momentos puntuales, mientras mantienes una tecla o un botón del mouse.",
-    "warning": "Úsalos con cuidado: algunos juegos y torneos consideran que aclarar las sombras o hacer zoom da ventaja, y pueden sancionarlo. Revisa sus reglas; la decisión y el riesgo son tuyos.",
+    "warning": "Úsalo con cuidado: algunos juegos y torneos consideran que aclarar las sombras da ventaja, y pueden sancionarlo. Revisa sus reglas; la decisión y el riesgo son tuyos.",
     "arm": "Armar",
     "disarm": "Desarmar",
     "state": {
@@ -666,51 +691,91 @@
       "times": "{{value}}×"
     }
   },
-  "customize": {
-    "title": "Personalizar",
-    "subtitle": "El aspecto de VRes, a tu gusto.",
-    "theme": {
-      "title": "Tema",
-      "description": "Los colores de la interfaz. El verde lima de VRes se mantiene.",
-      "black": "Negro",
-      "blackHint": "Negro total, el de siempre",
-      "graphite": "Grafito",
-      "graphiteHint": "Grises oscuros, más suave"
+  "home": {
+    "title": "Inicio",
+    "subtitle": "Tu config principal en un solo lugar: colores, mira, resolución y atajos. Se guarda sola y vuelve cada vez que abres VRes.",
+    "edit": "Editar",
+    "on": "Activo",
+    "off": "Apagado",
+    "copySetup": "Copiar mi setup",
+    "copied": "¡Copiado!",
+    "scope": {
+      "title": "Dónde se aplica",
+      "description": "Elige si tu config principal se ve siempre o solo mientras juegas.",
+      "always": "Siempre",
+      "alwaysHint": "En el escritorio y en los juegos.",
+      "games": "Solo en juegos",
+      "gamesHint": "Con un juego al frente. En el escritorio, la pantalla queda normal y sin mira.",
+      "pick": "Toca los juegos donde se aplica:",
+      "anyGame": "Sin ninguno marcado, vale para cualquier juego que VRes reconozca (los de fábrica y los que agregues en Perfiles).",
+      "fullscreen": "También en pantalla completa: ahí la saturación pasa a la vibrance del driver (NVIDIA o AMD). La mira se ve en ventana sin bordes y en la pantalla completa de Windows 10/11, no en la exclusiva antigua."
     },
-    "background": {
-      "title": "Fondo",
-      "description": "Una imagen o un GIF tuyo detrás de las pestañas (PNG, JPEG, GIF o WebP, hasta 25 MB).",
-      "choose": "Elegir imagen o GIF",
-      "replace": "Cambiar imagen",
-      "uploading": "Guardando…",
-      "remove": "Quitar fondo",
-      "opacity": "Cuánto se ve",
-      "note": "El GIF se queda quieto mientras VRes no está al frente, para no gastar mientras juegas. La imagen no sale de tu PC.",
-      "blur": "Desenfoque"
+    "colors": {
+      "title": "Colores",
+      "saturation": "Saturación",
+      "vibrance": "Vibrance",
+      "enabled": "Color encendido"
     },
-    "units": {
-      "percent": "{{value}} %",
-      "px": "{{value}} px"
+    "crosshair": {
+      "title": "Mira",
+      "enabled": "Mostrar la mira",
+      "browse": "Explorar miras"
     },
-    "accent": {
-      "title": "Color de acento",
-      "description": "El color de los botones, las marcas y los detalles.",
-      "lime": "Lima",
-      "cyan": "Cian",
-      "blue": "Azul",
-      "violet": "Violeta",
-      "pink": "Rosa",
-      "red": "Rojo",
-      "orange": "Naranja",
-      "yellow": "Amarillo"
+    "resolution": {
+      "title": "Resolución",
+      "target": "Alterna a {{mode}} en {{display}}.",
+      "toggle": "Alternar ahora",
+      "none": "Todavía no elegiste una resolución estirada. Prueba una en Resolución y consérvala."
     },
-    "size": {
-      "title": "Tamaño de la interfaz",
-      "description": "Agranda o achica todo: textos, botones y espacios.",
-      "s90": "Compacta",
-      "s100": "Normal",
-      "s110": "Grande",
-      "s125": "Muy grande"
+    "hotkeys": {
+      "title": "Atajos",
+      "description": "Funcionan con la ventana cerrada y con el juego al frente.",
+      "crosshair": "Mostrar u ocultar la mira",
+      "resolution": "Nativa ↔ estirada",
+      "emergency": "Restablecer la pantalla"
+    },
+    "games": {
+      "title": "Juegos con config propia",
+      "description": "Un perfil cambia los colores, la mira o la resolución solo en ese juego.",
+      "manage": "Perfiles",
+      "none": "Ningún juego tiene config propia todavía.",
+      "active": "en uso"
+    }
+  },
+  "potato": {
+    "title": "Gráficos potato",
+    "subtitle": "Texturas planas y sin detalle a cambio de más FPS, para placas NVIDIA. VRes lo pone en el perfil del juego en el driver, igual que el panel de NVIDIA: no toca el juego.",
+    "warning": "Úsalo bajo tu responsabilidad: algunos juegos consideran que bajar las texturas desde el driver da ventaja (Riot lo llamó «exploit» en VALORANT) y pueden sancionarlo. Revisa las reglas del juego.",
+    "unavailable": {
+      "title": "Hace falta una placa NVIDIA",
+      "description": "No se encontró el driver de NVIDIA con perfiles de juego. En AMD e Intel esta función no está disponible."
+    },
+    "game": {
+      "description": "Se aplica a {{exe}}."
+    },
+    "levels": {
+      "off": {
+        "name": "Normal",
+        "hint": "Sin cambios: el juego se ve como siempre."
+      },
+      "low": {
+        "name": "Texturas bajas",
+        "hint": "Texturas más simples y menos ruido visual. Un poco más de FPS."
+      },
+      "potato": {
+        "name": "Potato",
+        "hint": "Texturas planas, como de arcilla. Lo máximo en FPS."
+      }
+    },
+    "applying": "Guardando en el driver… acepta el aviso de Windows.",
+    "restart": "Listo. Cierra y vuelve a abrir el juego para verlo.",
+    "custom": "Este juego ya tenía un ajuste de texturas propio en el driver (por ejemplo, de Profile Inspector). Al elegir un nivel, VRes lo reemplaza.",
+    "how": {
+      "title": "Cómo funciona",
+      "driver": "Cambia el «LOD Bias» de las texturas en el perfil del juego del driver de NVIDIA. Funciona en juegos DirectX 11, como ROB RUN.",
+      "admin": "El driver pide permiso de administrador para guardar: Windows muestra un aviso cada vez que cambias el nivel.",
+      "hybrid": "En notebooks con dos placas, el juego tiene que usar la NVIDIA (Configuración de Windows › Pantalla › Gráficos).",
+      "undo": "Queda guardado aunque cierres VRes. Para volver, elige «Normal»."
     }
   }
 }

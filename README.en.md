@@ -4,7 +4,7 @@
 
 **Display tuning for gaming. Free, local and open source.**
 
-Saturation up to 300%, digital vibrance, stretched resolution, crosshair, per-game profiles, Dark Boost and zoom, in a single Windows app. No account, no subscription and no telemetry.
+Saturation up to 300%, digital vibrance, stretched resolution, crosshair, per-game profiles, Dark Boost and potato graphics, in a single Windows app. No account, no subscription and no telemetry.
 
 [![CI](https://github.com/Gxnza48/VRes/actions/workflows/ci.yml/badge.svg)](https://github.com/Gxnza48/VRes/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/Gxnza48/VRes?include_prereleases)](https://github.com/Gxnza48/VRes/releases)
@@ -41,7 +41,10 @@ It is built for the Latin-American gaming community: **truly free** (no paid pla
 | **Crosshair** overlay: shapes by parts, colors, your own image, any monitor, hidden from captures, saved crosshairs and a show/hide hotkey | ✅ Available | v0.4 – v0.9.1 |
 | **Looks & Library:** own per-game looks, local library, share codes, color depth, color-blindness aids, eye care and quick adjust from the tray | ✅ Available | v0.5 |
 | **Per-game profiles:** Fortnite, VALORANT, CS2, Apex Legends, Rust, Rainbow Six Siege and any other game; look and crosshair while in front, resolution while the game is open | ✅ Available | v0.6 |
-| **Dark Boost & Zoom** while holding (or toggling) a key or a mouse button, Mouse 4 and 5 included; they ship disarmed | ✅ Available | v0.7 |
+| **Dark Boost** while holding (or toggling) a key or a mouse button, Mouse 4 and 5 included; ships disarmed | ✅ Available | v0.7 |
+| **Home:** your main config (colors, crosshair, resolution and hotkeys) in one place, always or **only in games** | ✅ Available | v0.10 |
+| **Potato graphics** for NVIDIA (flat textures, more FPS) in ROB RUN, from the game's driver profile | ✅ Available | v0.10 |
+| 24 built-in crosshairs and a [web gallery](https://vresolution.vercel.app/miras) with their codes | ✅ Available | v0.10 |
 | **Customize:** theme, accent color, interface size and your own background (image or GIF). Diagnostic report without personal data | ✅ Available | v0.8 – v0.9 |
 | Per-GPU custom resolutions and a signed installer | 🗓 Planned | v1.0 |
 
@@ -68,7 +71,7 @@ VRes works in three layers, all in user mode and **without touching the game**:
 | **Gamma ramp** | Gamma, brightness, contrast, temperature, shadows, highlights | Graphics card gamma table (`SetDeviceGammaRamp`) | Per monitor |
 | **Driver** | Digital vibrance | Each vendor's API (NVIDIA NVAPI, AMD ADL) | Per monitor |
 
-The **crosshair** is a transparent window that ignores clicks; **zoom** uses the Windows magnifier; **resolution** changes are temporary (Windows reverts them if anything goes wrong) and always ask for confirmation; **profiles** detect which program is in the foreground by its name.
+The **crosshair** is a transparent window that ignores clicks; **resolution** changes are temporary (Windows reverts them if anything goes wrong) and always ask for confirmation; **profiles** detect which program is in the foreground by its name.
 
 What VRes does **not** do: inject code, read or write any game's memory, install drivers or services, use keyboard or mouse hooks, or open the game's process.
 
@@ -83,7 +86,7 @@ Technical details (in Spanish): [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) and
 | Driver vibrance | ✅ | ✅ | 🧪 emulated in software |
 | Custom resolutions | v1.0 | v1.0 | 🧪 |
 
-- **Game display mode:** we recommend **borderless windowed**. In **exclusive full screen** the game bypasses the Windows color layer: matrix saturation, the crosshair and zoom don't show there, but driver vibrance and gamma ramps do. VRes detects it and tells you.
+- **Game display mode:** we recommend **borderless windowed**. In **exclusive full screen** the game bypasses the Windows color layer: VRes detects it and moves saturation to the driver's vibrance (NVIDIA or AMD), which does show there, as do gamma ramps. The crosshair doesn't show in old exclusive full screen (it does in Windows 10/11 full screen).
 - **HDR:** with HDR on, Windows doesn't guarantee gamma-ramp behavior and the matrix is limited to safe adjustments. VRes marks those layers as *limited* and explains why.
 - **Multiple monitors:** the Windows color matrix is shared by the whole desktop. If you untick a monitor, VRes pauses global effects and tells you; brightness, gamma, temperature and vibrance are per monitor.
 - **Laptops with two GPUs:** VRes detects which GPU drives each screen and uses the right driver for each.
@@ -92,7 +95,7 @@ Real-hardware results: [docs/hardware/RESULTADOS.md](docs/hardware/RESULTADOS.md
 
 ## Anti-cheat, honestly
 
-VRes doesn't interact with games and uses the same API families as GPU control panels and Windows color filters. **Even so, there is no guarantee:** no anti-cheat publishes an allow-list, and publishers judge by **effect**, not method. Epic says third-party software is used at your own risk; Riot lists zoom tools among unfair advantages; FACEIT bans any software giving an unfair advantage (and lists VibranceGUI, another vibrance tool, as safe). The **crosshair**, **zoom** and **Dark Boost** may count as cheating depending on the game or tournament, so they ship turned off with a warning. Check your game's rules. Details: [docs/ANTI-CHEAT.md](docs/ANTI-CHEAT.md).
+VRes doesn't interact with games and uses the same API families as GPU control panels and Windows color filters. **Even so, there is no guarantee:** no anti-cheat publishes an allow-list, and publishers judge by **effect**, not method. Epic says third-party software is used at your own risk; Riot lists zoom tools among unfair advantages; FACEIT bans any software giving an unfair advantage (and lists VibranceGUI, another vibrance tool, as safe). The **crosshair**, **Dark Boost** and **potato graphics** may count as cheating depending on the game or tournament, so they ship turned off with a warning. Check your game's rules. Details: [docs/ANTI-CHEAT.md](docs/ANTI-CHEAT.md).
 
 ## Keeping your display safe
 

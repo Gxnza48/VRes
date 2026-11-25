@@ -189,6 +189,9 @@ impl EnhancerSettings {
             c.dark_boost.effect.tint = DEFAULT_TINT.to_owned();
         }
         c.zoom.level = ranges::ZOOM.clamp(c.zoom.level);
+        // El zoom se quitó en la v0.10 (casi todos los juegos lo sancionan):
+        // queda siempre desarmado, aunque venga armado de una versión vieja.
+        c.zoom.armed = false;
         c
     }
 }

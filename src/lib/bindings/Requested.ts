@@ -25,4 +25,9 @@ targets: Array<string> | null,
 /**
  * Ajuste propio de cada pantalla.
  */
-trims: { [key in string]: DisplayTrim }, };
+trims: { [key in string]: DisplayTrim }, 
+/**
+ * Hay un juego en pantalla completa exclusiva: el filtro de color de
+ * Windows no se ve, así que la saturación pasa a la vibrance del driver.
+ */
+exclusiveFullscreen: boolean, };

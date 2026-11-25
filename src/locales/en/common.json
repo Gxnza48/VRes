@@ -13,11 +13,12 @@
     "display": "Display",
     "library": "Library",
     "resolution": "Resolution",
-    "customize": "Customize",
     "crosshair": "Crosshair",
     "profiles": "Profiles",
-    "enhancers": "Dark Boost & Zoom",
-    "more": "More"
+    "enhancers": "Dark Boost",
+    "more": "More",
+    "home": "Home",
+    "potato": "Potato"
   },
   "phase": {
     "badge": "Coming in phase {{phase}}",
@@ -197,7 +198,7 @@
   "reasons": {
     "hdrActive": "HDR is on: fine tuning doesn't apply on this monitor.",
     "partialTargets": "Paused because some monitors are unticked.",
-    "exclusiveFullscreen": "A game in exclusive full screen doesn't show this layer. Use borderless windowed.",
+    "exclusiveFullscreen": "Game in exclusive full screen: saturation moves to the driver's vibrance, which does show there.",
     "magUnavailable": "Windows didn't allow applying saturation.",
     "magDropped": "Windows dropped the saturation.",
     "magConflict": "Another app (for example, Magnifier or Windows color filters) is using the color filter.",
@@ -362,7 +363,10 @@
     "hotkeyTaken": "Another program already uses that hotkey. Choose another one.",
     "settingsFailed": "The settings couldn't be saved.",
     "crosshairInvalid": "That crosshair could not be drawn.",
-    "backgroundInvalid": "That image won't work: it must be PNG, JPEG, GIF or WebP, up to 25 MB."
+    "backgroundInvalid": "That image won't work: it must be PNG, JPEG, GIF or WebP, up to 25 MB.",
+    "potatoUnavailable": "There's no NVIDIA driver with game profiles.",
+    "potatoCancelled": "Nothing changed: you need to accept the administrator prompt.",
+    "potatoFailed": "The driver didn't save the change. Try again or restart the PC."
   },
   "crosshair": {
     "title": "Crosshair",
@@ -389,7 +393,23 @@
       "circle": "Circle",
       "plus": "Solid cross",
       "cross": "X",
-      "large": "Large"
+      "large": "Large",
+      "micro": "Micro",
+      "cyan": "Cyan",
+      "magenta": "Magenta",
+      "yellow": "Yellow T",
+      "red": "Red cross",
+      "white": "Thin white",
+      "purple": "Purple",
+      "bigdot": "Big dot",
+      "squaredot": "Square dot",
+      "target": "Target",
+      "halo": "Halo",
+      "scope": "Long scope",
+      "rail": "Rail",
+      "xdot": "X with dot",
+      "bold": "Bold",
+      "tiny": "Tiny"
     },
     "color": {
       "title": "Color",
@@ -459,6 +479,11 @@
       "px": "{{value}} px",
       "deg": "{{value}}°",
       "percent": "{{value}}%"
+    },
+    "browse": {
+      "title": "More crosshairs",
+      "description": "The crosshair gallery lives on the website, so the app stays light. Copy a code and paste it below in \"Share\".",
+      "open": "Browse crosshairs on the web"
     }
   },
   "looks": {
@@ -596,9 +621,9 @@
     }
   },
   "enhancers": {
-    "title": "Dark Boost and Zoom",
+    "title": "Dark Boost",
     "subtitle": "To see better at key moments, while you hold a key or a mouse button.",
-    "warning": "Use them with care: some games and tournaments consider brightening shadows or zooming an advantage and may penalize it. Check their rules; the decision and the risk are yours.",
+    "warning": "Use it with care: some games and tournaments consider brightening shadows an advantage and may penalize it. Check their rules; the decision and the risk are yours.",
     "arm": "Arm",
     "disarm": "Disarm",
     "state": {
@@ -666,51 +691,91 @@
       "times": "{{value}}×"
     }
   },
-  "customize": {
-    "title": "Customize",
-    "subtitle": "Make VRes look the way you like.",
-    "theme": {
-      "title": "Theme",
-      "description": "The interface colors. VRes's lime green stays.",
-      "black": "Black",
-      "blackHint": "Pure black, the classic",
-      "graphite": "Graphite",
-      "graphiteHint": "Dark grays, softer"
+  "home": {
+    "title": "Home",
+    "subtitle": "Your main config in one place: colors, crosshair, resolution and hotkeys. It saves itself and comes back every time you open VRes.",
+    "edit": "Edit",
+    "on": "On",
+    "off": "Off",
+    "copySetup": "Copy my setup",
+    "copied": "Copied!",
+    "scope": {
+      "title": "Where it applies",
+      "description": "Choose whether your main config is always on or only while you play.",
+      "always": "Always",
+      "alwaysHint": "On the desktop and in games.",
+      "games": "Only in games",
+      "gamesHint": "With a game in front. On the desktop, the screen stays normal and without a crosshair.",
+      "pick": "Tap the games where it applies:",
+      "anyGame": "With none selected, it applies to any game VRes recognizes (the built-in ones and those you add in Profiles).",
+      "fullscreen": "Also in full screen: there, saturation moves to the driver's vibrance (NVIDIA or AMD). The crosshair shows in borderless windowed and in Windows 10/11 full screen, not in old exclusive full screen."
     },
-    "background": {
-      "title": "Background",
-      "description": "An image or GIF of yours behind the tabs (PNG, JPEG, GIF or WebP, up to 25 MB).",
-      "choose": "Choose image or GIF",
-      "replace": "Change image",
-      "uploading": "Saving…",
-      "remove": "Remove background",
-      "opacity": "How visible",
-      "note": "The GIF stays still while VRes isn't in front, so it costs nothing while you play. The image never leaves your PC.",
-      "blur": "Blur"
+    "colors": {
+      "title": "Colors",
+      "saturation": "Saturation",
+      "vibrance": "Vibrance",
+      "enabled": "Color on"
     },
-    "units": {
-      "percent": "{{value}}%",
-      "px": "{{value}} px"
+    "crosshair": {
+      "title": "Crosshair",
+      "enabled": "Show the crosshair",
+      "browse": "Browse crosshairs"
     },
-    "accent": {
-      "title": "Accent color",
-      "description": "The color of buttons, marks and details.",
-      "lime": "Lime",
-      "cyan": "Cyan",
-      "blue": "Blue",
-      "violet": "Violet",
-      "pink": "Pink",
-      "red": "Red",
-      "orange": "Orange",
-      "yellow": "Yellow"
+    "resolution": {
+      "title": "Resolution",
+      "target": "Switches to {{mode}} on {{display}}.",
+      "toggle": "Switch now",
+      "none": "You haven't picked a stretched resolution yet. Try one in Resolution and keep it."
     },
-    "size": {
-      "title": "Interface size",
-      "description": "Makes everything bigger or smaller: text, buttons and spacing.",
-      "s90": "Compact",
-      "s100": "Normal",
-      "s110": "Large",
-      "s125": "Extra large"
+    "hotkeys": {
+      "title": "Hotkeys",
+      "description": "They work with the window closed and with the game in front.",
+      "crosshair": "Show or hide the crosshair",
+      "resolution": "Native ↔ stretched",
+      "emergency": "Reset the screen"
+    },
+    "games": {
+      "title": "Games with their own config",
+      "description": "A profile changes colors, crosshair or resolution only in that game.",
+      "manage": "Profiles",
+      "none": "No game has its own config yet.",
+      "active": "in use"
+    }
+  },
+  "potato": {
+    "title": "Potato graphics",
+    "subtitle": "Flat, detail-free textures for more FPS, on NVIDIA cards. VRes sets it in the game's driver profile, just like the NVIDIA control panel: it doesn't touch the game.",
+    "warning": "Use it at your own risk: some games consider lowering textures from the driver an advantage (Riot called it an “exploit” in VALORANT) and may penalize it. Check the game's rules.",
+    "unavailable": {
+      "title": "An NVIDIA card is required",
+      "description": "The NVIDIA driver with game profiles wasn't found. This feature isn't available on AMD or Intel."
+    },
+    "game": {
+      "description": "Applies to {{exe}}."
+    },
+    "levels": {
+      "off": {
+        "name": "Normal",
+        "hint": "No changes: the game looks as usual."
+      },
+      "low": {
+        "name": "Low textures",
+        "hint": "Simpler textures and less visual noise. A bit more FPS."
+      },
+      "potato": {
+        "name": "Potato",
+        "hint": "Flat, clay-like textures. Maximum FPS."
+      }
+    },
+    "applying": "Saving to the driver… accept the Windows prompt.",
+    "restart": "Done. Close and reopen the game to see it.",
+    "custom": "This game already had its own texture setting in the driver (for example, from Profile Inspector). Picking a level replaces it.",
+    "how": {
+      "title": "How it works",
+      "driver": "It changes the textures' “LOD Bias” in the game's NVIDIA driver profile. It works in DirectX 11 games, like ROB RUN.",
+      "admin": "The driver asks for administrator permission to save: Windows shows a prompt each time you change the level.",
+      "hybrid": "On laptops with two GPUs, the game has to run on the NVIDIA one (Windows Settings › Display › Graphics).",
+      "undo": "It stays saved even if you close VRes. To go back, pick “Normal”."
     }
   }
 }

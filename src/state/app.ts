@@ -14,7 +14,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>()((set) => ({
   bootstrap: null,
-  tab: "display",
+  tab: "home",
   setBootstrap: (bootstrap) => set({ bootstrap }),
   setTab: (tab) => set({ tab }),
 }));

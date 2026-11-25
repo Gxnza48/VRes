@@ -29,6 +29,7 @@ mod hw;
 mod lut;
 #[cfg(windows)]
 mod monitor;
+mod potato;
 #[cfg(windows)]
 mod resolution;
 mod share;
@@ -117,6 +118,9 @@ enum Command {
     /// Códigos para compartir (looks, crosshairs y resoluciones).
     #[command(subcommand)]
     Share(ShareCommand),
+    /// Gráficos potato de NVIDIA (perfil del juego en el driver).
+    #[command(subcommand)]
+    Potato(PotatoCommand),
     /// Exporta un look como LUT 3D (`.cube`) para editores de video: lo mismo
     /// que VRes aplica en pantalla (las grabaciones de juegos no lo ven).
     Lut {
@@ -257,6 +261,14 @@ enum FgCommand {
 }
 
 #[derive(Debug, Subcommand)]
+enum PotatoCommand {
+    /// Muestra qué nivel está puesto en cada juego (no cambia nada).
+    Status,
+    /// Pone un nivel en ROB RUN: off, low o potato.
+    Set { level: String },
+}
+
+#[derive(Debug, Subcommand)]
 enum ShareCommand {
     /// Muestra qué hay en un código.
     Decode {
@@ -270,6 +282,8 @@ enum ShareCommand {
         #[arg(long)]
         crosshair: Option<String>,
     },
+    /// Lista los crosshairs de fábrica con su código (para la galería web).
+    Presets,
 }
 
 #[derive(Debug, Subcommand)]
@@ -565,7 +579,10 @@ fn run(command: Command) -> Report {
         Command::Fg(FgCommand::Watch { seconds }) => {
             foreground::watch(Duration::from_secs(seconds.clamp(1, 600)))
         }
+        Command::Potato(PotatoCommand::Status) => potato::status(),
+        Command::Potato(PotatoCommand::Set { level }) => potato::set(&level),
         Command::Share(ShareCommand::Decode { code }) => share::decode(&code),
+        Command::Share(ShareCommand::Presets) => share::presets(),
         Command::Share(ShareCommand::Encode { look, crosshair }) => {
             share::encode(look.as_deref(), crosshair.as_deref())
         }

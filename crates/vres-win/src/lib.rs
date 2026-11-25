@@ -23,6 +23,7 @@ pub mod identify;
 pub mod keyboard;
 pub mod mag;
 pub mod modes;
+pub mod nvdrs;
 pub mod overlay;
 pub mod panel;
 pub mod probe;

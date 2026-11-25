@@ -7,6 +7,10 @@
 //!   lo pide; si no, deshace lo que haya quedado de un cierre inesperado. Lo
 //!   usa el acceso directo "VRes — Restablecer pantalla".
 //!
+//! - `--potato JUEGO NIVEL`: pone los gráficos potato en el perfil del juego
+//!   en el driver de NVIDIA. La app lo lanza **como administrador** (el driver
+//!   lo exige para guardar) y espera el código de salida: 0 bien, 2 falló.
+//!
 //! Ninguno de estos flags abre la interfaz.
 
 #[cfg(windows)]
@@ -34,6 +38,18 @@ pub fn handle_early_flags() -> Option<i32> {
             // igual verifica después si la app sigue abierta.
             let _ = control::shutdown_running(Duration::from_secs(6));
             return Some(0);
+        }
+
+        if let Some(position) = args.iter().position(|arg| arg == "--potato") {
+            let game = args
+                .get(position + 1)
+                .map(String::as_str)
+                .unwrap_or_default();
+            let level = args
+                .get(position + 2)
+                .map(String::as_str)
+                .unwrap_or_default();
+            return Some(crate::commands::potato::apply_from_flag(game, level));
         }
 
         if has("--reset") {

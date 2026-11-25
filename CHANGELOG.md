@@ -4,9 +4,29 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.10.0] - 2026-11-25
+
+**Inicio, miras nuevas, pantalla completa y gráficos potato.**
+
 ### Agregado
 
+- Pestaña **Inicio**: tu config principal en un lugar (colores, mira, resolución estirada y atajos), con «Copiar mi setup» (los códigos del look, la mira y la resolución) y los juegos que tienen perfil propio.
+- **Solo en juegos**: la config principal puede valer solo con un juego al frente (todos los que VRes reconoce, o los que elijas). En el escritorio la pantalla queda normal y sin mira.
+- **Pantalla completa exclusiva**: VRes la detecta y pasa la saturación a la vibrance del driver (NVIDIA o AMD), que sí se ve ahí. Al volver a ventana, regresa la matriz.
+- **16 miras nuevas** (24 en total) y el botón **Explorar miras**, que abre la galería en la web ([vresolution.vercel.app/miras](https://vresolution.vercel.app/miras)) con el código de cada una para pegar en Compartir. La app no carga la galería.
+- Pestaña **Potato** (NVIDIA): texturas bajas o «potato» para ROB RUN desde el perfil del juego en el driver, la misma base de ajustes que el panel de NVIDIA. Guardar en el driver pide permiso de administrador (aviso de Windows) solo en ese momento; «Normal» lo quita.
+- ROB RUN entre los juegos reconocidos (perfiles y «solo en juegos»).
+- `vres-cli potato status | set` y `vres-cli share presets`.
 - `vres-cli lut`: exporta un look como LUT 3D (`.cube`) para editores de video, con la misma matriz y rampa que VRes aplica en pantalla (las grabaciones de juegos no las ven). Toma el look de un código, de un JSON o el que VRes tiene aplicado (`--current`).
+
+### Cambiado
+
+- Casillas, deslizadores y barras de desplazamiento con un diseño propio (el deslizador muestra en color lo recorrido).
+
+### Quitado
+
+- El **Zoom**: casi todos los juegos competitivos lo sancionan. Si estaba armado, queda desarmado.
+- La pestaña **Personalizar**: el tema y el acento que elegiste se mantienen.
 
 ## [0.9.1] - 2026-11-24
 

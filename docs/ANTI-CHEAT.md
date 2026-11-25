@@ -12,9 +12,9 @@ VRes **sí** usa:
 - una ventana transparente que no recibe clics, para el crosshair;
 - el cambio de resolución estándar de Windows;
 - el nombre del programa en primer plano, para cambiar de perfil (sin abrir su proceso);
-- la lupa de pantalla completa de Windows, para el zoom (solo visual: el mouse no cambia);
+- los perfiles de juego del driver de NVIDIA (DRS), para los gráficos potato: es la misma base de ajustes que el panel de NVIDIA;
 - DDC/CI, el mismo canal que usa el menú del monitor, y el brillo de Windows (WMI) del panel de la notebook, para la pestaña Monitor;
-- la lectura del estado de **una** tecla o botón (`GetAsyncKeyState`) para Dark Boost y Zoom, solo mientras están armados y en su alcance. Solo lee: no la consume ni la intercepta, y el juego la recibe igual.
+- la lectura del estado de **una** tecla o botón (`GetAsyncKeyState`) para Dark Boost, solo mientras está armado y en su alcance. Solo lee: no la consume ni la intercepta, y el juego la recibe igual.
 
 VRes **no**:
 
@@ -41,10 +41,11 @@ Ningún anti-cheat publica una lista de programas permitidos, y los editores juz
 | Resolución estirada | El modo de pantalla de Windows | Bajo (es práctica común en competitivo) | Pide confirmación |
 | Crosshair superpuesto | Agrega una marca en el centro de la pantalla | **Medio:** algunos juegos o torneos lo prohíben | Apagado |
 | Dark Boost | Aclara las zonas oscuras | **Medio-alto:** puede verse como ventaja (por ejemplo en Rust) | Apagado, con aviso |
-| Zoom | Amplía una parte de la pantalla | **Alto en juegos competitivos:** Riot lo menciona como ventaja indebida | Apagado, con aviso |
+| Gráficos potato (NVIDIA) | Aplana las texturas desde el perfil del juego en el driver | **Alto en competitivo:** Riot llamó «exploit» a forzar el LOD Bias en VALORANT | Apagado, con aviso |
+| Zoom | (quitado en la v0.10) | Riot lo menciona como ventaja indebida | — |
 
 **Recomendaciones:**
 
-- Revisa el reglamento de cada juego y de cada torneo antes de usar el crosshair, el Dark Boost o el zoom.
+- Revisa el reglamento de cada juego y de cada torneo antes de usar el crosshair, el Dark Boost o los gráficos potato.
 - Si dudas, prueba primero en una cuenta secundaria.
 - Si encuentras una regla oficial que no figura acá, [avísanos](https://github.com/Gxnza48/VRes/issues/new/choose) para sumarla con su fuente.

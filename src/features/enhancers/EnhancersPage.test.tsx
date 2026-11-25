@@ -40,7 +40,7 @@ describe("EnhancersPage", () => {
   it("avisa del riesgo y vienen desarmados", () => {
     render(<EnhancersPage />);
     expect(screen.getByText(/algunos juegos y torneos consideran/)).toBeInTheDocument();
-    expect(screen.getAllByText("Desarmado")).toHaveLength(2);
+    expect(screen.getAllByText("Desarmado")).toHaveLength(1);
   });
 
   it("arma Dark Boost", async () => {
@@ -51,24 +51,6 @@ describe("EnhancersPage", () => {
       expect.objectContaining({
         enhancers: expect.objectContaining({
           darkBoost: expect.objectContaining({ armed: true }),
-        }),
-      }),
-    );
-  });
-
-  it("graba un botón lateral del mouse para el zoom", async () => {
-    const user = userEvent.setup();
-    render(<EnhancersPage />);
-    await user.click(screen.getAllByRole("button", { name: "Cambiar" })[1]);
-    expect(screen.getByText("Aprieta una tecla o un botón del mouse…")).toBeInTheDocument();
-    expect(ipc.hotkeysSuspend).toHaveBeenCalledWith(true);
-    fireEvent.mouseDown(window, { button: 4 });
-    expect(ipc.settingsUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        enhancers: expect.objectContaining({
-          zoom: expect.objectContaining({
-            binding: { kind: "mouse", button: "forward" },
-          }),
         }),
       }),
     );
@@ -87,7 +69,6 @@ describe("EnhancersPage", () => {
 
   it("muestra el estado en vivo y avisa al invertir", () => {
     const enhancers = defaultEnhancers();
-    enhancers.zoom.armed = true;
     enhancers.darkBoost.armed = true;
     enhancers.darkBoost.effect.invert = true;
     useSettingsStore.setState({
@@ -96,13 +77,10 @@ describe("EnhancersPage", () => {
     useEngineStore.setState({
       enhancers: {
         ...idle,
-        zoomListening: true,
-        zoom: true,
         darkBoostListening: true,
       },
     });
     render(<EnhancersPage />);
-    expect(screen.getByText("Activo")).toBeInTheDocument();
     expect(screen.getByText("Listo")).toBeInTheDocument();
     expect(
       screen.getByText(/puede molestar, o ser peligroso si eres fotosensible/),

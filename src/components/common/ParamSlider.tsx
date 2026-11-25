@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -46,6 +46,8 @@ export function ParamSlider({
   className,
 }: ParamSliderProps) {
   const commitFrom = (target: EventTarget) => onCommit(Number((target as HTMLInputElement).value));
+  const span = range.max - range.min;
+  const fill = span > 0 ? ((Math.min(Math.max(value, range.min), range.max) - range.min) / span) * 100 : 0;
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
@@ -69,6 +71,7 @@ export function ParamSlider({
         value={value}
         disabled={disabled}
         title={resetTitle}
+        style={{ "--fill": `${fill}%` } as CSSProperties}
         onChange={(event) => onChange(Number(event.target.value))}
         onPointerUp={(event) => commitFrom(event.target)}
         onKeyUp={(event) => commitFrom(event.target)}
@@ -76,7 +79,7 @@ export function ParamSlider({
           onChange(range.default);
           onCommit(range.default);
         }}
-        className="w-full cursor-pointer accent-accent disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full disabled:opacity-50"
       />
       {scale && (
         <div className="flex justify-between text-[11px] text-muted">

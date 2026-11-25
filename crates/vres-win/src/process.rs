@@ -7,6 +7,8 @@
 use std::collections::HashMap;
 
 use windows::Win32::Foundation::{CloseHandle, HWND, LPARAM};
+
+use crate::{WinError, WinResult};
 use windows::Win32::System::Diagnostics::ToolHelp::{
     CreateToolhelp32Snapshot, PROCESSENTRY32W, Process32FirstW, Process32NextW, TH32CS_SNAPPROCESS,
 };
@@ -157,6 +159,67 @@ pub fn windowed_apps() -> Vec<WindowedApp> {
     }
     apps.sort_by_key(|app| app.title.to_lowercase());
     apps
+}
+
+/// `true` si una app Direct3D está en pantalla completa exclusiva (en esa
+/// situación el filtro de color de Windows no se ve).
+pub fn exclusive_fullscreen() -> bool {
+    use windows::Win32::UI::Shell::{QUNS_RUNNING_D3D_FULL_SCREEN, SHQueryUserNotificationState};
+    // SAFETY: la función solo escribe el estado en el valor que devuelve.
+    unsafe { SHQueryUserNotificationState() }
+        .is_ok_and(|state| state == QUNS_RUNNING_D3D_FULL_SCREEN)
+}
+
+/// Vuelve a abrir este mismo ejecutable **como administrador** con `args`
+/// (Windows muestra el aviso de UAC), espera a que termine y devuelve su
+/// código de salida. `Ok(None)` si el usuario dijo que no.
+pub fn run_self_elevated(args: &str, timeout: std::time::Duration) -> WinResult<Option<u32>> {
+    use windows::Win32::Foundation::{ERROR_CANCELLED, WAIT_OBJECT_0};
+    use windows::Win32::System::Threading::{GetExitCodeProcess, WaitForSingleObject};
+    use windows::Win32::UI::Shell::{
+        SEE_MASK_NOASYNC, SEE_MASK_NOCLOSEPROCESS, SHELLEXECUTEINFOW, ShellExecuteExW,
+    };
+    use windows::Win32::UI::WindowsAndMessaging::SW_HIDE;
+    use windows::core::{HSTRING, PCWSTR, w};
+
+    let exe = std::env::current_exe().map_err(|_| WinError::Unsupported("current_exe"))?;
+    let file = HSTRING::from(exe.as_os_str());
+    let parameters = HSTRING::from(args);
+    let mut info = SHELLEXECUTEINFOW {
+        cbSize: size_of::<SHELLEXECUTEINFOW>() as u32,
+        fMask: SEE_MASK_NOCLOSEPROCESS | SEE_MASK_NOASYNC,
+        lpVerb: w!("runas"),
+        lpFile: PCWSTR(file.as_ptr()),
+        lpParameters: PCWSTR(parameters.as_ptr()),
+        nShow: SW_HIDE.0,
+        ..Default::default()
+    };
+    // SAFETY: las cadenas viven hasta el final de la función y `info` tiene su tamaño.
+    if let Err(error) = unsafe { ShellExecuteExW(&mut info) } {
+        if error.code() == ERROR_CANCELLED.to_hresult() {
+            return Ok(None);
+        }
+        return Err(WinError::api("ShellExecuteExW", error));
+    }
+    let process = info.hProcess;
+    if process.is_invalid() {
+        return Err(WinError::Unsupported("elevated process handle"));
+    }
+    let millis = u32::try_from(timeout.as_millis()).unwrap_or(u32::MAX);
+    // SAFETY: `process` es el proceso propio que acabamos de abrir; se cierra una sola vez.
+    let result = unsafe {
+        let waited = WaitForSingleObject(process, millis);
+        let mut code = 1u32;
+        let read = GetExitCodeProcess(process, &mut code);
+        let _ = CloseHandle(process);
+        if waited != WAIT_OBJECT_0 {
+            return Err(WinError::Timeout("elevated process"));
+        }
+        read.map(|_| code)
+    };
+    result
+        .map(Some)
+        .map_err(|error| WinError::api("GetExitCodeProcess", error))
 }
 
 #[cfg(test)]

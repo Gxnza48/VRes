@@ -203,7 +203,7 @@ pub fn presets() -> Vec<CrosshairPreset> {
         id: id.to_owned(),
         crosshair,
     };
-    vec![
+    let mut list = vec![
         preset("classic", base.clone()),
         preset(
             "dot",
@@ -302,6 +302,183 @@ pub fn presets() -> Vec<CrosshairPreset> {
                 ..base
             },
         ),
+    ];
+    list.extend(
+        more_presets()
+            .into_iter()
+            .map(|(id, crosshair)| preset(id, crosshair)),
+    );
+    list
+}
+
+/// Partes de un preset: brazos `(largo, grosor, separación, [arriba, derecha, abajo, izquierda])`,
+/// punto `(tamaño, redondo)` y anillo `(radio, grosor)`.
+struct Shape {
+    color: &'static str,
+    arms: Option<(f32, f32, f32, [bool; 4])>,
+    dot: Option<(f32, bool)>,
+    ring: Option<(f32, f32)>,
+    outline: bool,
+    rotation: f32,
+}
+
+impl Shape {
+    const fn new(color: &'static str) -> Self {
+        Self {
+            color,
+            arms: None,
+            dot: None,
+            ring: None,
+            outline: true,
+            rotation: 0.0,
+        }
+    }
+    const fn arms(mut self, length: f32, thickness: f32, gap: f32) -> Self {
+        self.arms = Some((length, thickness, gap, [true; 4]));
+        self
+    }
+    const fn sides(mut self, sides: [bool; 4]) -> Self {
+        if let Some((length, thickness, gap, _)) = self.arms {
+            self.arms = Some((length, thickness, gap, sides));
+        }
+        self
+    }
+    const fn dot(mut self, size: f32, round: bool) -> Self {
+        self.dot = Some((size, round));
+        self
+    }
+    const fn ring(mut self, radius: f32, thickness: f32) -> Self {
+        self.ring = Some((radius, thickness));
+        self
+    }
+    const fn no_outline(mut self) -> Self {
+        self.outline = false;
+        self
+    }
+    const fn rotated(mut self, degrees: f32) -> Self {
+        self.rotation = degrees;
+        self
+    }
+    fn build(self) -> Crosshair {
+        let base = Crosshair::default();
+        let arms = match self.arms {
+            Some((length, thickness, gap, [top, right, bottom, left])) => Arms {
+                enabled: true,
+                length,
+                thickness,
+                gap,
+                top,
+                right,
+                bottom,
+                left,
+            },
+            None => Arms {
+                enabled: false,
+                ..Arms::default()
+            },
+        };
+        let dot = match self.dot {
+            Some((size, round)) => Dot {
+                enabled: true,
+                size,
+                round,
+            },
+            None => Dot::default(),
+        };
+        let ring = match self.ring {
+            Some((radius, thickness)) => Ring {
+                enabled: true,
+                radius,
+                thickness,
+            },
+            None => Ring::default(),
+        };
+        Crosshair {
+            color: self.color.to_owned(),
+            outline: Outline {
+                enabled: self.outline,
+                ..Outline::default()
+            },
+            arms,
+            dot,
+            ring,
+            rotation: self.rotation,
+            ..base
+        }
+    }
+}
+
+/// Más presets propios: colores que se leen sobre cualquier mapa y formas
+/// para cada estilo de juego.
+fn more_presets() -> Vec<(&'static str, Crosshair)> {
+    const NO_TOP: [bool; 4] = [false, true, true, true];
+    const SIDES: [bool; 4] = [false, true, false, true];
+    vec![
+        ("micro", Shape::new("#9EFA12").arms(3.0, 1.0, 2.0).build()),
+        ("cyan", Shape::new("#00E5FF").arms(6.0, 2.0, 3.0).build()),
+        (
+            "magenta",
+            Shape::new("#FF3DF5")
+                .arms(5.0, 2.0, 2.0)
+                .dot(2.0, false)
+                .build(),
+        ),
+        (
+            "yellow",
+            Shape::new("#FFE600")
+                .arms(7.0, 2.0, 4.0)
+                .sides(NO_TOP)
+                .build(),
+        ),
+        ("red", Shape::new("#FF2E2E").arms(6.0, 2.0, 0.0).build()),
+        ("white", Shape::new("#FFFFFF").arms(10.0, 1.0, 5.0).build()),
+        (
+            "purple",
+            Shape::new("#B266FF")
+                .arms(6.0, 2.0, 3.0)
+                .dot(2.0, false)
+                .build(),
+        ),
+        ("bigdot", Shape::new("#FF3DF5").dot(6.0, true).build()),
+        ("squaredot", Shape::new("#00E5FF").dot(3.0, false).build()),
+        (
+            "target",
+            Shape::new("#9EFA12")
+                .arms(5.0, 2.0, 9.0)
+                .ring(6.0, 1.0)
+                .dot(2.0, true)
+                .build(),
+        ),
+        (
+            "halo",
+            Shape::new("#FFFFFF").ring(20.0, 2.0).dot(2.0, true).build(),
+        ),
+        (
+            "scope",
+            Shape::new("#FF2E2E")
+                .arms(30.0, 1.0, 8.0)
+                .dot(1.0, false)
+                .no_outline()
+                .build(),
+        ),
+        (
+            "rail",
+            Shape::new("#00E5FF")
+                .arms(14.0, 2.0, 6.0)
+                .sides(SIDES)
+                .dot(2.0, false)
+                .build(),
+        ),
+        (
+            "xdot",
+            Shape::new("#FFE600")
+                .arms(5.0, 2.0, 3.0)
+                .dot(2.0, false)
+                .rotated(45.0)
+                .build(),
+        ),
+        ("bold", Shape::new("#9EFA12").arms(12.0, 4.0, 0.0).build()),
+        ("tiny", Shape::new("#FFFFFF").dot(1.0, false).build()),
     ]
 }
 
