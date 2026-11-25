@@ -4,6 +4,10 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+### Agregado
+
+- `vres-cli lut`: exporta un look como LUT 3D (`.cube`) para editores de video, con la misma matriz y rampa que VRes aplica en pantalla (las grabaciones de juegos no las ven). Toma el look de un código, de un JSON o el que VRes tiene aplicado (`--current`).
+
 ## [0.9.1] - 2026-11-24
 
 **Atajo para el crosshair.**

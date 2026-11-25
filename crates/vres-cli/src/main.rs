@@ -26,6 +26,7 @@ mod foreground;
 mod guard;
 #[cfg(windows)]
 mod hw;
+mod lut;
 #[cfg(windows)]
 mod monitor;
 #[cfg(windows)]
@@ -116,6 +117,28 @@ enum Command {
     /// Códigos para compartir (looks, crosshairs y resoluciones).
     #[command(subcommand)]
     Share(ShareCommand),
+    /// Exporta un look como LUT 3D (`.cube`) para editores de video: lo mismo
+    /// que VRes aplica en pantalla (las grabaciones de juegos no lo ven).
+    Lut {
+        /// Código del look (`VRL1-…`).
+        #[arg(long, conflicts_with_all = ["look", "current"])]
+        code: Option<String>,
+        /// El look en JSON.
+        #[arg(long, conflicts_with = "current")]
+        look: Option<String>,
+        /// El look que VRes tiene aplicado ahora.
+        #[arg(long)]
+        current: bool,
+        /// Archivo `.cube` de salida.
+        #[arg(long)]
+        out: std::path::PathBuf,
+        /// Puntos por lado (2 a 65).
+        #[arg(long, default_value_t = 33)]
+        size: usize,
+        /// `emulated`: la vibrance se emula en la matriz; `off`: sin vibrance.
+        #[arg(long, default_value = "emulated")]
+        vibrance: String,
+    },
     /// Programa en primer plano (detección de juegos).
     #[command(subcommand)]
     Fg(FgCommand),
@@ -546,6 +569,27 @@ fn run(command: Command) -> Report {
         Command::Share(ShareCommand::Encode { look, crosshair }) => {
             share::encode(look.as_deref(), crosshair.as_deref())
         }
+        Command::Lut {
+            code,
+            look,
+            current,
+            out,
+            size,
+            vibrance,
+        } => {
+            let source = match (code.as_deref(), look.as_deref(), current) {
+                (Some(code), _, _) => lut::Source::Code(code),
+                (None, Some(json), _) => lut::Source::Json(json),
+                (None, None, true) => lut::Source::Current,
+                (None, None, false) => {
+                    return Report::fail(
+                        serde_json::json!({ "ok": false, "error": "use --code, --look or --current" }),
+                        "Indica el look: --code, --look o --current.",
+                    );
+                }
+            };
+            lut::export(&source, &out, size, &vibrance)
+        }
         Command::Overlay(OverlayCommand::Test { display, hold_ms }) => {
             crosshair::overlay_test(display.as_deref(), hold(hold_ms))
         }
@@ -598,6 +642,32 @@ mod tests {
     #[test]
     fn cli_definition_is_valid() {
         Cli::command().debug_assert();
+    }
+
+    #[test]
+    fn parses_lut_and_rejects_two_sources() {
+        let cli = Cli::try_parse_from(["vres-cli", "lut", "--current", "--out", "a.cube"])
+            .expect("argumentos válidos");
+        assert!(matches!(
+            cli.command,
+            Command::Lut {
+                current: true,
+                size: 33,
+                ..
+            }
+        ));
+        assert!(
+            Cli::try_parse_from([
+                "vres-cli",
+                "lut",
+                "--code",
+                "VRL1-X",
+                "--current",
+                "--out",
+                "a.cube"
+            ])
+            .is_err()
+        );
     }
 
     #[test]

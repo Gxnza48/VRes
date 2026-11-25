@@ -2,5 +2,6 @@
 //! temperatura de color. Todo es puro y determinista.
 
 pub mod kelvin;
+pub mod lut;
 pub mod matrix;
 pub mod ramp;

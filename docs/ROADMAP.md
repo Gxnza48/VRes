@@ -127,6 +127,7 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 
 - [x] Atajo para mostrar u ocultar el crosshair (si un perfil de juego lo controla, el cambio vale mientras ese juego siga al frente)
 - [x] La misma combinación no se puede usar para dos atajos, y un atajo que ocupa otro programa ya no impide guardar los demás ajustes
+- [x] `vres-cli lut`: un look como LUT 3D (`.cube`) para videos (sin publicar todavía)
 - [ ] A ojo: el atajo muestra y oculta la mira sobre un juego en ventana sin bordes
 
 ## F9 — Control desde el celular (descartada)
