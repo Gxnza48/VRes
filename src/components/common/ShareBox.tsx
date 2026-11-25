@@ -28,6 +28,8 @@ export function ShareBox({ kind, encode, onDecoded }: ShareBoxProps) {
   const [pasted, setPasted] = useState("");
   const [problem, setProblem] = useState<string | null>(null);
   const [clamped, setClamped] = useState(false);
+  // La mira vino de un código de VALORANT o CS2 (traducida).
+  const [imported, setImported] = useState<string | null>(null);
 
   const copy = async () => {
     setCopyFailed(false);
@@ -44,6 +46,7 @@ export function ShareBox({ kind, encode, onDecoded }: ShareBoxProps) {
   const read = async () => {
     setProblem(null);
     setClamped(false);
+    setImported(null);
     const decoded = await ipc.shareDecode(pasted).catch(() => null);
     if (!decoded) {
       setProblem(t("share.errors.badPrefix"));
@@ -58,6 +61,7 @@ export function ShareBox({ kind, encode, onDecoded }: ShareBoxProps) {
       return;
     }
     setClamped(decoded.clamped);
+    setImported(decoded.source ? t(`share.games.${decoded.source}`) : null);
     setPasted("");
     onDecoded(decoded);
   };
@@ -105,6 +109,11 @@ export function ShareBox({ kind, encode, onDecoded }: ShareBoxProps) {
         </p>
       )}
       {clamped && <p className="text-sm text-warning">{t("share.clamped")}</p>}
+      {imported && (
+        <p role="status" className="text-sm text-success">
+          {t("share.imported", { game: imported })}
+        </p>
+      )}
     </div>
   );
 }

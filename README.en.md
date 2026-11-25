@@ -44,7 +44,7 @@ It is built for the Latin-American gaming community: **truly free** (no paid pla
 | **Dark Boost** while holding (or toggling) a key or a mouse button, Mouse 4 and 5 included; ships disarmed | ✅ Available | v0.7 |
 | **Home:** your main config (colors, crosshair, resolution and hotkeys) in one place, always or **only in games** | ✅ Available | v0.10 |
 | **Potato graphics** for NVIDIA (flat textures, more FPS) in ROB RUN, from the game's driver profile | ✅ Available | v0.10 |
-| 24 built-in crosshairs and a [web gallery](https://vresolution.vercel.app/miras) with their codes | ✅ Available | v0.10 |
+| 24 built-in crosshairs, a [web gallery](https://vresolution.vercel.app/miras) with their codes and import of **VALORANT and CS2** crosshair codes | ✅ Available | v0.10 |
 | **Customize:** theme, accent color, interface size and your own background (image or GIF). Diagnostic report without personal data | ✅ Available | v0.8 – v0.9 |
 | Per-GPU custom resolutions and a signed installer | 🗓 Planned | v1.0 |
 

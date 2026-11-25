@@ -9,6 +9,19 @@ use crate::Report;
 
 /// `vres-cli share decode CODE`: muestra qué hay en un código.
 pub fn decode(code: &str) -> Report {
+    if let Some(result) = vres_core::game_codes::decode(code) {
+        return match result {
+            Ok((source, crosshair)) => {
+                let value = json!({ "ok": true, "kind": "crosshair", "source": source, "crosshair": crosshair });
+                let text = serde_json::to_string_pretty(&value).unwrap_or_default();
+                Report::ok(value, text)
+            }
+            Err(error) => Report::fail(
+                json!({ "ok": false, "error": error.to_string() }),
+                format!("No se pudo leer el código del juego ({error})."),
+            ),
+        };
+    }
     let kind = match share::kind_of(code) {
         Ok(kind) => kind,
         Err(error) => {

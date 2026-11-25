@@ -13,6 +13,7 @@ pub mod appearance;
 pub mod color;
 pub mod crosshair;
 pub mod enhancers;
+pub mod game_codes;
 pub mod ipc;
 pub mod keys;
 pub mod looks;

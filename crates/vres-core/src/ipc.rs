@@ -73,6 +73,10 @@ pub struct ShareDecoded {
     pub clamped: bool,
     /// Por qué no se pudo leer (si no se pudo).
     pub error: Option<ShareError>,
+    /// La mira vino de un código de otro juego (traducida, aproximada).
+    #[ts(optional)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<crate::game_codes::GameCodeSource>,
 }
 
 /// Un juego conocido (looks por juego y, más adelante, perfiles).

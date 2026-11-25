@@ -24,6 +24,7 @@ VRes se distribuye bajo [GPL-3.0-or-later](LICENSE) e incluye o usa software de 
 La implementación de las capas de driver se basa en documentación y SDK públicos:
 
 - [NVIDIA NVAPI](https://github.com/NVIDIA/nvapi) (MIT).
+- [akiver/csgo-sharecode](https://github.com/akiver/csgo-sharecode) (MIT): disposición de los bytes de los códigos de mira de CS2 (`crates/vres-core/src/game_codes.rs`).
 - [AMD Display Library (ADL)](https://github.com/GPUOpen-LibrariesAndSDKs/display-library): las estructuras se declaran en Rust; no se incluyen las cabeceras del SDK.
 - [Intel Graphics Control Library](https://github.com/intel/drivers.gpu.control-library): ídem.
 - Documentación pública de Microsoft: Magnification API, GDI, configuración de pantalla (CCD), DDC/CI.

@@ -526,10 +526,10 @@
     "lookTitle": "Share the look",
     "lookDescription": "Send it over Discord or WhatsApp as text, or paste a friend's.",
     "crosshairTitle": "Share the crosshair",
-    "crosshairDescription": "A text code with your crosshair; paste a friend's to try it.",
+    "crosshairDescription": "A text code with your crosshair; paste a friend's to try it. It also takes VALORANT (0;P;…) and CS2 (CSGO-… or CS…) crosshair codes.",
     "placeholder": {
       "look": "VRL1-…",
-      "crosshair": "VRC1-…",
+      "crosshair": "VRC1-…, or a VALORANT or CS2 code",
       "resolution": "VRR1-…"
     },
     "errors": {
@@ -541,6 +541,11 @@
       "tooLong": "The code is too long.",
       "truncated": "The code is cut off.",
       "imageNotShareable": "Image crosshairs don't fit in a code."
+    },
+    "imported": "Crosshair imported from {{game}}. It's an approximation: tweak it and save it.",
+    "games": {
+      "valorant": "VALORANT",
+      "cs2": "Counter-Strike 2"
     }
   },
   "library": {

@@ -135,6 +135,7 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 - [x] Pestaña Inicio con la config principal (colores, mira, resolución y atajos) y «solo en juegos»
 - [x] Pantalla completa exclusiva detectada (`SHQueryUserNotificationState`): la saturación pasa a la vibrance del driver
 - [x] 24 miras propias y galería en la web con sus códigos (la app no la carga)
+- [x] Importar códigos de mira de VALORANT y CS2 (`CSGO-…` y `CS…`)
 - [x] Gráficos potato para NVIDIA (perfil DRS del juego; administrador solo al guardar) y ROB RUN como juego reconocido
 - [x] Casillas, deslizadores y barras de desplazamiento propias
 - [x] Se quitan el Zoom y la pestaña Personalizar

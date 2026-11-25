@@ -15,6 +15,7 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 - **Pantalla completa exclusiva**: VRes la detecta y pasa la saturación a la vibrance del driver (NVIDIA o AMD), que sí se ve ahí. Al volver a ventana, regresa la matriz.
 - **16 miras nuevas** (24 en total) y el botón **Explorar miras**, que abre la galería en la web ([vresolution.vercel.app/miras](https://vresolution.vercel.app/miras)) con el código de cada una para pegar en Compartir. La app no carga la galería.
 - Pestaña **Potato** (NVIDIA): texturas bajas o «potato» para ROB RUN desde el perfil del juego en el driver, la misma base de ajustes que el panel de NVIDIA. Guardar en el driver pide permiso de administrador (aviso de Windows) solo en ese momento; «Normal» lo quita.
+- **Códigos de mira de VALORANT y CS2**: se pegan en Crosshair › Compartir y VRes los traduce a su mira (una aproximación: VRes dibuja un solo juego de brazos). CS2 acepta los formatos `CSGO-…` y `CS…`.
 - ROB RUN entre los juegos reconocidos (perfiles y «solo en juegos»).
 - `vres-cli potato status | set` y `vres-cli share presets`.
 - `vres-cli lut`: exporta un look como LUT 3D (`.cube`) para editores de video, con la misma matriz y rampa que VRes aplica en pantalla (las grabaciones de juegos no las ven). Toma el look de un código, de un JSON o el que VRes tiene aplicado (`--current`).

@@ -526,10 +526,10 @@
     "lookTitle": "Compartir el look",
     "lookDescription": "Pásalo por Discord o WhatsApp como texto, o pega el de un amigo.",
     "crosshairTitle": "Compartir el crosshair",
-    "crosshairDescription": "Un código de texto con tu mira; pega el de un amigo para probarla.",
+    "crosshairDescription": "Un código de texto con tu mira; pega el de un amigo para probarla. También acepta códigos de mira de VALORANT (0;P;…) y CS2 (CSGO-… o CS…).",
     "placeholder": {
       "look": "VRL1-…",
-      "crosshair": "VRC1-…",
+      "crosshair": "VRC1-…, o un código de VALORANT o CS2",
       "resolution": "VRR1-…"
     },
     "errors": {
@@ -541,6 +541,11 @@
       "tooLong": "El código es demasiado largo.",
       "truncated": "El código está cortado.",
       "imageNotShareable": "Los crosshairs de imagen no entran en un código."
+    },
+    "imported": "Mira importada de {{game}}. Es una aproximación: ajústala a gusto y guárdala.",
+    "games": {
+      "valorant": "VALORANT",
+      "cs2": "Counter-Strike 2"
     }
   },
   "library": {

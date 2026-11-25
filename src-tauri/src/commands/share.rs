@@ -1,11 +1,12 @@
 //! Códigos para compartir y looks incluidos.
 
 use vres_core::crosshair::Crosshair;
+use vres_core::game_codes::{self, GameCodeError};
 use vres_core::ipc::{GameInfo, IpcError, ShareDecoded};
 use vres_core::looks::{self, LookPreset};
 use vres_core::model::look::Look;
 use vres_core::model::resolution::ModeRequest;
-use vres_core::share::{self, ShareKind};
+use vres_core::share::{self, ShareError, ShareKind};
 
 /// Código de un look.
 #[tauri::command]
@@ -35,7 +36,24 @@ pub async fn share_decode(code: String) -> Result<ShareDecoded, IpcError> {
         resolution: None,
         clamped: false,
         error: None,
+        source: None,
     };
+    // Códigos de mira de VALORANT y CS2: se traducen a una mira de VRes.
+    if let Some(result) = game_codes::decode(&code) {
+        decoded.kind = Some(ShareKind::Crosshair);
+        match result {
+            Ok((source, crosshair)) => {
+                decoded.source = Some(source);
+                decoded.crosshair = Some(crosshair);
+            }
+            Err(GameCodeError::BadChar) => decoded.error = Some(ShareError::BadChar),
+            Err(GameCodeError::BadChecksum) => decoded.error = Some(ShareError::BadChecksum),
+            Err(GameCodeError::UnsupportedVersion) => {
+                decoded.error = Some(ShareError::UnsupportedVersion);
+            }
+        }
+        return Ok(decoded);
+    }
     match share::kind_of(&code) {
         Err(error) => decoded.error = Some(error),
         Ok(kind) => {
