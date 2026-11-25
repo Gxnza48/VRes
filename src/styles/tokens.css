@@ -26,6 +26,14 @@
   --vr-warning: #ffb020;
   --vr-danger: #ff4d4f;
 
+  /* Partners: dorado del sello "Partner oficial" y azul de Discord. */
+  --vr-gold: #f5c542;
+  --vr-gold-light: #fff4c2;
+  --vr-gold-dark: #b8860b;
+  --vr-discord: #5865f2;
+  --vr-discord-fg: #ffffff;
+  --vr-scrim: rgb(0 0 0 / 0.82);
+
   --vr-radius-card: 16px;
   --vr-font-sans: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
   --vr-font-display: "Orbitron", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;

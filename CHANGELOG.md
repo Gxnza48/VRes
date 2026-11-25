@@ -4,6 +4,12 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.10.3] - 2026-11-27
+
+### Agregado
+
+- **Partner oficial: ROB RUN LATAM.** Banner en Inicio con el Discord de la comunidad latinoamericana de ROB RUN.
+
 ## [0.10.2] - 2026-11-26
 
 ### Corregido

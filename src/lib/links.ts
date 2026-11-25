@@ -16,3 +16,5 @@ export function openSite(url: string): void {
   if (inTauri()) void ipc.openExternal(url);
   else window.open(url, "_blank", "noopener");
 }
+/** Servidor partner oficial: la comunidad latinoamericana de ROB RUN. */
+export const PARTNER_ROBRUN_DISCORD_URL = "https://discord.gg/fnJNph5fp8";

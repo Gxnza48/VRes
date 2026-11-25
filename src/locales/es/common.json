@@ -797,5 +797,12 @@
       "hybrid": "En notebooks con dos placas, el juego tiene que usar la NVIDIA (Configuración de Windows › Pantalla › Gráficos).",
       "undo": "Queda guardado aunque cierres VRes. Para volver, elige «Normal»."
     }
+  },
+  "partner": {
+    "badge": "Partner oficial",
+    "name": "ROB RUN LATAM",
+    "text": "Supervivencia en Latinoamérica: la comunidad de ROB RUN para partidas, clanes, clips y ayuda.",
+    "cta": "Unirme al Discord",
+    "aria": "Abrir el Discord de ROB RUN LATAM, partner oficial de VRes"
   }
 }

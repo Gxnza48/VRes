@@ -797,5 +797,12 @@
       "hybrid": "On laptops with two GPUs, the game has to run on the NVIDIA one (Windows Settings › Display › Graphics).",
       "undo": "It stays saved even if you close VRes. To go back, pick “Normal”."
     }
+  },
+  "partner": {
+    "badge": "Official partner",
+    "name": "ROB RUN LATAM",
+    "text": "Survival in Latin America: the ROB RUN community for matches, clans, clips and help.",
+    "cta": "Join the Discord",
+    "aria": "Open the Discord of ROB RUN LATAM, an official VRes partner"
   }
 }

@@ -14,6 +14,9 @@
   --color-success: var(--vr-success);
   --color-warning: var(--vr-warning);
   --color-danger: var(--vr-danger);
+  --color-gold: var(--vr-gold);
+  --color-discord: var(--vr-discord);
+  --color-discord-fg: var(--vr-discord-fg);
 
   --radius-card: var(--vr-radius-card);
   --font-sans: var(--vr-font-sans);
@@ -188,5 +191,82 @@
   }
   input[type="range"]:disabled {
     cursor: not-allowed;
+  }
+}
+
+/* Sello "Partner oficial": dorado con brillo que recorre el texto y respira. */
+.partner-gold {
+  background-image: linear-gradient(
+    100deg,
+    var(--vr-gold-dark) 0%,
+    var(--vr-gold) 30%,
+    var(--vr-gold-light) 45%,
+    var(--vr-gold) 60%,
+    var(--vr-gold-dark) 100%
+  );
+  background-size: 250% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--vr-gold) 55%, transparent));
+  animation:
+    partner-glint 3.2s linear infinite,
+    partner-fade 3.2s ease-in-out infinite;
+}
+
+/* Destello diagonal que cruza el banner. */
+.partner-sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    color-mix(in srgb, var(--vr-gold-light) 28%, transparent) 50%,
+    transparent 65%
+  );
+  transform: translateX(-100%);
+  animation: partner-sweep 4.8s ease-in-out infinite;
+}
+
+.partner-scrim {
+  background: linear-gradient(90deg, var(--vr-scrim) 0%, color-mix(in srgb, var(--vr-scrim) 55%, transparent) 45%, transparent 75%);
+}
+
+@keyframes partner-glint {
+  from {
+    background-position: 125% 0;
+  }
+  to {
+    background-position: -125% 0;
+  }
+}
+
+@keyframes partner-fade {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.72;
+  }
+}
+
+@keyframes partner-sweep {
+  0%,
+  55% {
+    transform: translateX(-100%);
+  }
+  85%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partner-gold,
+  .partner-sweep::after {
+    animation: none;
   }
 }
