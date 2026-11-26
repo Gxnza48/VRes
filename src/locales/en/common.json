@@ -745,6 +745,19 @@
       "manage": "Profiles",
       "none": "No game has its own config yet.",
       "active": "in use"
+    },
+    "paste": {
+      "title": "Paste a setup",
+      "description": "Paste a friend's setup (what \"Copy my setup\" copies) and everything applies at once: colors, crosshair and resolution. Single codes work too, including VALORANT and CS2 crosshair codes.",
+      "apply": "Apply setup",
+      "done": "Applied: {{parts}}.",
+      "parts": {
+        "look": "colors",
+        "crosshair": "crosshair",
+        "resolution": "resolution (confirm it in the window)"
+      },
+      "failed_one": "One code couldn't be read: check that it's complete.",
+      "failed_other": "{{count}} codes couldn't be read: check that they're complete."
     }
   },
   "potato": {

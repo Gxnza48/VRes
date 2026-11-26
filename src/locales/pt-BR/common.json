@@ -745,6 +745,19 @@
       "manage": "Perfis",
       "none": "Nenhum jogo tem config própria ainda.",
       "active": "em uso"
+    },
+    "paste": {
+      "title": "Colar um setup",
+      "description": "Cole o setup de um amigo (o que «Copiar meu setup» copia) e tudo se aplica de uma vez: cores, mira e resolução. Também aceita códigos soltos, inclusive os de mira do VALORANT e do CS2.",
+      "apply": "Aplicar setup",
+      "done": "Aplicado: {{parts}}.",
+      "parts": {
+        "look": "cores",
+        "crosshair": "mira",
+        "resolution": "resolução (confirme na janela)"
+      },
+      "failed_one": "Um código não pôde ser lido: confira se está completo.",
+      "failed_other": "{{count}} códigos não puderam ser lidos: confira se estão completos."
     }
   },
   "potato": {

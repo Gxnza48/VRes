@@ -4,6 +4,12 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.10.1] - 2026-11-25
+
+### Agregado
+
+- **Pegar un setup** en Inicio: pegas las tres líneas que copia «Copiar mi setup» (o códigos sueltos, también de mira de VALORANT y CS2) y se aplican juntos los colores, la mira y la resolución (con la confirmación de siempre).
+
 ## [0.10.0] - 2026-11-25
 
 **Inicio, miras nuevas, pantalla completa y gráficos potato.**

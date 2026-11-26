@@ -32,6 +32,8 @@ import { useCatalogStore } from "@/state/catalog";
 import { useEngineStore } from "@/state/engine";
 import { saveSettings, useSettingsStore } from "@/state/settings";
 
+import { SetupPaste } from "./SetupPaste";
+
 /** Tarjeta de un bloque de la config principal, con su botón para editarlo. */
 function SummaryCard({
   icon,
@@ -347,6 +349,8 @@ export function HomePage() {
           )}
         </CardContent>
       </Card>
+
+      <SetupPaste />
     </div>
   );
 }
