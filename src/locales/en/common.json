@@ -366,7 +366,8 @@
     "backgroundInvalid": "That image won't work: it must be PNG, JPEG, GIF or WebP, up to 25 MB.",
     "potatoUnavailable": "There's no NVIDIA driver with game profiles.",
     "potatoCancelled": "Nothing changed: you need to accept the administrator prompt.",
-    "potatoFailed": "The driver didn't save the change. Try again or restart the PC."
+    "potatoFailed": "The driver didn't save the change. Try again or restart the PC.",
+    "potatoGameRunning": "Nothing changed: close the game and try again."
   },
   "crosshair": {
     "title": "Crosshair",
@@ -788,6 +789,7 @@
     "applying": "Saving to the driver… accept the Windows prompt.",
     "restart": "Done. Close and reopen the game to see it.",
     "custom": "This game already had its own texture setting in the driver (for example, from Profile Inspector). Picking a level replaces it.",
+    "legacy": "Your NVIDIA driver is for an older card and may ignore the driver setting. So VRes also lowers the texture limit in the game settings: pick the level with the game closed and don't change textures in its graphics menu.",
     "how": {
       "title": "How it works",
       "driver": "It changes the textures' “LOD Bias” in the game's NVIDIA driver profile. It works in DirectX 11 games, like ROB RUN.",

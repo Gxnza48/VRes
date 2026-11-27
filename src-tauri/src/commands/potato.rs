@@ -85,6 +85,19 @@ fn apply_blocking(game_id: &str, level: PotatoLevel) -> Result<Vec<PotatoStatus>
     let Some(target) = game(game_id) else {
         return Err(IpcError::new(ErrorCode::PotatoUnavailable, "unknown game"));
     };
+    // Driver viejo: además se cambia el archivo de ajustes del juego, que el
+    // juego reescribe al cerrarse. Por eso tiene que estar cerrado.
+    let legacy = nvdrs::driver_version().is_some_and(potato::legacy_driver);
+    if legacy
+        && process::process_names()
+            .values()
+            .any(|exe| exe.eq_ignore_ascii_case(&target.executable))
+    {
+        return Err(IpcError::new(
+            ErrorCode::PotatoGameRunning,
+            "game is running",
+        ));
+    }
     match nvdrs::potato_apply(&target, level) {
         Ok(()) => {}
         Err(error) if nvdrs::needs_admin(&error) => {
@@ -111,6 +124,10 @@ fn apply_blocking(game_id: &str, level: PotatoLevel) -> Result<Vec<PotatoStatus>
             };
             return Err(IpcError::new(code, error.to_string()));
         }
+    }
+    if legacy {
+        super::potato_file::apply(&target.id, level)
+            .map_err(|error| IpcError::new(ErrorCode::PotatoFailed, error))?;
     }
     let status = all_status();
     let applied = status

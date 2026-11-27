@@ -366,7 +366,8 @@
     "backgroundInvalid": "Esa imagen no sirve: tiene que ser PNG, JPEG, GIF o WebP de hasta 25 MB.",
     "potatoUnavailable": "No hay driver de NVIDIA con perfiles de juego.",
     "potatoCancelled": "No se cambió nada: hace falta aceptar el aviso de administrador.",
-    "potatoFailed": "El driver no guardó el cambio. Prueba de nuevo o reinicia la PC."
+    "potatoFailed": "El driver no guardó el cambio. Prueba de nuevo o reinicia la PC.",
+    "potatoGameRunning": "No se cambió nada: cierra el juego y vuelve a intentarlo."
   },
   "crosshair": {
     "title": "Crosshair",
@@ -788,6 +789,7 @@
     "applying": "Guardando en el driver… acepta el aviso de Windows.",
     "restart": "Listo. Cierra y vuelve a abrir el juego para verlo.",
     "custom": "Este juego ya tenía un ajuste de texturas propio en el driver (por ejemplo, de Profile Inspector). Al elegir un nivel, VRes lo reemplaza.",
+    "legacy": "Tu driver de NVIDIA es de una placa vieja y puede ignorar el ajuste del driver. Por eso VRes también baja el límite de texturas en los ajustes del juego: elige el nivel con el juego cerrado y no cambies las texturas en su menú de gráficos.",
     "how": {
       "title": "Cómo funciona",
       "driver": "Cambia el «LOD Bias» de las texturas en el perfil del juego del driver de NVIDIA. Funciona en juegos DirectX 11, como ROB RUN.",

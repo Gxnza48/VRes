@@ -4,6 +4,12 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.10.2] - 2026-11-26
+
+### Corregido
+
+- **Potato en placas NVIDIA viejas** (driver anterior a la rama 500, como la GT 730 con el 475): esos drivers pueden ignorar el LOD Bias en DirectX 11. Ahora VRes, además del perfil del driver, baja el límite de texturas en el archivo de ajustes de ROB RUN (con el juego cerrado) y devuelve el valor del jugador al elegir «Normal». Con drivers actuales no cambia nada.
+
 ## [0.10.1] - 2026-11-25
 
 ### Agregado

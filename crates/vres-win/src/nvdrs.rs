@@ -14,7 +14,7 @@ use std::ptr::null_mut;
 use windows::Win32::Foundation::{FreeLibrary, HMODULE};
 use windows::core::w;
 
-use crate::vibrance::{driver_error, load_system_dll, symbol, typed};
+use crate::vibrance::{driver_error, load_system_dll, symbol, typed, typed_optional};
 use crate::{WinError, WinResult};
 
 const NVAPI_OK: i32 = 0;
@@ -38,6 +38,7 @@ const DRS_CREATE_APPLICATION: u32 = 0x4347_A9DE;
 const DRS_GET_SETTING: u32 = 0x73BF_8338;
 const DRS_SET_SETTING: u32 = 0x577D_D202;
 const DRS_DELETE_PROFILE_SETTING: u32 = 0xE4A2_6362;
+const SYS_GET_DRIVER_AND_BRANCH_VERSION: u32 = 0x2926_AAAD;
 
 const UNICODE_LEN: usize = 2048;
 type UnicodeString = [u16; UNICODE_LEN];
@@ -105,6 +106,7 @@ type CreateApplication = unsafe extern "C" fn(Handle, Handle, *mut DrsApplicatio
 type GetSetting = unsafe extern "C" fn(Handle, Handle, u32, *mut DrsSetting) -> i32;
 type SetSetting = unsafe extern "C" fn(Handle, Handle, *mut DrsSetting) -> i32;
 type DeleteSetting = unsafe extern "C" fn(Handle, Handle, u32) -> i32;
+type DriverVersion = unsafe extern "C" fn(*mut u32, *mut [u8; 64]) -> i32;
 
 /// Valor de un ajuste en el perfil de un juego.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -161,6 +163,7 @@ struct Api {
     get_setting: GetSetting,
     set_setting: SetSetting,
     delete_setting: DeleteSetting,
+    driver_version: Option<DriverVersion>,
 }
 
 impl Api {
@@ -208,6 +211,7 @@ impl Api {
                 get_setting: typed(function(DRS_GET_SETTING)?),
                 set_setting: typed(function(DRS_SET_SETTING)?),
                 delete_setting: typed(function(DRS_DELETE_PROFILE_SETTING)?),
+                driver_version: typed_optional(function(SYS_GET_DRIVER_AND_BRANCH_VERSION)),
             })
         }
     }
@@ -345,6 +349,17 @@ pub fn available() -> bool {
     Session::open().is_ok()
 }
 
+/// Versión del driver en centésimas (475.14 = 47514), si se puede leer.
+pub fn driver_version() -> Option<u32> {
+    let api = Api::load().ok()?;
+    let get = api.driver_version?;
+    let mut version = 0u32;
+    let mut branch = [0u8; 64];
+    // SAFETY: ambos punteros viven durante la llamada; la rama mide 64 bytes.
+    let status = unsafe { get(&mut version, &mut branch) };
+    (status == NVAPI_OK && version > 0).then_some(version)
+}
+
 /// Lee los ajustes `ids` del perfil del ejecutable (sin cambiar nada).
 pub fn read(executable: &str, ids: &[u32]) -> WinResult<Vec<SettingValue>> {
     let session = Session::open()?;
@@ -406,6 +421,7 @@ pub fn potato_status(game: &vres_core::potato::PotatoGame) -> vres_core::potato:
                 game: game.clone(),
                 level,
                 custom,
+                legacy: driver_version().is_some_and(vres_core::potato::legacy_driver),
             }
         }
         Err(_) => PotatoStatus {
@@ -413,6 +429,7 @@ pub fn potato_status(game: &vres_core::potato::PotatoGame) -> vres_core::potato:
             game: game.clone(),
             level: PotatoLevel::Off,
             custom: false,
+            legacy: false,
         },
     }
 }

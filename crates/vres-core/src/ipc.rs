@@ -191,6 +191,8 @@ pub enum ErrorCode {
     PotatoCancelled,
     /// El driver no guardó los ajustes.
     PotatoFailed,
+    /// Hay que cerrar el juego para cambiar su archivo de ajustes.
+    PotatoGameRunning,
 }
 
 /// Error que devuelven todos los comandos de Tauri.

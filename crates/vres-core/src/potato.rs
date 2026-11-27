@@ -82,6 +82,57 @@ pub struct PotatoStatus {
     pub level: PotatoLevel,
     /// El perfil tiene ajustes de LOD que no son de VRes.
     pub custom: bool,
+    /// Driver viejo (rama anterior a 500, placas como la GT 730) que puede
+    /// ignorar el LOD Bias en DirectX 11: VRes además baja el límite de
+    /// texturas en el archivo de ajustes del juego.
+    pub legacy: bool,
+}
+
+/// Primera rama del driver de NVIDIA en la que VRes confía para el LOD Bias
+/// en DirectX 11 (las anteriores son de placas Kepler y más viejas).
+pub const MODERN_DRIVER: u32 = 50_000;
+
+/// `true` si el driver (versión en centésimas: 475.14 = 47514) es de una rama
+/// anterior a la 500.
+pub fn legacy_driver(version: u32) -> bool {
+    version > 0 && version < MODERN_DRIVER
+}
+
+/// Clave del límite de texturas de Unity en los ajustes de ROB RUN.
+pub const MIPMAP_KEY: &str = "global_texture_mipmap_limit";
+
+/// Límite de texturas para un nivel (`None` = volver al del jugador).
+/// Cada paso divide la textura a la mitad; 15 deja solo el color promedio.
+pub fn mipmap_limit(level: PotatoLevel) -> Option<u32> {
+    match level {
+        PotatoLevel::Off => None,
+        PotatoLevel::Low => Some(3),
+        PotatoLevel::Potato => Some(15),
+    }
+}
+
+/// Posición del número de `"clave":` en un JSON plano (sin parsearlo, para no
+/// reescribir el resto del archivo del juego).
+fn number_span(text: &str, key: &str) -> Option<(usize, usize)> {
+    let pattern = format!("\"{key}\":");
+    let start = text.find(&pattern)? + pattern.len();
+    let digits = text[start..]
+        .bytes()
+        .take_while(|byte| byte.is_ascii_digit())
+        .count();
+    (digits > 0).then_some((start, start + digits))
+}
+
+/// Lee un entero de un JSON plano.
+pub fn read_int(text: &str, key: &str) -> Option<u32> {
+    let (start, end) = number_span(text, key)?;
+    text[start..end].parse().ok()
+}
+
+/// Cambia un entero de un JSON plano y deja todo lo demás igual.
+pub fn write_int(text: &str, key: &str, value: u32) -> Option<String> {
+    let (start, end) = number_span(text, key)?;
+    Some(format!("{}{value}{}", &text[..start], &text[end..]))
 }
 
 /// Valores a escribir para un nivel (`None` = quitar el ajuste del perfil).
@@ -139,6 +190,31 @@ mod tests {
             assert_eq!(detect(&values(level)), (level, false));
         }
         assert_eq!(detect(&[(LOD_BIAS_DX, Some(8))]), (PotatoLevel::Off, true));
+    }
+
+    #[test]
+    fn legacy_is_before_branch_500() {
+        assert!(legacy_driver(47514));
+        assert!(!legacy_driver(50000));
+        assert!(!legacy_driver(58102));
+        assert!(!legacy_driver(0));
+    }
+
+    #[test]
+    fn edits_only_the_mipmap_number() {
+        let text = r#"{"anisotropic_filtering":2,"global_texture_mipmap_limit":2,"fullscreen_setting":true}"#;
+        assert_eq!(read_int(text, MIPMAP_KEY), Some(2));
+        let edited = write_int(text, MIPMAP_KEY, 15).unwrap();
+        assert_eq!(
+            edited,
+            r#"{"anisotropic_filtering":2,"global_texture_mipmap_limit":15,"fullscreen_setting":true}"#
+        );
+        assert_eq!(read_int(&edited, MIPMAP_KEY), Some(15));
+        assert_eq!(write_int("{}", MIPMAP_KEY, 1), None);
+        assert_eq!(
+            read_int(r#"{"global_texture_mipmap_limit":"x"}"#, MIPMAP_KEY),
+            None
+        );
     }
 
     #[test]

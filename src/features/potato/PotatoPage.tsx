@@ -117,6 +117,7 @@ export function PotatoPage() {
                 </p>
               )}
               {status.custom && <p className="text-xs text-warning">{t("potato.custom")}</p>}
+              {status.legacy && <p className="text-xs text-muted">{t("potato.legacy")}</p>}
             </CardContent>
           </Card>
         ))}

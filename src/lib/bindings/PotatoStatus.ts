@@ -17,4 +17,10 @@ level: PotatoLevel,
 /**
  * El perfil tiene ajustes de LOD que no son de VRes.
  */
-custom: boolean, };
+custom: boolean, 
+/**
+ * Driver viejo (rama anterior a 500, placas como la GT 730) que puede
+ * ignorar el LOD Bias en DirectX 11: VRes además baja el límite de
+ * texturas en el archivo de ajustes del juego.
+ */
+legacy: boolean, };

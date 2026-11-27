@@ -10,6 +10,8 @@ pub mod diag;
 pub mod engine;
 pub mod enhancers;
 pub mod potato;
+#[cfg(windows)]
+mod potato_file;
 pub mod profiles;
 pub mod resolution;
 pub mod settings;

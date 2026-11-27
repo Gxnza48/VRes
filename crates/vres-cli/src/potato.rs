@@ -29,7 +29,24 @@ pub fn status() -> Report {
         })
         .collect::<Vec<_>>()
         .join("\n");
-    Report::ok(json!({ "ok": true, "games": games }), text)
+    let driver = nvdrs::driver_version();
+    let text = match driver {
+        Some(version) => format!(
+            "{text}\nDriver de NVIDIA: {}.{:02}{}",
+            version / 100,
+            version % 100,
+            if potato::legacy_driver(version) {
+                " (viejo: también se cambia el archivo del juego)"
+            } else {
+                ""
+            }
+        ),
+        None => text,
+    };
+    Report::ok(
+        json!({ "ok": true, "games": games, "driverVersion": driver }),
+        text,
+    )
 }
 
 /// `vres-cli potato set LEVEL`: pone el nivel en ROB RUN.
