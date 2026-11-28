@@ -193,6 +193,12 @@ pub enum ErrorCode {
     PotatoFailed,
     /// Hay que cerrar el juego para cambiar su archivo de ajustes.
     PotatoGameRunning,
+    /// El juego está abierto: hay que cerrarlo para cambiar sus ajustes.
+    GameRunning,
+    /// No está el archivo de ajustes del juego (nunca se abrió en esta PC).
+    GameTuneNotFound,
+    /// No se pudo escribir el archivo de ajustes del juego.
+    GameTuneFailed,
 }
 
 /// Error que devuelven todos los comandos de Tauri.

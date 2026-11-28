@@ -26,7 +26,7 @@ fn settings_dir(game_id: &str) -> Option<PathBuf> {
 }
 
 /// Archivos de ajustes del juego (uno por cuenta de Steam).
-fn settings_files(game_id: &str) -> Vec<PathBuf> {
+pub(super) fn settings_files(game_id: &str) -> Vec<PathBuf> {
     let Some(dir) = settings_dir(game_id) else {
         return Vec::new();
     };
@@ -59,7 +59,7 @@ fn load_originals(path: &Path) -> BTreeMap<String, u32> {
 }
 
 /// Escribe en un temporal y lo reemplaza, para no dejar el archivo a medias.
-fn write_atomic(path: &Path, text: &str) -> std::io::Result<()> {
+pub(super) fn write_atomic(path: &Path, text: &str) -> std::io::Result<()> {
     let temporary = path.with_extension("vres-tmp");
     fs::write(&temporary, text)?;
     fs::rename(&temporary, path)

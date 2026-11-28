@@ -4,6 +4,12 @@ Todos los cambios importantes de VRes se documentan acá. El formato sigue [Keep
 
 ## [Sin publicar]
 
+## [0.11.0] - 2026-11-28
+
+### Agregado
+
+- **Pestaña «FPS»:** pone los gráficos de ROB RUN en los valores que más FPS dan (sombras, HBAO, reflejos, desenfoque, profundidad de campo y luces adicionales apagados; pasto, agua y distancia de objetos al mínimo; contador de FPS encendido). Cambia el archivo de ajustes que escribe el menú del juego, solo con el juego cerrado y con valores de ese menú, y guarda los del jugador para «Restaurar mis ajustes». Funciona con cualquier placa.
+
 ## [0.10.3] - 2026-11-27
 
 ### Agregado

@@ -3,6 +3,7 @@ import {
   Cpu,
   Crosshair,
   Gamepad2,
+  Gauge,
   House,
   Layers,
   type LucideIcon,
@@ -21,6 +22,7 @@ export const TAB_IDS = [
   "profiles",
   "enhancers",
   "potato",
+  "fps",
   "more",
 ] as const;
 
@@ -42,6 +44,7 @@ export const TABS: readonly TabDefinition[] = [
   { id: "profiles", icon: Gamepad2, phase: "F6" },
   { id: "enhancers", icon: MoonStar, phase: "F7" },
   { id: "potato", icon: Cpu, phase: "v0.10" },
+  { id: "fps", icon: Gauge, phase: "v0.11" },
   { id: "more", icon: Settings, phase: "F0" },
 ];
 

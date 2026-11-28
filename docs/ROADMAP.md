@@ -141,6 +141,11 @@ Con **F2**, VRes ya ofrece gratis todo lo que la competencia ofrece en su plan g
 - [x] Se quitan el Zoom y la pestaña Personalizar
 - [ ] A ojo: el potato se ve en ROB RUN tras reabrirlo; la saturación sigue en pantalla completa exclusiva
 
+## v0.11 — Más FPS
+
+- [x] Pestaña FPS: preset «máximo FPS» para ROB RUN en su archivo de ajustes (juego cerrado, valores de su menú) con restauración
+- [ ] A ojo: los FPS suben en ROB RUN y «Restaurar mis ajustes» devuelve todo
+
 ## F9 — Control desde el celular (descartada)
 
 Se decidió no hacerla: VRes no abre ningún servidor ni puerto.

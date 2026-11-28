@@ -9,6 +9,7 @@ pub mod customize;
 pub mod diag;
 pub mod engine;
 pub mod enhancers;
+pub mod game_tune;
 pub mod potato;
 #[cfg(windows)]
 mod potato_file;

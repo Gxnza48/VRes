@@ -4,6 +4,7 @@ import { EnhancersPage } from "@/features/enhancers/EnhancersPage";
 import { HomePage } from "@/features/home/HomePage";
 import { LibraryPage } from "@/features/library/LibraryPage";
 import { PotatoPage } from "@/features/potato/PotatoPage";
+import { FpsPage } from "@/features/fps/FpsPage";
 import { ProfilesPage } from "@/features/profiles/ProfilesPage";
 import { PartnerBanner } from "@/components/common/PartnerBanner";
 import { MorePage } from "@/features/more/MorePage";
@@ -50,6 +51,8 @@ export function Shell() {
             <EnhancersPage />
           ) : tab.id === "potato" ? (
             <PotatoPage />
+          ) : tab.id === "fps" ? (
+            <FpsPage />
           ) : (
             <MorePage />
           )}

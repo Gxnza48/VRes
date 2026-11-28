@@ -112,6 +112,8 @@ pub fn run() {
             commands::profiles::games_running_candidates,
             commands::potato::potato_status,
             commands::potato::potato_apply,
+            commands::game_tune::game_tune_status,
+            commands::game_tune::game_tune_apply,
             commands::enhancers::enhancers_state,
             commands::enhancers::enhancers_key_supported,
             commands::customize::customize_background_set,

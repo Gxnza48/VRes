@@ -44,6 +44,7 @@ Está pensado para la comunidad gamer de Latinoamérica: es **gratis de verdad**
 | **Dark Boost** manteniendo (o alternando) una tecla o un botón del mouse, incluidos Mouse 4 y 5; viene desarmado | ✅ Disponible | v0.7 |
 | **Inicio:** tu config principal (colores, mira, resolución y atajos) en un lugar, siempre o **solo en juegos** | ✅ Disponible | v0.10 |
 | **Gráficos potato** para NVIDIA (texturas planas, más FPS) en ROB RUN, desde el perfil del juego en el driver | ✅ Disponible | v0.10 |
+| **Más FPS** en ROB RUN: pone sus gráficos en los valores de más FPS (con el juego cerrado, solo valores de su menú) y los restaura cuando quieras; cualquier placa | ✅ Disponible | v0.11 |
 | 24 miras propias, [galería en la web](https://vresolution.vercel.app/miras) con sus códigos e importación de códigos de mira de **VALORANT y CS2** | ✅ Disponible | v0.10 |
 | Resoluciones personalizadas por GPU e instalador firmado | 🗓 Planeado | v1.0 |
 

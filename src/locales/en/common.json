@@ -18,7 +18,8 @@
     "enhancers": "Dark Boost",
     "more": "More",
     "home": "Home",
-    "potato": "Potato"
+    "potato": "Potato",
+    "fps": "FPS"
   },
   "phase": {
     "badge": "Coming in phase {{phase}}",
@@ -367,7 +368,10 @@
     "potatoUnavailable": "There's no NVIDIA driver with game profiles.",
     "potatoCancelled": "Nothing changed: you need to accept the administrator prompt.",
     "potatoFailed": "The driver didn't save the change. Try again or restart the PC.",
-    "potatoGameRunning": "Nothing changed: close the game and try again."
+    "potatoGameRunning": "Nothing changed: close the game and try again.",
+    "gameRunning": "Nothing changed: close the game and try again.",
+    "gameTuneNotFound": "We couldn't find the game's settings. Open it once and close it.",
+    "gameTuneFailed": "Couldn't change the game's settings file."
   },
   "crosshair": {
     "title": "Crosshair",
@@ -804,5 +808,59 @@
     "text": "Survival in Latin America: the ROB RUN community for matches, clans, clips and help.",
     "cta": "Join the Discord",
     "aria": "Open the Discord of ROB RUN LATAM, an official VRes partner"
+  },
+  "fps": {
+    "title": "More FPS",
+    "subtitle": "Sets the game's graphics to the values that give the most FPS, using the same options as its menu. Works with any GPU: NVIDIA, AMD or Intel.",
+    "game": {
+      "description": "Shadows, effects and grass at minimum. Resolution and FPS limit stay the same."
+    },
+    "state": {
+      "applied": "Max FPS",
+      "player": "Your settings"
+    },
+    "notFound": "We couldn't find the game's settings on this PC. Open the game once, close it and come back.",
+    "running": "The game is open. Close it to change its settings: the game rewrites them when it closes.",
+    "apply": "Apply max FPS ({{n}} changes)",
+    "alreadyMax": "Already at max FPS",
+    "restore": "Restore my settings",
+    "check": "I closed it",
+    "applying": "Changing the settings…",
+    "done": "Done. Open the game and check the FPS counter at the top.",
+    "restored": "Done: the game has your previous settings again.",
+    "keys": {
+      "setting_quality": "Overall quality",
+      "anti_aliasing_mode_id_setting": "Anti-aliasing",
+      "cast_shadow_setting": "Shadows",
+      "additional_cast_lights_setting": "Additional lights",
+      "hbao_setting": "Ambient occlusion (HBAO)",
+      "screen_space_reflections_setting": "Reflections",
+      "depth_of_field": "Depth of field",
+      "motion_blur_setting": "Motion blur",
+      "settings_grass": "Grass",
+      "grass_vibile_distance_factor_setting": "Grass distance",
+      "settings_water": "Water",
+      "renderers_culling_preset_id_setting": "Object distance",
+      "performance_info_fps": "FPS counter"
+    },
+    "values": {
+      "true": "Yes",
+      "false": "No",
+      "disabled": "Off",
+      "minimum": "Minimum",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "ultra": "Ultra",
+      "custom": "Custom"
+    },
+    "how": {
+      "title": "How it works",
+      "menu": "VRes edits the settings file written by the game's graphics menu, with the game closed and only with values that menu offers. It never touches the game while it runs.",
+      "anyGpu": "It doesn't depend on your GPU: it works on NVIDIA, AMD and Intel, and on laptops.",
+      "untouched": "It doesn't change resolution, render scale, FPS limit or controls. You can adjust anything later from the game's menu.",
+      "potato": "With NVIDIA you can add Potato for even more FPS.",
+      "steam": "\"Restore my settings\" puts everything back as it was. If Steam asks which settings to keep, choose the ones on this PC."
+    }
   }
 }

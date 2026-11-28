@@ -18,7 +18,8 @@
     "enhancers": "Dark Boost",
     "more": "Más",
     "home": "Inicio",
-    "potato": "Potato"
+    "potato": "Potato",
+    "fps": "FPS"
   },
   "phase": {
     "badge": "Llega en la fase {{phase}}",
@@ -367,7 +368,10 @@
     "potatoUnavailable": "No hay driver de NVIDIA con perfiles de juego.",
     "potatoCancelled": "No se cambió nada: hace falta aceptar el aviso de administrador.",
     "potatoFailed": "El driver no guardó el cambio. Prueba de nuevo o reinicia la PC.",
-    "potatoGameRunning": "No se cambió nada: cierra el juego y vuelve a intentarlo."
+    "potatoGameRunning": "No se cambió nada: cierra el juego y vuelve a intentarlo.",
+    "gameRunning": "No se cambió nada: cierra el juego y vuelve a intentarlo.",
+    "gameTuneNotFound": "No encontramos los ajustes del juego. Ábrelo una vez y ciérralo.",
+    "gameTuneFailed": "No se pudo cambiar el archivo de ajustes del juego."
   },
   "crosshair": {
     "title": "Crosshair",
@@ -804,5 +808,59 @@
     "text": "Supervivencia en Latinoamérica: la comunidad de ROB RUN para partidas, clanes, clips y ayuda.",
     "cta": "Unirme al Discord",
     "aria": "Abrir el Discord de ROB RUN LATAM, partner oficial de VRes"
+  },
+  "fps": {
+    "title": "Más FPS",
+    "subtitle": "Pone los gráficos del juego en los valores que más FPS dan, con las mismas opciones de su menú. Funciona con cualquier placa: NVIDIA, AMD o Intel.",
+    "game": {
+      "description": "Sombras, efectos y pasto al mínimo. No cambia la resolución ni el límite de FPS."
+    },
+    "state": {
+      "applied": "Máximo FPS",
+      "player": "Tus ajustes"
+    },
+    "notFound": "No encontramos los ajustes del juego en esta PC. Abre el juego una vez, ciérralo y vuelve.",
+    "running": "El juego está abierto. Ciérralo para cambiar sus ajustes: el juego los reescribe al cerrarse.",
+    "apply": "Aplicar máximo FPS ({{n}} cambios)",
+    "alreadyMax": "Ya está en máximo FPS",
+    "restore": "Restaurar mis ajustes",
+    "check": "Ya lo cerré",
+    "applying": "Cambiando los ajustes…",
+    "done": "Listo. Abre el juego y mira el contador de FPS arriba.",
+    "restored": "Listo: el juego vuelve a tener tus ajustes de antes.",
+    "keys": {
+      "setting_quality": "Calidad general",
+      "anti_aliasing_mode_id_setting": "Antialiasing",
+      "cast_shadow_setting": "Sombras",
+      "additional_cast_lights_setting": "Luces adicionales",
+      "hbao_setting": "Oclusión ambiental (HBAO)",
+      "screen_space_reflections_setting": "Reflejos",
+      "depth_of_field": "Profundidad de campo",
+      "motion_blur_setting": "Desenfoque de movimiento",
+      "settings_grass": "Pasto",
+      "grass_vibile_distance_factor_setting": "Distancia del pasto",
+      "settings_water": "Agua",
+      "renderers_culling_preset_id_setting": "Distancia de objetos",
+      "performance_info_fps": "Contador de FPS"
+    },
+    "values": {
+      "true": "Sí",
+      "false": "No",
+      "disabled": "Apagado",
+      "minimum": "Mínimo",
+      "low": "Bajo",
+      "medium": "Medio",
+      "high": "Alto",
+      "ultra": "Ultra",
+      "custom": "Personalizada"
+    },
+    "how": {
+      "title": "Cómo funciona",
+      "menu": "VRes cambia el archivo de ajustes que escribe el menú de gráficos del juego, con el juego cerrado y solo con valores que ese menú ofrece. No toca el juego mientras corre.",
+      "anyGpu": "No depende de la placa: sirve en NVIDIA, AMD e Intel, y en notebooks.",
+      "untouched": "No cambia la resolución, la escala de render, el límite de FPS ni los controles. Puedes ajustar cualquier cosa después desde el menú del juego.",
+      "potato": "Con NVIDIA puedes sumar el Potato para ganar todavía más FPS.",
+      "steam": "«Restaurar mis ajustes» devuelve todo como lo tenías. Si Steam pregunta qué ajustes conservar, elige los de esta PC."
+    }
   }
 }
